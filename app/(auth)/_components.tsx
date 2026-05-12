@@ -86,7 +86,7 @@ export function BrandPanel() {
 
         <div className="mt-12 rounded-2xl border border-white/20 bg-white/10 p-5">
           <p className="text-sm italic text-white/75">
-            "Desde que comecei a usar o NutriWeek, perdi 8 kg em 3 meses sem passar fome. A organização faz toda a diferença!"
+            &ldquo;Desde que comecei a usar o NutriWeek, perdi 8 kg em 3 meses sem passar fome. A organização faz toda a diferença!&rdquo;
           </p>
           <div className="mt-3 flex items-center gap-3">
             <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold text-white">

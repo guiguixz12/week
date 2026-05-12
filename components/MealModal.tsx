@@ -227,6 +227,7 @@ export function MealModal({
       document.addEventListener('keydown', onKey)
       return () => document.removeEventListener('keydown', onKey)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   // ── Populate from existingSlot ─────────────────────────────────────────────
@@ -448,7 +449,7 @@ export function MealModal({
                 {results.length === 0 ? (
                   <li className="py-10 text-center text-sm text-gray-400">
                     Nenhum alimento encontrado para{' '}
-                    <span className="font-medium">"{query}"</span>
+                    <span className="font-medium">&ldquo;{query}&rdquo;</span>
                   </li>
                 ) : results.map(food => {
                   const isAdded = selectedItems.some(i => i.food.id === food.id)

@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Check,
   ClipboardCopy,
-  Loader2,
   Pencil,
   RefreshCw,
   Share2,
@@ -391,7 +390,7 @@ export default function ComprasPage() {
   const [mealNames,   setMealNames]   = useState<string[]>([])
   const [isDemo,      setIsDemo]      = useState(false)
   const [loading,     setLoading]     = useState(true)
-  const [weekStart,   setWeekStart]   = useState<Date>(() => getMondayOf(new Date()))
+  const [weekStart] = useState<Date>(() => getMondayOf(new Date()))
 
   const [checked,     setChecked]     = useState<Set<string>>(new Set())
   const [prices,      setPrices]      = useState<Record<string, number>>({})
@@ -482,7 +481,7 @@ export default function ComprasPage() {
   function toggleItem(id: string) {
     setChecked(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
       try { localStorage.setItem(lsCheckedKey(weekStartStr), JSON.stringify(Array.from(next))) } catch { /* noop */ }
       return next
     })
