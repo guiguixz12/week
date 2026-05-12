@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { PENDING_PLAN_KEY } from '@/lib/profile'
 import type { DayPlan, MealSlot, MealType, WeekPlan } from '@/types'
 import { AIGeneratorDrawer } from './AIGeneratorDrawer'
 
@@ -235,6 +236,19 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal }: Weekl
     () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
     [weekStart],
   )
+
+  // Apply pending plan generated during onboarding (one-shot)
+  useEffect(() => {
+    const raw = localStorage.getItem(PENDING_PLAN_KEY)
+    if (!raw) return
+    try {
+      const plan = JSON.parse(raw) as WeekPlan
+      setAiPlan(plan)
+      setWeekStart(getMondayOf(new Date()))
+    } catch { /* noop */ } finally {
+      localStorage.removeItem(PENDING_PLAN_KEY)
+    }
+  }, [])
 
   // AI plan is week-specific; clear it when navigating away
   useEffect(() => { setAiPlan(null) }, [weekStart])

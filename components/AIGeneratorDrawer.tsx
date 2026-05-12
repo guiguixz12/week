@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Loader2, RefreshCw, Sparkles, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getProfile } from '@/lib/profile'
 import type { DayPlan, MealSlot, MealType, WeekPlan } from '@/types'
 
 // ─── API response types ───────────────────────────────────────────────────────
@@ -139,6 +140,26 @@ export function AIGeneratorDrawer({
       setVisible(false)
       const t = setTimeout(() => setRendered(false), 300)
       return () => clearTimeout(t)
+    }
+  }, [isOpen])
+
+  // Pre-fill from saved profile when drawer opens
+  useEffect(() => {
+    if (!isOpen) return
+    const profile = getProfile()
+    if (profile.metas.kcal_dia) setCalories(profile.metas.kcal_dia)
+    if (profile.alimentos_nao_gosta) setAvoidFoods(profile.alimentos_nao_gosta)
+    if (profile.preferencias.length > 0) {
+      const prefMap: Record<string, string> = {
+        vegetariano: 'vegetariano',
+        sem_gluten:  'sem glúten',
+        low_carb:    'low carb',
+        sem_lactose: 'sem lactose',
+      }
+      const mapped = profile.preferencias
+        .map(p => prefMap[p])
+        .filter(Boolean)
+      setPrefs(new Set(mapped))
     }
   }, [isOpen])
 
