@@ -13,15 +13,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# All secrets passed as build args so they are available at both
-# build time and baked into the runner image as ENV vars.
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG OPENAI_API_KEY
-
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV OPENAI_API_KEY=$OPENAI_API_KEY
+# NEXT_PUBLIC_* vars come from .env.production (committed to repo).
+# Do NOT set them here — an empty ARG/ENV would override .env.production.
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
