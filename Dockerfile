@@ -37,10 +37,14 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public          ./public
 
+COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 USER nextjs
 
 EXPOSE 3000
 
-# EasyPanel injects env vars (like OPENAI_API_KEY) directly into the container.
-# Node.js reads them via process.env at runtime — no entrypoint.sh needed.
-CMD ["node", "server.js"]
+# EasyPanel creates /app/.env from the "Ambiente" settings.
+# entrypoint.sh sources that file before starting Node so
+# process.env.OPENAI_API_KEY is available at runtime.
+CMD ["/app/entrypoint.sh"]
