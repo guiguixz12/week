@@ -108,7 +108,11 @@ function extractJSON(text: string): WeeklyPlan {
 
 // ─── Route handler ────────────────────────────────────────────────────────────
 
-const client = new OpenAI()
+// Placeholder prevents the SDK from throwing at module-load time during build.
+// The real key must be set in EasyPanel → Environment Variables → OPENAI_API_KEY.
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || 'placeholder',
+})
 
 export async function POST(req: NextRequest) {
   try {
