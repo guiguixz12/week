@@ -13,11 +13,17 @@ import { BrandPanel, NutriWeekLogo } from '../_components'
 // ─── Error translation ────────────────────────────────────────────────────────
 
 function translateError(msg: string): string {
-  if (msg.includes('User already registered'))   return 'Este email já está cadastrado.'
+  if (msg.includes('User already registered'))    return 'Este email já está cadastrado.'
+  if (msg.includes('user_already_exists'))        return 'Este email já está cadastrado.'
   if (msg.includes('Password should be at least')) return 'A senha deve ter pelo menos 6 caracteres.'
-  if (msg.includes('rate limit'))                return 'Muitas tentativas. Aguarde alguns minutos.'
-  if (msg.includes('invalid email'))             return 'Email inválido.'
-  return 'Ocorreu um erro. Tente novamente.'
+  if (msg.includes('rate limit'))                 return 'Muitas tentativas. Aguarde alguns minutos.'
+  if (msg.includes('over_email_send_rate_limit')) return 'Muitas tentativas. Aguarde alguns minutos.'
+  if (msg.includes('invalid email'))              return 'Email inválido.'
+  if (msg.includes('Email signups are disabled')) return 'Cadastro por email está desativado no Supabase.'
+  if (msg.includes('signup_disabled'))            return 'Cadastros estão desativados no momento.'
+  if (msg.includes('email_address_not_authorized')) return 'Este email não está autorizado.'
+  // Mostra o erro original para diagnóstico
+  return `Erro: ${msg}`
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
