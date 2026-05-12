@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowLeft,
   Check,
@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getRecipes } from '@/lib/store'
 import type { MacroInfo, MealSlot, MealType } from '@/types'
 
 // ─── Local types ──────────────────────────────────────────────────────────────
@@ -22,6 +23,7 @@ interface FoodItem {
   caloriesPer100g: number
   macrosPer100g: MacroInfo
   defaultGrams: number
+  isRecipe?: boolean
 }
 
 interface SelectedItem {
@@ -179,8 +181,10 @@ export interface MealModalProps {
   date: string         // YYYY-MM-DD
   mealType: MealType
   existingSlot?: MealSlot
+  weekStart?: string
   onClose: () => void
   onSave: (slot: Omit<MealSlot, 'id'>) => void
+  onDelete?: () => void
 }
 
 // ─── MealModal ────────────────────────────────────────────────────────────────
@@ -192,6 +196,7 @@ export function MealModal({
   existingSlot,
   onClose,
   onSave,
+  onDelete,
 }: MealModalProps) {
   // Animation states: rendered keeps DOM alive during exit, visible drives CSS
   const [rendered, setRendered] = useState(false)
@@ -332,11 +337,27 @@ export function MealModal({
   }
 
   // ── Derived state ──────────────────────────────────────────────────────────
-  const results = FOODS.filter(f =>
-    query.trim() === ''
-      ? true
-      : f.name.toLowerCase().includes(query.toLowerCase().trim()),
-  ).slice(0, 9)
+  const q = query.toLowerCase().trim()
+
+  // User recipes converted to FoodItem format (shown first)
+  const recipeItems: FoodItem[] = useMemo(() => getRecipes()
+    .filter(r => !q || r.nome.toLowerCase().includes(q))
+    .slice(0, 3)
+    .map(r => ({
+      id:              `recipe-${r.id}`,
+      name:            r.nome,
+      emoji:           r.emoji,
+      caloriesPer100g: r.calorias,
+      macrosPer100g:   { protein: r.proteina, carbs: r.carbs, fat: r.gordura },
+      defaultGrams:    100,
+      isRecipe:        true,
+    })), [q])
+
+  const foodItems = FOODS
+    .filter(f => !q || f.name.toLowerCase().includes(q))
+    .slice(0, Math.max(0, 9 - recipeItems.length))
+
+  const results: FoodItem[] = [...recipeItems, ...foodItems]
 
   const totals   = sumTotals(selectedItems)
   const hasItems = selectedItems.length > 0
@@ -467,12 +488,19 @@ export function MealModal({
                       >
                         <span className="shrink-0 text-xl">{food.emoji}</span>
                         <div className="min-w-0 flex-1">
-                          <p className={cn(
-                            'truncate text-sm font-semibold',
-                            isAdded ? 'text-brand' : 'text-gray-800',
-                          )}>
-                            {food.name}
-                          </p>
+                          <div className="flex items-center gap-1.5">
+                            <p className={cn(
+                              'truncate text-sm font-semibold',
+                              isAdded ? 'text-brand' : 'text-gray-800',
+                            )}>
+                              {food.name}
+                            </p>
+                            {food.isRecipe && (
+                              <span className="shrink-0 rounded-full bg-brand/10 px-1.5 py-0.5 text-[10px] font-semibold text-brand">
+                                Minha receita
+                              </span>
+                            )}
+                          </div>
                           <p className="mt-0.5 text-xs text-gray-400">
                             {food.defaultGrams}g ·{' '}
                             <span className="text-orange-500 font-medium">{preview.calories} kcal</span>
@@ -685,20 +713,31 @@ export function MealModal({
         </div>
 
         {/* ── Footer ──────────────────────────────────────────────────────── */}
-        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-gray-100 bg-white px-5 py-4">
-          <button
-            onClick={handleClose}
-            className="rounded-xl px-5 py-2.5 text-sm font-semibold text-gray-500 transition-colors hover:bg-gray-100"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!hasItems}
-            className="rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-600 disabled:pointer-events-none disabled:opacity-40"
-          >
-            Salvar refeição
-          </button>
+        <div className="flex shrink-0 items-center gap-3 border-t border-gray-100 bg-white px-5 py-4">
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-red-500 transition-colors hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+              Excluir
+            </button>
+          )}
+          <div className="flex flex-1 items-center justify-end gap-3">
+            <button
+              onClick={handleClose}
+              className="rounded-xl px-5 py-2.5 text-sm font-semibold text-gray-500 transition-colors hover:bg-gray-100"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={!hasItems}
+              className="rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-600 disabled:pointer-events-none disabled:opacity-40"
+            >
+              Salvar refeição
+            </button>
+          </div>
         </div>
       </div>
     </div>

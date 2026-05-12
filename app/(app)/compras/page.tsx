@@ -522,6 +522,7 @@ export default function ComprasPage() {
       if (!user) {
         setMealNames(DEMO_MEAL_NAMES)
         setIsDemo(true)
+        if (showToast) toast('Lista atualizada', 'success')
         return
       }
 
@@ -529,6 +530,7 @@ export default function ComprasPage() {
       if (!result || result.slots.length === 0) {
         setMealNames(DEMO_MEAL_NAMES)
         setIsDemo(true)
+        if (showToast) toast('Lista atualizada', 'success')
         return
       }
 

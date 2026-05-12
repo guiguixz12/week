@@ -10,6 +10,7 @@ import {
 import { cn } from '@/lib/utils'
 import { toast } from '@/lib/toast'
 import { getPreferences, savePreferences, type UserPreferences } from '@/lib/store'
+import { getProfile, saveProfile, type DietaryPref } from '@/lib/profile'
 import { supabase } from '@/lib/supabase'
 
 // ─── Toggle ───────────────────────────────────────────────────────────────────
@@ -64,7 +65,15 @@ const DIETARY_PREFS: { key: keyof UserPreferences; label: string; desc: string }
 ]
 
 export default function ConfiguracoesPage() {
-  const [prefs, setPrefs]   = useState<UserPreferences>(getPreferences)
+  const [prefs, setPrefs]   = useState<UserPreferences>(() => {
+    const p = getPreferences()
+    // Bug 9: fall back to profile nome if preferences nome is empty
+    if (!p.nome) {
+      const profile = getProfile()
+      if (profile.nome) p.nome = profile.nome
+    }
+    return p
+  })
   const [saving, setSaving] = useState(false)
   const avatarInputRef      = useRef<HTMLInputElement>(null)
 
@@ -73,9 +82,6 @@ export default function ConfiguracoesPage() {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user?.email && !prefs.email) {
         setPrefs(p => ({ ...p, email: data.user!.email! }))
-      }
-      if (data.user?.user_metadata?.nome && !prefs.nome) {
-        setPrefs(p => ({ ...p, nome: data.user!.user_metadata.nome as string }))
       }
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,7 +94,16 @@ export default function ConfiguracoesPage() {
   async function handleSave() {
     setSaving(true)
     savePreferences(prefs)
-    // Optionally sync name to Supabase user metadata
+
+    // Bug 5: sync dietary prefs + nome to nw_profile so all pages read consistent data
+    const dietaryKeys: DietaryPref[] = ['vegetariano', 'vegano', 'sem_gluten', 'sem_lactose', 'low_carb', 'cetogenico']
+    const preferencias = dietaryKeys.filter(k => !!prefs[k as keyof UserPreferences])
+    saveProfile({
+      nome:                prefs.nome,
+      preferencias,
+      alimentos_nao_gosta: prefs.alimentos_evitar,
+    })
+
     try {
       if (prefs.nome) {
         await supabase.auth.updateUser({ data: { nome: prefs.nome } })

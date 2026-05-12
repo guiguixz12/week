@@ -95,7 +95,7 @@ function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
               <Clock className="h-3 w-3" />{recipe.tempo_preparo} min
             </span>
             <span className="flex items-center gap-1">
-              <BookOpen className="h-3 w-3" />{recipe.porcoes} porção{recipe.porcoes !== 1 ? 'ões' : ''}
+              <BookOpen className="h-3 w-3" />{recipe.porcoes} porç{recipe.porcoes !== 1 ? 'ões' : 'ão'}
             </span>
           </div>
         </div>

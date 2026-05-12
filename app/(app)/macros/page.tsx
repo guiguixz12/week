@@ -18,7 +18,7 @@ import {
 } from 'recharts'
 import { Flame, TrendingDown, TrendingUp, Dumbbell } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { supabase } from '@/lib/supabase'
+import { getWeekPlan, getGoals as getStoredGoals } from '@/lib/store'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -56,7 +56,14 @@ const DEMO_KCAL: number[][] = [
   [1720, 2030, 1870, 1990, 2160, 1340, 1980], // 3 weeks ago
 ]
 
-const DEFAULT_GOALS: Goals = { calories: 2000, protein: 150 }
+function loadGoals(): Goals {
+  if (typeof window === 'undefined') return { calories: 2000, protein: 150 }
+  const g = getStoredGoals()
+  return {
+    calories: g.calorias_meta || 2000,
+    protein:  g.proteina_meta || 150,
+  }
+}
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
@@ -179,91 +186,65 @@ function buildDemoData(period: Period): DayData[] {
   })
 }
 
-// ─── Supabase fetcher ─────────────────────────────────────────────────────────
+// ─── localStorage reader ──────────────────────────────────────────────────────
 
-async function fetchPeriodData(userId: string, period: Period): Promise<DayData[] | null> {
+function buildLocalData(period: Period): DayData[] {
   const today         = new Date()
   const currentMonday = getMondayOf(today)
 
-  let startMonday: Date
-  switch (period) {
-    case 'current':  startMonday = currentMonday; break
-    case 'previous': startMonday = addDays(currentMonday, -7); break
-    case 'month':    startMonday = addDays(currentMonday, -21); break
-  }
+  if (period === 'month') {
+    const weeks: DayData[] = []
+    for (let wi = 3; wi >= 0; wi--) {
+      const weekMonday = addDays(currentMonday, -wi * 7)
+      const weekStart  = toLocalISODate(weekMonday)
+      const weekEnd    = addDays(weekMonday, 6)
+      const plan       = getWeekPlan(weekStart)
+      if (!plan) continue
 
-  const startStr = toLocalISODate(startMonday)
-  const endStr   = toLocalISODate(currentMonday) // inclusive of current week start
+      const dayTotals = plan.days
+        .map(d => {
+          const slots = Object.values(d.meals)
+          return {
+            calories: slots.reduce((s, m) => s + (m?.calories ?? 0), 0),
+            protein:  slots.reduce((s, m) => s + (m?.macros.protein ?? 0), 0),
+            carbs:    slots.reduce((s, m) => s + (m?.macros.carbs ?? 0), 0),
+            fat:      slots.reduce((s, m) => s + (m?.macros.fat ?? 0), 0),
+          }
+        })
+        .filter(d => d.calories > 0)
 
-  const { data: plans, error: planErr } = await supabase
-    .from('weekly_plans')
-    .select('id, semana_inicio')
-    .eq('user_id', userId)
-    .gte('semana_inicio', startStr)
-    .lte('semana_inicio', endStr)
-
-  if (planErr || !plans?.length) return null
-
-  const { data: slots, error: slotErr } = await supabase
-    .from('meal_slots')
-    .select('plan_id, dia_semana, calorias, proteina, carbs, gordura')
-    .in('plan_id', plans.map(p => p.id))
-
-  if (slotErr || !slots?.length) return null
-
-  // Map plan_id → semana_inicio
-  const planMap = new Map(plans.map(p => [p.id, p.semana_inicio]))
-
-  // Aggregate per day
-  const dayMap = new Map<string, DayData>()
-
-  for (const slot of slots) {
-    const weekStart = planMap.get(slot.plan_id)
-    if (!weekStart) continue
-
-    const day     = addDays(parseISODate(weekStart), slot.dia_semana)
-    const dateStr = toLocalISODate(day)
-
-    const existing = dayMap.get(dateStr) ?? {
-      dateStr,
-      label:    fmtDay(day),
-      calories: 0,
-      protein:  0,
-      carbs:    0,
-      fat:      0,
+      if (!dayTotals.length) continue
+      const n = dayTotals.length
+      weeks.push({
+        dateStr:  weekStart,
+        label:    `${fmtShort(weekMonday)}–${fmtShort(weekEnd)}`,
+        calories: Math.round(dayTotals.reduce((s, d) => s + d.calories, 0) / n),
+        protein:  Math.round(dayTotals.reduce((s, d) => s + d.protein,  0) / n),
+        carbs:    Math.round(dayTotals.reduce((s, d) => s + d.carbs,    0) / n),
+        fat:      Math.round(dayTotals.reduce((s, d) => s + d.fat,      0) / n),
+      })
     }
-
-    dayMap.set(dateStr, {
-      ...existing,
-      calories: existing.calories + slot.calorias,
-      protein:  existing.protein  + slot.proteina,
-      carbs:    existing.carbs    + slot.carbs,
-      fat:      existing.fat      + slot.gordura,
-    })
+    return weeks
   }
 
-  const days = Array.from(dayMap.values()).sort((a, b) => a.dateStr.localeCompare(b.dateStr))
+  const weekOffset = period === 'previous' ? -7 : 0
+  const monday     = addDays(currentMonday, weekOffset)
+  const weekStart  = toLocalISODate(monday)
+  const plan       = getWeekPlan(weekStart)
+  if (!plan) return []
 
-  if (period !== 'month') return days
-
-  // For month view: aggregate by week
-  const weeks: DayData[] = []
-  for (let wi = 0; wi < 4; wi++) {
-    const wStart  = addDays(startMonday, wi * 7)
-    const wEnd    = addDays(wStart, 6)
-    const wDays   = days.filter(d => d.dateStr >= toLocalISODate(wStart) && d.dateStr <= toLocalISODate(wEnd))
-    if (!wDays.length) continue
-    const n       = wDays.length
-    weeks.push({
-      dateStr:  toLocalISODate(wStart),
-      label:    `${fmtShort(wStart)}–${fmtShort(wEnd)}`,
-      calories: Math.round(wDays.reduce((s, d) => s + d.calories, 0) / n),
-      protein:  Math.round(wDays.reduce((s, d) => s + d.protein,  0) / n),
-      carbs:    Math.round(wDays.reduce((s, d) => s + d.carbs,    0) / n),
-      fat:      Math.round(wDays.reduce((s, d) => s + d.fat,      0) / n),
-    })
-  }
-  return weeks
+  return plan.days.map(d => {
+    const day   = parseISODate(d.date)
+    const slots = Object.values(d.meals)
+    return {
+      dateStr:  d.date,
+      label:    fmtDay(day),
+      calories: slots.reduce((s, m) => s + (m?.calories ?? 0), 0),
+      protein:  slots.reduce((s, m) => s + (m?.macros.protein ?? 0), 0),
+      carbs:    slots.reduce((s, m) => s + (m?.macros.carbs ?? 0), 0),
+      fat:      slots.reduce((s, m) => s + (m?.macros.fat ?? 0), 0),
+    }
+  })
 }
 
 // ─── Computed stats ───────────────────────────────────────────────────────────
@@ -552,7 +533,7 @@ function CaloriesBarChart({ data, goal }: { data: DayData[]; goal: number }) {
               fontWeight: 600,
             }}
           />
-          <Bar dataKey="calories" radius={[5, 5, 0, 0]} maxBarSize={64}>
+          <Bar dataKey="calories" fill={STATUS_COLORS.neutral} radius={[5, 5, 0, 0]} maxBarSize={64}>
             {data.map((entry, i) => (
               <Cell
                 key={i}
@@ -571,40 +552,24 @@ function CaloriesBarChart({ data, goal }: { data: DayData[]; goal: number }) {
 export default function MacrosPage() {
   const [period,   setPeriod]   = useState<Period>('current')
   const [data,     setData]     = useState<DayData[]>([])
-  const [goals,    setGoals]    = useState<Goals>(DEFAULT_GOALS)
+  const [goals,    setGoals]    = useState<Goals>({ calories: 2000, protein: 150 })
   const [loading,  setLoading]  = useState(true)
   const [isDemo,   setIsDemo]   = useState(false)
 
-  // ── Data fetching ─────────────────────────────────────────────────────────
+  // ── Data loading ──────────────────────────────────────────────────────────
 
-  const load = useCallback(async () => {
+  const load = useCallback(() => {
     setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('unauthenticated')
-
-      // Load user goals
-      const { data: profile } = await supabase
-        .from('users')
-        .select('calorias_meta, proteina_meta')
-        .eq('id', user.id)
-        .maybeSingle()
-
-      if (profile) {
-        setGoals({
-          calories: profile.calorias_meta ?? DEFAULT_GOALS.calories,
-          protein:  profile.proteina_meta ?? DEFAULT_GOALS.protein,
-        })
+      setGoals(loadGoals())
+      const rows = buildLocalData(period)
+      if (rows.length > 0) {
+        setData(rows)
+        setIsDemo(false)
+      } else {
+        setData(buildDemoData(period))
+        setIsDemo(true)
       }
-
-      const rows = await fetchPeriodData(user.id, period)
-      if (!rows?.length) throw new Error('no data')
-
-      setData(rows)
-      setIsDemo(false)
-    } catch {
-      setData(buildDemoData(period))
-      setIsDemo(true)
     } finally {
       setLoading(false)
     }

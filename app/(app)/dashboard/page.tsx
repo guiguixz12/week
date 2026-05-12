@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { WeeklyCalendar } from '@/components/WeeklyCalendar'
 import { MealModal }      from '@/components/MealModal'
+import { upsertMealSlot } from '@/lib/store'
 import type { MealSlot, MealType } from '@/types'
 
 interface ModalState {
@@ -15,7 +16,8 @@ interface ModalState {
 const CLOSED: ModalState = { isOpen: false, date: '', mealType: 'breakfast' }
 
 export default function DashboardPage() {
-  const [modal, setModal] = useState<ModalState>(CLOSED)
+  const [modal,     setModal]     = useState<ModalState>(CLOSED)
+  const [weekStart, setWeekStart] = useState('')
 
   function openAdd(date: string, mealType: MealType) {
     setModal({ isOpen: true, date, mealType })
@@ -25,15 +27,25 @@ export default function DashboardPage() {
     setModal({ isOpen: true, date, mealType: slot.mealType, existingSlot: slot })
   }
 
-  function handleSave(slot: Omit<MealSlot, 'id'>) {
-    // TODO: persist via Supabase (lib/db.ts — upsertMealSlot)
-    console.log('Saving slot:', slot, 'date:', modal.date)
+  const handleSave = useCallback((slot: Omit<MealSlot, 'id'>) => {
+    if (!modal.date || !weekStart) return
+    upsertMealSlot(weekStart, modal.date, modal.mealType, slot)
     setModal(CLOSED)
-  }
+  }, [modal.date, modal.mealType, weekStart])
+
+  const handleDelete = useCallback(() => {
+    if (!modal.date || !weekStart) return
+    upsertMealSlot(weekStart, modal.date, modal.mealType, null)
+    setModal(CLOSED)
+  }, [modal.date, modal.mealType, weekStart])
 
   return (
     <>
-      <WeeklyCalendar onAddMeal={openAdd} onEditMeal={openEdit} />
+      <WeeklyCalendar
+        onAddMeal={openAdd}
+        onEditMeal={openEdit}
+        onWeekStartChange={setWeekStart}
+      />
       <MealModal
         isOpen={modal.isOpen}
         date={modal.date}
@@ -41,6 +53,7 @@ export default function DashboardPage() {
         existingSlot={modal.existingSlot}
         onClose={() => setModal(CLOSED)}
         onSave={handleSave}
+        onDelete={modal.existingSlot ? handleDelete : undefined}
       />
     </>
   )

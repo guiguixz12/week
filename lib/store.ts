@@ -1,5 +1,7 @@
 'use client'
 
+import type { WeekPlan, DayPlan, MealSlot, MealType } from '@/types'
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type MealTag =
@@ -170,6 +172,59 @@ export function getPreferences(): UserPreferences {
 
 export function savePreferences(prefs: UserPreferences): void {
   save(PREFS_KEY, prefs)
+}
+
+// ─── Week plan (localStorage persistence) ────────────────────────────────────
+
+const PLAN_PREFIX = 'nw_plan_'
+
+function isoDate(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+function buildEmptyWeek(weekStart: string): DayPlan[] {
+  const base = new Date(`${weekStart}T12:00:00`)
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(base)
+    d.setDate(d.getDate() + i)
+    return { date: isoDate(d), meals: {} }
+  })
+}
+
+export function getWeekPlan(weekStart: string): WeekPlan | null {
+  return load<WeekPlan | null>(`${PLAN_PREFIX}${weekStart}`, null)
+}
+
+export function saveWeekPlan(plan: WeekPlan): void {
+  save(`${PLAN_PREFIX}${plan.weekStart}`, plan)
+}
+
+export function upsertMealSlot(
+  weekStart: string,
+  date: string,
+  mealType: MealType,
+  slot: Omit<MealSlot, 'id'> | null,
+): WeekPlan {
+  const existing = getWeekPlan(weekStart)
+  const days: DayPlan[] = existing?.days.length === 7 ? existing.days : buildEmptyWeek(weekStart)
+  const updatedDays = days.map(d => {
+    if (d.date !== date) return d
+    const meals = { ...d.meals }
+    if (slot === null) {
+      delete meals[mealType]
+    } else {
+      meals[mealType] = { ...slot, id: `${date}-${mealType}` }
+    }
+    return { ...d, meals }
+  })
+  const plan: WeekPlan = {
+    id: existing?.id ?? `local-${weekStart}`,
+    userId: 'local',
+    weekStart,
+    days: updatedDays,
+  }
+  saveWeekPlan(plan)
+  return plan
 }
 
 // ─── Calorie average utility (shared to avoid divergence) ─────────────────────

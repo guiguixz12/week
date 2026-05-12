@@ -35,6 +35,7 @@ interface Notification {
   read: boolean
   time: string
   icon: React.ReactNode
+  href?: string
 }
 
 const MOCK_NOTIFICATIONS: Notification[] = [
@@ -44,6 +45,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
     read: false,
     time: 'Agora',
     icon: <CalendarDays className="h-4 w-4 text-amber-500" />,
+    href: '/dashboard',
   },
   {
     id: '2',
@@ -51,6 +53,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
     read: false,
     time: '2h atrás',
     icon: <Target className="h-4 w-4 text-red-500" />,
+    href: '/macros',
   },
   {
     id: '3',
@@ -58,6 +61,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
     read: true,
     time: 'Ontem',
     icon: <CheckCircle2 className="h-4 w-4 text-brand" />,
+    href: '/compras',
   },
 ]
 
@@ -169,8 +173,15 @@ function GlobalSearch({ onClose }: { onClose: () => void }) {
 
 // ─── NotificationsPanel ───────────────────────────────────────────────────────
 
-function NotificationsPanel({ onClose }: { onClose: () => void }) {
-  const [notifs, setNotifs] = useState(MOCK_NOTIFICATIONS)
+function NotificationsPanel({
+  notifs,
+  setNotifs,
+  onClose,
+}: {
+  notifs: Notification[]
+  setNotifs: React.Dispatch<React.SetStateAction<Notification[]>>
+  onClose: () => void
+}) {
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -204,27 +215,38 @@ function NotificationsPanel({ onClose }: { onClose: () => void }) {
         )}
       </div>
       <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto">
-        {notifs.map(n => (
-          <button
-            key={n.id}
-            onClick={() => markRead(n.id)}
-            className={cn(
-              'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50',
-              !n.read && 'bg-brand/5',
-            )}
-          >
-            <span className="mt-0.5 shrink-0">{n.icon}</span>
-            <div className="flex-1 min-w-0">
-              <p className={cn('text-sm leading-tight', n.read ? 'text-gray-500' : 'font-semibold text-gray-900')}>
-                {n.message}
-              </p>
-              <p className="mt-0.5 text-[11px] text-gray-400">{n.time}</p>
-            </div>
-            {!n.read && (
-              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand" />
-            )}
-          </button>
-        ))}
+        {notifs.map(n => {
+          const inner = (
+            <>
+              <span className="mt-0.5 shrink-0">{n.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className={cn('text-sm leading-tight', n.read ? 'text-gray-500' : 'font-semibold text-gray-900')}>
+                  {n.message}
+                </p>
+                <p className="mt-0.5 text-[11px] text-gray-400">{n.time}</p>
+              </div>
+              {!n.read && (
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand" />
+              )}
+            </>
+          )
+          const cls = cn(
+            'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50',
+            !n.read && 'bg-brand/5',
+          )
+          if (n.href) {
+            return (
+              <Link key={n.id} href={n.href} onClick={() => { markRead(n.id); onClose() }} className={cls}>
+                {inner}
+              </Link>
+            )
+          }
+          return (
+            <button key={n.id} onClick={() => markRead(n.id)} className={cls}>
+              {inner}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
@@ -326,8 +348,9 @@ export function AppHeader({ onMenuClick }: AppHeaderProps) {
   const [searchOpen, setSearchOpen]  = useState(false)
   const [notifOpen, setNotifOpen]    = useState(false)
   const [userOpen, setUserOpen]      = useState(false)
+  const [notifs, setNotifs]          = useState<Notification[]>(MOCK_NOTIFICATIONS)
 
-  const unreadCount = MOCK_NOTIFICATIONS.filter(n => !n.read).length
+  const unreadCount = notifs.filter(n => !n.read).length
 
   const initials = prefs.nome
     ? prefs.nome.split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase()
@@ -373,7 +396,7 @@ export function AppHeader({ onMenuClick }: AppHeaderProps) {
                 </span>
               )}
             </button>
-            {notifOpen && <NotificationsPanel onClose={() => setNotifOpen(false)} />}
+            {notifOpen && <NotificationsPanel notifs={notifs} setNotifs={setNotifs} onClose={() => setNotifOpen(false)} />}
           </div>
 
           {/* User avatar */}

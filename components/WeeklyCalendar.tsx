@@ -12,7 +12,8 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { PENDING_PLAN_KEY } from '@/lib/profile'
+import { PENDING_PLAN_KEY, getProfile } from '@/lib/profile'
+import { getWeekPlan, saveWeekPlan } from '@/lib/store'
 import type { DayPlan, MealSlot, MealType, WeekPlan } from '@/types'
 import { AIGeneratorDrawer } from './AIGeneratorDrawer'
 
@@ -222,14 +223,26 @@ export interface WeeklyCalendarProps {
   initialWeekPlan?: WeekPlan
   onAddMeal?: (date: string, mealType: MealType) => void
   onEditMeal?: (slot: MealSlot, date: string) => void
+  onWeekStartChange?: (weekStart: string) => void
 }
 
-export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal }: WeeklyCalendarProps) {
+type ViewMode = 'week' | 'day'
+
+export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekStartChange }: WeeklyCalendarProps) {
   const [weekStart,    setWeekStart]    = useState<Date>(() => getMondayOf(new Date()))
   const [aiPlan,       setAiPlan]       = useState<WeekPlan | null>(null)
+  const [localPlan,    setLocalPlan]    = useState<WeekPlan | null>(null)
   const [drawerOpen,   setDrawerOpen]   = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [viewMode,     setViewMode]     = useState<ViewMode>('week')
+  const [selectedDay,  setSelectedDay]  = useState<number>(() => {
+    const today = new Date()
+    const monday = getMondayOf(today)
+    const diff = Math.round((today.getTime() - monday.getTime()) / 86400000)
+    return Math.max(0, Math.min(6, diff))
+  })
 
+  const profile  = useMemo(() => getProfile(), [])
   const todayStr = toLocalISODate(new Date())
 
   const weekDays = useMemo(
@@ -237,13 +250,22 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal }: Weekl
     [weekStart],
   )
 
+  // Notify parent of weekStart
+  useEffect(() => {
+    const s = toLocalISODate(weekStart)
+    onWeekStartChange?.(s)
+    setLocalPlan(getWeekPlan(s))
+  }, [weekStart, onWeekStartChange])
+
   // Apply pending plan generated during onboarding (one-shot)
   useEffect(() => {
     const raw = localStorage.getItem(PENDING_PLAN_KEY)
     if (!raw) return
     try {
       const plan = JSON.parse(raw) as WeekPlan
+      saveWeekPlan(plan)
       setAiPlan(plan)
+      setLocalPlan(plan)
       setWeekStart(getMondayOf(new Date()))
     } catch { /* noop */ } finally {
       localStorage.removeItem(PENDING_PLAN_KEY)
@@ -254,8 +276,8 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal }: Weekl
   useEffect(() => { setAiPlan(null) }, [weekStart])
 
   const weekPlan = useMemo(
-    () => aiPlan ?? initialWeekPlan ?? buildSamplePlan(weekStart),
-    [aiPlan, initialWeekPlan, weekStart],
+    () => aiPlan ?? localPlan ?? initialWeekPlan ?? buildSamplePlan(weekStart),
+    [aiPlan, localPlan, initialWeekPlan, weekStart],
   )
 
   const dayPlanMap = useMemo(
@@ -282,6 +304,19 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal }: Weekl
   function prevWeek() { setWeekStart(d => addDays(d, -7)) }
   function nextWeek() { setWeekStart(d => addDays(d, 7))  }
   function goToday()  { setWeekStart(getMondayOf(new Date())) }
+
+  // ── Daily view derived state ───────────────────────────────────────────────
+  const selectedDate    = toLocalISODate(addDays(weekStart, selectedDay))
+  const selectedDayPlan = dayPlanMap[selectedDate]
+  const daySlots        = Object.values(selectedDayPlan?.meals ?? {}) as MealSlot[]
+  const dayKcal         = daySlots.reduce((s, m) => s + m.calories, 0)
+  const dayProt         = daySlots.reduce((s, m) => s + m.macros.protein, 0)
+  const dayCarbs        = daySlots.reduce((s, m) => s + m.macros.carbs, 0)
+  const dayFat          = daySlots.reduce((s, m) => s + m.macros.fat, 0)
+  const kcalGoal        = profile.metas.kcal_dia || 2000
+  const protGoal        = profile.metas.proteina_g || 150
+  const kcalPct         = Math.min(100, Math.round((dayKcal / kcalGoal) * 100))
+  const protPct         = Math.min(100, Math.round((dayProt / protGoal) * 100))
 
   return (
     <>
@@ -325,6 +360,24 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal }: Weekl
             <div className="flex-1">
               <h2 className="text-base font-bold text-gray-900">Planejamento Semanal</h2>
               <p className="mt-0.5 text-xs text-gray-400">{weekLabel}</p>
+            </div>
+
+            {/* View mode toggle */}
+            <div className="flex gap-0.5 rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+              <button
+                onClick={() => setViewMode('week')}
+                className={cn('rounded-md px-2.5 py-1 text-xs font-semibold transition-all',
+                  viewMode === 'week' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700')}
+              >
+                📅 Semanal
+              </button>
+              <button
+                onClick={() => setViewMode('day')}
+                className={cn('rounded-md px-2.5 py-1 text-xs font-semibold transition-all',
+                  viewMode === 'day' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700')}
+              >
+                ☀️ Diário
+              </button>
             </div>
 
             {/* AI generate button */}
@@ -371,8 +424,136 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal }: Weekl
             </div>
           </div>
 
+          {/* Daily view */}
+          {viewMode === 'day' && (
+            <div className="px-6 py-5 space-y-5">
+              {/* Day selector strip */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedDay(d => Math.max(0, d - 1))}
+                  disabled={selectedDay === 0}
+                  className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <div className="flex flex-1 justify-center gap-1">
+                  {weekDays.map((day, i) => {
+                    const ds = toLocalISODate(day)
+                    const isSelected = i === selectedDay
+                    const isToday   = ds === todayStr
+                    return (
+                      <button
+                        key={ds}
+                        onClick={() => setSelectedDay(i)}
+                        className={cn(
+                          'flex flex-col items-center gap-1 rounded-xl px-2.5 py-2 text-xs font-semibold transition-all',
+                          isSelected ? 'bg-brand text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100',
+                        )}
+                      >
+                        <span>{DAY_NAMES[i]}</span>
+                        <span className={cn('flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold',
+                          isSelected ? 'bg-white/20' : isToday ? 'bg-green-100 text-green-700' : '')}>
+                          {day.getDate()}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+                <button
+                  onClick={() => setSelectedDay(d => Math.min(6, d + 1))}
+                  disabled={selectedDay === 6}
+                  className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Progress bars */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div className="mb-2 flex justify-between text-xs font-semibold">
+                    <span className="text-gray-600">Calorias</span>
+                    <span className="text-gray-900">{dayKcal.toLocaleString('pt-BR')} / {kcalGoal.toLocaleString('pt-BR')} kcal ({kcalPct}%)</span>
+                  </div>
+                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
+                    <div
+                      className={cn('h-full rounded-full transition-all duration-500',
+                        kcalPct >= 90 && kcalPct <= 110 ? 'bg-green-500' :
+                        kcalPct >= 75 ? 'bg-amber-400' : 'bg-red-400')}
+                      style={{ width: `${kcalPct}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div className="mb-2 flex justify-between text-xs font-semibold">
+                    <span className="text-gray-600">Proteína</span>
+                    <span className="text-gray-900">{dayProt}g / {protGoal}g ({protPct}%)</span>
+                  </div>
+                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
+                    <div
+                      className={cn('h-full rounded-full transition-all duration-500',
+                        protPct >= 85 ? 'bg-blue-500' : protPct >= 65 ? 'bg-amber-400' : 'bg-red-400')}
+                      style={{ width: `${protPct}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Meal cards */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                {MEAL_ORDER.map(mealType => {
+                  const slot = selectedDayPlan?.meals[mealType]
+                  return (
+                    <div key={mealType} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                      <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">{MEAL_LABELS[mealType]}</p>
+                      {slot ? (
+                        <button
+                          onClick={() => onEditMeal?.(slot, selectedDate)}
+                          className="w-full text-left group"
+                        >
+                          <p className="font-semibold text-gray-800 group-hover:text-brand transition-colors">{slot.name}</p>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            <span className="rounded-md bg-orange-50 px-2 py-0.5 text-[10px] font-bold text-orange-500">🔥 {slot.calories} kcal</span>
+                            <MacroBadge label={`P ${slot.macros.protein}g`} bg="bg-blue-50"  fg="text-blue-600" />
+                            <MacroBadge label={`C ${slot.macros.carbs}g`}   bg="bg-amber-50" fg="text-amber-600" />
+                            <MacroBadge label={`G ${slot.macros.fat}g`}     bg="bg-rose-50"  fg="text-rose-500" />
+                          </div>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => onAddMeal?.(selectedDate, mealType)}
+                          className="flex w-full items-center gap-2 rounded-lg border-2 border-dashed border-gray-200 px-3 py-4 text-sm text-gray-400 hover:border-brand/40 hover:text-brand transition-all"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Adicionar {MEAL_LABELS[mealType].toLowerCase()}
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Daily macro summary */}
+              {daySlots.length > 0 && (
+                <div className="grid grid-cols-4 gap-2 rounded-xl border border-gray-200 bg-gray-50 p-3 text-center">
+                  {[
+                    { label: 'Calorias', value: `${dayKcal}`, unit: 'kcal', color: 'text-orange-500' },
+                    { label: 'Proteína', value: `${dayProt}`, unit: 'g',    color: 'text-blue-500'   },
+                    { label: 'Carbs',    value: `${dayCarbs}`, unit: 'g',   color: 'text-amber-500'  },
+                    { label: 'Gordura',  value: `${dayFat}`,  unit: 'g',    color: 'text-rose-500'   },
+                  ].map(({ label, value, unit, color }) => (
+                    <div key={label}>
+                      <p className={cn('text-lg font-bold leading-none', color)}>{value}<span className="text-xs font-medium text-gray-400">{unit}</span></p>
+                      <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400">{label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Grid */}
-          <div className="overflow-x-auto">
+          <div className={cn('overflow-x-auto', viewMode === 'day' && 'hidden')}>
             <div className="min-w-[860px]">
 
               {/* Day header row */}
@@ -463,7 +644,9 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal }: Weekl
         onClose={() => setDrawerOpen(false)}
         weekStart={weekStart}
         onPlanGenerated={plan => {
+          saveWeekPlan(plan)
           setAiPlan(plan)
+          setLocalPlan(plan)
           setDrawerOpen(false)
         }}
         onGeneratingChange={setIsGenerating}
