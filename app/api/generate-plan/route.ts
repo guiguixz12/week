@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -36,9 +36,9 @@ interface WeeklyPlan {
 
 function buildPrompt(body: GeneratePlanRequest): string {
   const objetivoLabel = {
-    emagrecer:     'emagrecimento (déficit calórico)',
-    manter:        'manutenção de peso',
-    ganhar_massa:  'ganho de massa muscular (superávit calórico)',
+    emagrecer:    'emagrecimento (déficit calórico)',
+    manter:       'manutenção de peso',
+    ganhar_massa: 'ganho de massa muscular (superávit calórico)',
   }[body.objetivo]
 
   const restricoesText = body.restricoes?.length
@@ -73,9 +73,9 @@ O JSON deve seguir exatamente esta estrutura:
         "gordura": 10,
         "ingredientes": ["ingrediente 1", "ingrediente 2"]
       },
-      "lanche": { ... },
-      "almoco": { ... },
-      "jantar": { ... }
+      "lanche": { "nome": "...", "calorias": 0, "proteina": 0, "carbs": 0, "gordura": 0, "ingredientes": [] },
+      "almoco": { "nome": "...", "calorias": 0, "proteina": 0, "carbs": 0, "gordura": 0, "ingredientes": [] },
+      "jantar": { "nome": "...", "calorias": 0, "proteina": 0, "carbs": 0, "gordura": 0, "ingredientes": [] }
     }
   ]
 }
@@ -94,8 +94,6 @@ Regras:
 
 function extractJSON(text: string): WeeklyPlan {
   const trimmed = text.trim()
-
-  // Strip markdown code fences if Claude wraps it anyway
   const fenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/)
   const raw = fenceMatch ? fenceMatch[1].trim() : trimmed
 
@@ -110,7 +108,7 @@ function extractJSON(text: string): WeeklyPlan {
 
 // ─── Route handler ────────────────────────────────────────────────────────────
 
-const client = new Anthropic()
+const client = new OpenAI()
 
 export async function POST(req: NextRequest) {
   try {
@@ -123,35 +121,29 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+    const completion = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
       max_tokens: 4096,
       messages: [
-        {
-          role: 'user',
-          content: buildPrompt(body),
-        },
+        { role: 'user', content: buildPrompt(body) },
       ],
     })
 
-    const textBlock = message.content.find(b => b.type === 'text')
-    if (!textBlock || textBlock.type !== 'text') {
-      throw new Error('Resposta inesperada da API: nenhum bloco de texto.')
+    const content = completion.choices[0]?.message?.content
+    if (!content) {
+      throw new Error('Resposta vazia da API.')
     }
 
-    const plan = extractJSON(textBlock.text)
+    const plan = extractJSON(content)
 
     return NextResponse.json({ plan })
   } catch (err: unknown) {
-    const isAnthropicError = err instanceof Error && err.constructor.name.includes('Anthropic')
     const message =
       err instanceof SyntaxError
         ? 'Erro ao interpretar o plano gerado. Tente novamente.'
-        : isAnthropicError
-          ? 'Erro na comunicação com a IA. Verifique a chave de API.'
-          : err instanceof Error
-            ? err.message
-            : 'Erro desconhecido.'
+        : err instanceof Error
+          ? err.message
+          : 'Erro desconhecido.'
 
     console.error('[generate-plan]', err)
 
