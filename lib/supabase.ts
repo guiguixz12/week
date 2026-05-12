@@ -3,14 +3,14 @@ import type { Database } from '@/types/database'
 
 // ─── Env validation ───────────────────────────────────────────────────────────
 
-const supabaseUrl     = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+// Fallback to placeholder so the module loads at build time without throwing.
+// At runtime, a missing/wrong URL causes API calls to fail gracefully (pages
+// fall back to demo data). Set the real values in your environment.
+const supabaseUrl     = process.env.NEXT_PUBLIC_SUPABASE_URL     || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Supabase env vars not set. Add NEXT_PUBLIC_SUPABASE_URL and ' +
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local'
-  )
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  console.warn('[supabase] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is not set.')
 }
 
 // ─── Typed browser client (singleton — use in Client Components) ──────────────
