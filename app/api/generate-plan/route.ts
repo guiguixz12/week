@@ -109,7 +109,8 @@ function extractJSON(text: string): WeeklyPlan {
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.OPENAI_API_KEY
+  // Bracket notation prevents Next.js from inlining this at build time
+  const apiKey = process.env['OPENAI_API_KEY']
   if (!apiKey) {
     return NextResponse.json({ error: 'OPENAI_API_KEY não configurada no servidor.' }, { status: 500 })
   }
