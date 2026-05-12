@@ -39,13 +39,13 @@ RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nextjs
 
 # Static assets
-COPY --from=builder /app/public ./.next/standalone/public 2>/dev/null || true
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public          ./public
 
 USER nextjs
 
 EXPOSE 3000
 
-# ANTHROPIC_API_KEY is read at runtime — set it in EasyPanel → Environment Variables.
+# OPENAI_API_KEY is read at runtime — set it in EasyPanel → Environment Variables.
 CMD ["node", "server.js"]
