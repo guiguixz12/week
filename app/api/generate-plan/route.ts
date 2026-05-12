@@ -108,13 +108,14 @@ function extractJSON(text: string): WeeklyPlan {
 
 // ─── Route handler ────────────────────────────────────────────────────────────
 
-// Placeholder prevents the SDK from throwing at module-load time during build.
-// The real key must be set in EasyPanel → Environment Variables → OPENAI_API_KEY.
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'placeholder',
-})
-
 export async function POST(req: NextRequest) {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    return NextResponse.json({ error: 'OPENAI_API_KEY não configurada no servidor.' }, { status: 500 })
+  }
+
+  const client = new OpenAI({ apiKey })
+
   try {
     const body = (await req.json()) as GeneratePlanRequest
 
