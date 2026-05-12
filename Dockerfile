@@ -47,9 +47,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public          ./public
 
+COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 USER nextjs
 
 EXPOSE 3000
 
-# OPENAI_API_KEY is read at runtime — set it in EasyPanel → Environment Variables.
-CMD ["node", "server.js"]
+CMD ["/app/entrypoint.sh"]
