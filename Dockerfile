@@ -23,7 +23,7 @@ ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-RUN npm run build
+RUN npm run build && mkdir -p /app/public
 
 # ─── Stage 3: production runner ───────────────────────────────────────────────
 FROM node:20-alpine AS runner
