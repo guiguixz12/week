@@ -112,7 +112,19 @@ export async function POST(req: NextRequest) {
   // Bracket notation prevents Next.js from inlining this at build time
   const apiKey = process.env['OPENAI_API_KEY']
   if (!apiKey) {
-    return NextResponse.json({ error: 'OPENAI_API_KEY não configurada no servidor.' }, { status: 500 })
+    const { existsSync } = await import('fs')
+    return NextResponse.json({
+      error: 'OPENAI_API_KEY não configurada no servidor.',
+      debug: {
+        cwd: process.cwd(),
+        totalEnvVars: Object.keys(process.env).length,
+        hasOpenAIKey: Object.prototype.hasOwnProperty.call(process.env, 'OPENAI_API_KEY'),
+        openAIKeyLength: (process.env['OPENAI_API_KEY'] ?? '').length,
+        envFileExists: existsSync('/app/.env'),
+        envLocalExists: existsSync('/app/.env.local'),
+        envVarNames: Object.keys(process.env).filter(k => k.startsWith('OPENAI') || k.startsWith('NEXT') || k.startsWith('NODE')),
+      }
+    }, { status: 500 })
   }
 
   const client = new OpenAI({ apiKey })
