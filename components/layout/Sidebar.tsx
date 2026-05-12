@@ -12,7 +12,9 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { getPreferences } from '@/lib/store'
+import { supabase } from '@/lib/supabase'
 
 // ─── Nav config ───────────────────────────────────────────────────────────────
 
@@ -63,6 +65,19 @@ function NavItem({ href, label, icon: Icon, active, onClick }: NavItemProps) {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
+  const router   = useRouter()
+  const prefs    = getPreferences()
+
+  const initials = prefs.nome
+    ? prefs.nome.split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase()
+    : 'GS'
+
+  const displayName = prefs.nome ? prefs.nome.split(' ')[0] : 'Usuário'
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
   function isActive(href: string) {
     return pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
@@ -158,22 +173,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           />
 
           {/* User avatar row */}
-          <div className="mt-3 flex items-center gap-3 rounded-lg px-3 py-2.5 group cursor-pointer hover:bg-white/10 transition-colors">
+          <button
+            onClick={handleLogout}
+            className="mt-3 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 group cursor-pointer hover:bg-white/10 transition-colors text-left"
+          >
             <div className="relative shrink-0">
               <div className="h-8 w-8 rounded-full bg-white/25 flex items-center justify-center ring-2 ring-white/20">
-                <span className="text-[11px] font-bold text-white">GS</span>
+                <span className="text-[11px] font-bold text-white">{initials}</span>
               </div>
-              {/* Online dot */}
               <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-300 ring-2 ring-brand" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-white leading-tight truncate">
-                Guilherme
+                {displayName}
               </p>
-              <p className="text-[11px] text-white/45 leading-tight">Plano Pro</p>
+              <p className="text-[11px] text-white/45 leading-tight">Sair</p>
             </div>
             <LogOut className="h-3.5 w-3.5 shrink-0 text-white/30 group-hover:text-white/60 transition-colors" />
-          </div>
+          </button>
         </div>
       </aside>
     </>

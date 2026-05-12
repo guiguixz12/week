@@ -113,11 +113,12 @@ interface MetricCardProps {
   value: string
   bg: string
   fg: string
+  tooltip?: string
 }
 
-function MetricCard({ icon, label, value, bg, fg }: MetricCardProps) {
+function MetricCard({ icon, label, value, bg, fg, tooltip }: MetricCardProps) {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="relative flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm group">
       <div className={cn('shrink-0 rounded-xl p-3', bg)}>
         <span className={fg}>{icon}</span>
       </div>
@@ -127,6 +128,13 @@ function MetricCard({ icon, label, value, bg, fg }: MetricCardProps) {
         </p>
         <p className="mt-0.5 text-2xl font-bold leading-none text-gray-900">{value}</p>
       </div>
+      {tooltip && (
+        <div className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 group-hover:block z-10 pointer-events-none">
+          <div className="rounded-lg bg-gray-800 px-3 py-1.5 text-[11px] text-white shadow-lg whitespace-nowrap">
+            {tooltip}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -272,6 +280,7 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal }: Weekl
             label="Calorias médias"
             value={`${metrics.avgCalories.toLocaleString('pt-BR')} kcal`}
             bg="bg-orange-100" fg="text-orange-500"
+            tooltip={`Média dos ${metrics.plannedDays} dias com refeições planejadas`}
           />
           <MetricCard
             icon={<Dumbbell className="h-5 w-5" />}

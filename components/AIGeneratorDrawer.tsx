@@ -219,8 +219,8 @@ export function AIGeneratorDrawer({
             <h2 className="text-base font-bold text-gray-900">Gerador IA</h2>
           </div>
           <button
-            onClick={onClose}
-            disabled={loading}
+            type="button"
+            onClick={e => { e.stopPropagation(); if (!loading) onClose() }}
             aria-label="Fechar"
             className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-40"
           >

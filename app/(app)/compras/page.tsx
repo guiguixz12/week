@@ -6,6 +6,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Check,
   ClipboardCopy,
+  Mail,
+  MessageCircle,
   Pencil,
   RefreshCw,
   Share2,
@@ -13,6 +15,7 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { toast } from '@/lib/toast'
 import { supabase } from '@/lib/supabase'
 import { getWeekPlanWithSlots } from '@/lib/db'
 
@@ -386,6 +389,93 @@ function CategorySection({
   )
 }
 
+// ─── ShareModal ───────────────────────────────────────────────────────────────
+
+interface ShareModalProps {
+  text: string
+  weekLabel: string
+  onClose: () => void
+}
+
+function ShareModal({ text, weekLabel, onClose }: ShareModalProps) {
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  async function copyText() {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    toast('Lista copiada!', 'success')
+    setTimeout(() => setCopied(false), 2500)
+  }
+
+  function shareWhatsApp() {
+    const encoded = encodeURIComponent(text.slice(0, 1500))
+    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank')
+    onClose()
+  }
+
+  function shareEmail() {
+    const subject = encodeURIComponent(`Lista de Compras NutriWeek — ${weekLabel}`)
+    const body = encodeURIComponent(text)
+    window.location.href = `mailto:?subject=${subject}&body=${body}`
+    onClose()
+  }
+
+  return (
+    <div
+      ref={overlayRef}
+      onClick={e => { if (e.target === overlayRef.current) onClose() }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+    >
+      <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+          <h2 className="font-bold text-gray-900">Compartilhar lista</h2>
+          <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="space-y-2.5 p-5">
+          <button
+            onClick={shareWhatsApp}
+            className="flex w-full items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-semibold text-gray-800 hover:border-green-400 hover:bg-green-50 transition-all"
+          >
+            <MessageCircle className="h-5 w-5 text-green-500" />
+            Compartilhar via WhatsApp
+          </button>
+
+          <button
+            onClick={shareEmail}
+            className="flex w-full items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-semibold text-gray-800 hover:border-blue-400 hover:bg-blue-50 transition-all"
+          >
+            <Mail className="h-5 w-5 text-blue-500" />
+            Enviar por Email
+          </button>
+
+          <button
+            onClick={copyText}
+            className={cn(
+              'flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-semibold transition-all',
+              copied
+                ? 'border-brand bg-brand text-white'
+                : 'border-gray-200 text-gray-800 hover:border-brand hover:bg-brand/5',
+            )}
+          >
+            {copied ? <Check className="h-5 w-5" /> : <ClipboardCopy className="h-5 w-5 text-gray-400" />}
+            {copied ? 'Copiado!' : 'Copiar texto da lista'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ComprasPage() {
@@ -400,7 +490,7 @@ export default function ComprasPage() {
   const [editValue,   setEditValue]   = useState('')
 
   const [copyState,   setCopyState]   = useState<'idle' | 'copied'>('idle')
-  const [shareState,  setShareState]  = useState<'idle' | 'shared'>('idle')
+  const [shareModalOpen, setShareModalOpen] = useState(false)
 
   // ── Derived ──────────────────────────────────────────────────────────────
 
@@ -425,7 +515,7 @@ export default function ComprasPage() {
 
   // ── Data fetch ────────────────────────────────────────────────────────────
 
-  const loadMeals = useCallback(async () => {
+  const loadMeals = useCallback(async (showToast = false) => {
     setLoading(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -444,6 +534,7 @@ export default function ComprasPage() {
 
       setMealNames(result.slots.map(s => s.nome))
       setIsDemo(false)
+      if (showToast) toast('Lista atualizada com sucesso', 'success')
     } catch {
       setMealNames(DEMO_MEAL_NAMES)
       setIsDemo(true)
@@ -515,19 +606,11 @@ export default function ComprasPage() {
     const text = formatListText(items, prices, checked, weekLabel)
     await navigator.clipboard.writeText(text)
     setCopyState('copied')
+    toast('Lista copiada!', 'success')
     setTimeout(() => setCopyState('idle'), 2500)
   }
 
-  async function shareList() {
-    const text = formatListText(items, prices, checked, weekLabel)
-    if (navigator.share) {
-      await navigator.share({ title: 'Lista de Compras NutriWeek', text })
-    } else {
-      await navigator.clipboard.writeText(window.location.href)
-      setShareState('shared')
-      setTimeout(() => setShareState('idle'), 2500)
-    }
-  }
+  function openShareModal() { setShareModalOpen(true) }
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -560,7 +643,7 @@ export default function ComprasPage() {
         {/* Action buttons */}
         <div className="flex shrink-0 items-center gap-2">
           <button
-            onClick={loadMeals}
+            onClick={() => loadMeals(true)}
             disabled={loading}
             title="Atualizar lista"
             className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-40"
@@ -586,20 +669,15 @@ export default function ComprasPage() {
           </button>
 
           <button
-            onClick={shareList}
+            onClick={openShareModal}
             disabled={loading || items.length === 0}
             className={cn(
               'flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all',
-              shareState === 'shared'
-                ? 'bg-green-500 text-white'
-                : 'bg-brand text-white hover:bg-brand-600',
+              'bg-brand text-white hover:bg-brand-600',
               (loading || items.length === 0) && 'opacity-40 cursor-not-allowed',
             )}
           >
-            {shareState === 'shared'
-              ? <><Check className="h-3.5 w-3.5" /> Link copiado!</>
-              : <><Share2 className="h-3.5 w-3.5" /> Compartilhar</>
-            }
+            <Share2 className="h-3.5 w-3.5" /> Compartilhar
           </button>
         </div>
       </div>
@@ -684,6 +762,15 @@ export default function ComprasPage() {
             </button>
           )}
         </>
+      )}
+
+      {/* Share modal */}
+      {shareModalOpen && (
+        <ShareModal
+          text={formatListText(items, prices, checked, weekLabel)}
+          weekLabel={weekLabel}
+          onClose={() => setShareModalOpen(false)}
+        />
       )}
 
       {/* ── Empty state ──────────────────────────────────────────────────── */}
