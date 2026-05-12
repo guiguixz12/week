@@ -3,15 +3,10 @@ import type { Database } from '@/types/database'
 
 // ─── Env validation ───────────────────────────────────────────────────────────
 
-// Fallback to placeholder so the module loads at build time without throwing.
-// At runtime, a missing/wrong URL causes API calls to fail gracefully (pages
-// fall back to demo data). Set the real values in your environment.
-const supabaseUrl     = process.env.NEXT_PUBLIC_SUPABASE_URL     || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
-
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  console.warn('[supabase] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is not set.')
-}
+// Public keys — safe to hardcode (anon key is designed to be client-side visible).
+// Override via NEXT_PUBLIC_SUPABASE_* env vars if needed.
+const supabaseUrl     = process.env.NEXT_PUBLIC_SUPABASE_URL     || 'https://rqoygmqrncayjoqthzje.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxb3lnbXFybmNheWpvcXRoemplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTA3OTUsImV4cCI6MjA5NDE2Njc5NX0.hZ6dS0-qRmN36obeDD7Z73K9TdL-q8j-Kj_hvQGXqgg'
 
 // ─── Typed browser client (singleton — use in Client Components) ──────────────
 // Type is inferred as SupabaseClient<Database, 'public', Database['public']>
