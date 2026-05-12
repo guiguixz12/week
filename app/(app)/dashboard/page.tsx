@@ -16,8 +16,9 @@ interface ModalState {
 const CLOSED: ModalState = { isOpen: false, date: '', mealType: 'breakfast' }
 
 export default function DashboardPage() {
-  const [modal,     setModal]     = useState<ModalState>(CLOSED)
-  const [weekStart, setWeekStart] = useState('')
+  const [modal,      setModal]      = useState<ModalState>(CLOSED)
+  const [weekStart,  setWeekStart]  = useState('')
+  const [refreshKey, setRefreshKey] = useState(0)
 
   function openAdd(date: string, mealType: MealType) {
     setModal({ isOpen: true, date, mealType })
@@ -31,12 +32,14 @@ export default function DashboardPage() {
     if (!modal.date || !weekStart) return
     upsertMealSlot(weekStart, modal.date, modal.mealType, slot)
     setModal(CLOSED)
+    setRefreshKey(k => k + 1)
   }, [modal.date, modal.mealType, weekStart])
 
   const handleDelete = useCallback(() => {
     if (!modal.date || !weekStart) return
     upsertMealSlot(weekStart, modal.date, modal.mealType, null)
     setModal(CLOSED)
+    setRefreshKey(k => k + 1)
   }, [modal.date, modal.mealType, weekStart])
 
   return (
@@ -45,6 +48,7 @@ export default function DashboardPage() {
         onAddMeal={openAdd}
         onEditMeal={openEdit}
         onWeekStartChange={setWeekStart}
+        refreshKey={refreshKey}
       />
       <MealModal
         isOpen={modal.isOpen}

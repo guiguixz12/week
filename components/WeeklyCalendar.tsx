@@ -9,13 +9,11 @@ import {
   Dumbbell,
   Flame,
   Plus,
-  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PENDING_PLAN_KEY, getProfile } from '@/lib/profile'
 import { getWeekPlan, saveWeekPlan } from '@/lib/store'
 import type { DayPlan, MealSlot, MealType, WeekPlan } from '@/types'
-import { AIGeneratorDrawer } from './AIGeneratorDrawer'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -141,34 +139,16 @@ function MetricCard({ icon, label, value, bg, fg, tooltip }: MetricCardProps) {
   )
 }
 
-// ─── SkeletonCell ─────────────────────────────────────────────────────────────
-
-function SkeletonCell() {
-  return (
-    <div className="h-[92px] w-full animate-pulse rounded-lg bg-gray-100 p-2.5">
-      <div className="mb-2 h-3 w-4/5 rounded bg-gray-200" />
-      <div className="h-2.5 w-2/5 rounded bg-gray-200" />
-      <div className="mt-3 flex gap-1">
-        <div className="h-4 w-10 rounded bg-gray-200" />
-        <div className="h-4 w-10 rounded bg-gray-200" />
-        <div className="h-4 w-10 rounded bg-gray-200" />
-      </div>
-    </div>
-  )
-}
-
 // ─── MealCell ─────────────────────────────────────────────────────────────────
 
 interface MealCellProps {
   slot: MealSlot | undefined
   mealType: MealType
-  isGenerating: boolean
   onAdd: () => void
   onEdit: () => void
 }
 
-function MealCell({ slot, mealType, isGenerating, onAdd, onEdit }: MealCellProps) {
-  if (isGenerating) return <SkeletonCell />
+function MealCell({ slot, mealType, onAdd, onEdit }: MealCellProps) {
 
   if (!slot) {
     return (
@@ -224,17 +204,16 @@ export interface WeeklyCalendarProps {
   onAddMeal?: (date: string, mealType: MealType) => void
   onEditMeal?: (slot: MealSlot, date: string) => void
   onWeekStartChange?: (weekStart: string) => void
+  refreshKey?: number
 }
 
 type ViewMode = 'week' | 'day'
 
-export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekStartChange }: WeeklyCalendarProps) {
-  const [weekStart,    setWeekStart]    = useState<Date>(() => getMondayOf(new Date()))
-  const [aiPlan,       setAiPlan]       = useState<WeekPlan | null>(null)
-  const [localPlan,    setLocalPlan]    = useState<WeekPlan | null>(null)
-  const [drawerOpen,   setDrawerOpen]   = useState(false)
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [viewMode,     setViewMode]     = useState<ViewMode>('week')
+export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekStartChange, refreshKey }: WeeklyCalendarProps) {
+  const [weekStart,  setWeekStart]  = useState<Date>(() => getMondayOf(new Date()))
+  const [aiPlan,     setAiPlan]     = useState<WeekPlan | null>(null)
+  const [localPlan,  setLocalPlan]  = useState<WeekPlan | null>(null)
+  const [viewMode,   setViewMode]   = useState<ViewMode>('week')
   const [selectedDay,  setSelectedDay]  = useState<number>(() => {
     const today = new Date()
     const monday = getMondayOf(today)
@@ -250,12 +229,20 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekS
     [weekStart],
   )
 
-  // Notify parent of weekStart
+  // Notify parent of weekStart and load plan from localStorage
   useEffect(() => {
     const s = toLocalISODate(weekStart)
     onWeekStartChange?.(s)
     setLocalPlan(getWeekPlan(s))
   }, [weekStart, onWeekStartChange])
+
+  // Reload plan from localStorage when parent signals a change (save/delete)
+  useEffect(() => {
+    if (refreshKey === undefined) return
+    const s = toLocalISODate(weekStart)
+    setLocalPlan(getWeekPlan(s))
+    setAiPlan(null)
+  }, [refreshKey, weekStart])
 
   // Apply pending plan generated during onboarding (one-shot)
   useEffect(() => {
@@ -380,43 +367,24 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekS
               </button>
             </div>
 
-            {/* AI generate button */}
-            <button
-              onClick={() => setDrawerOpen(true)}
-              disabled={isGenerating}
-              className={cn(
-                'flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all',
-                aiPlan
-                  ? 'bg-brand text-white hover:bg-brand-600'
-                  : 'border border-brand/30 bg-brand/5 text-brand hover:bg-brand/10',
-                isGenerating && 'cursor-not-allowed opacity-60',
-              )}
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              {isGenerating ? 'Gerando…' : aiPlan ? 'Plano IA ativo' : 'Gerar com IA'}
-            </button>
-
             {/* Week navigation */}
             <div className="flex items-center gap-1">
               <button
                 onClick={prevWeek}
-                disabled={isGenerating}
-                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 disabled:opacity-40"
+                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
                 aria-label="Semana anterior"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <button
                 onClick={goToday}
-                disabled={isGenerating}
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors disabled:opacity-40"
+                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
               >
                 Hoje
               </button>
               <button
                 onClick={nextWeek}
-                disabled={isGenerating}
-                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 disabled:opacity-40"
+                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
                 aria-label="Próxima semana"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -623,7 +591,6 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekS
                         <MealCell
                           slot={slot}
                           mealType={mealType}
-                          isGenerating={isGenerating}
                           onAdd={() => onAddMeal?.(dateStr, mealType)}
                           onEdit={() => slot && onEditMeal?.(slot, dateStr)}
                         />
@@ -638,19 +605,6 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekS
         </div>
       </div>
 
-      {/* AI generator drawer */}
-      <AIGeneratorDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        weekStart={weekStart}
-        onPlanGenerated={plan => {
-          saveWeekPlan(plan)
-          setAiPlan(plan)
-          setLocalPlan(plan)
-          setDrawerOpen(false)
-        }}
-        onGeneratingChange={setIsGenerating}
-      />
     </>
   )
 }
