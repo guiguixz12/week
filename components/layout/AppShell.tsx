@@ -24,7 +24,7 @@ export function AppShell({ children }: AppShellProps) {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AppHeader onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 overflow-y-auto bg-[#0d1117] p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto bg-[#0F1117] p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

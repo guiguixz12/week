@@ -16,8 +16,8 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
   return (
     <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)}
       className={cn('relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
-        checked ? 'bg-brand' : 'bg-gray-200')}>
-      <span className={cn('inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200',
+        checked ? 'bg-brand' : 'bg-[#30363d]')}>
+      <span className={cn('inline-block h-4 w-4 transform rounded-full bg-surface shadow-sm transition-transform duration-200',
         checked ? 'translate-x-6' : 'translate-x-1')} />
     </button>
   )
@@ -27,10 +27,10 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 
 function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <section className="rounded-2xl border border-surface-border bg-surface p-6 shadow-sm">
       <div className="mb-5 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10">{icon}</div>
-        <h2 className="font-bold text-gray-900">{title}</h2>
+        <h2 className="font-bold text-[#E6EDF3]">{title}</h2>
       </div>
       {children}
     </section>
@@ -120,22 +120,22 @@ export default function ConfiguracoesPage() {
             <span className="text-xl font-bold text-brand">{initials}</span>
           </div>
           <div>
-            <p className="font-semibold text-gray-900">{prefs.nome || 'Seu nome'}</p>
-            <p className="text-sm text-gray-500">{prefs.email || 'email@exemplo.com'}</p>
+            <p className="font-semibold text-[#E6EDF3]">{prefs.nome || 'Seu nome'}</p>
+            <p className="text-sm text-[#8B949E]">{prefs.email || 'email@exemplo.com'}</p>
           </div>
           <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" />
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs font-semibold text-gray-600">Nome completo</label>
+            <label className="mb-1 block text-xs font-semibold text-[#8B949E]">Nome completo</label>
             <input value={prefs.nome} onChange={e => setField('nome', e.target.value)}
               placeholder="Seu nome"
-              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" />
+              className="w-full rounded-xl border border-surface-border px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold text-gray-600">Email</label>
+            <label className="mb-1 block text-xs font-semibold text-[#8B949E]">Email</label>
             <input value={prefs.email} readOnly
-              className="w-full cursor-default rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-500" />
+              className="w-full cursor-default rounded-xl border border-surface-border bg-surface-subtle px-3.5 py-2.5 text-sm text-[#8B949E]" />
           </div>
         </div>
       </Section>
@@ -146,9 +146,9 @@ export default function ConfiguracoesPage() {
           <div>
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-brand" />
-              <span className="font-bold text-gray-900">Plano Free</span>
+              <span className="font-bold text-[#E6EDF3]">Plano Free</span>
             </div>
-            <p className="mt-0.5 text-xs text-gray-500">Até 5 receitas · 1 semana de planejamento</p>
+            <p className="mt-0.5 text-xs text-[#8B949E]">Até 5 receitas · 1 semana de planejamento</p>
           </div>
           <button className="flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2 text-xs font-bold text-white hover:bg-brand-600 transition-colors">
             Upgrade Pro <ChevronRight className="h-3.5 w-3.5" />
@@ -158,7 +158,7 @@ export default function ConfiguracoesPage() {
 
       {/* Restrições alimentares */}
       <Section icon={<span className="text-lg">🚫</span>} title="Restrições alimentares">
-        <p className="mb-4 text-xs text-gray-500">
+        <p className="mb-4 text-xs text-[#8B949E]">
           Usadas pela IA para excluir alimentos incompatíveis da sua dieta.
         </p>
         <div className="flex flex-wrap gap-2">
@@ -171,7 +171,7 @@ export default function ConfiguracoesPage() {
                   'flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all',
                   on
                     ? 'border-brand bg-brand text-white shadow-sm'
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-brand/40 hover:bg-brand/5',
+                    : 'border-surface-border bg-surface text-[#8B949E] hover:border-brand/40 hover:bg-brand/5',
                 )}>
                 <span>{r.emoji}</span>
                 {r.label}
@@ -181,18 +181,18 @@ export default function ConfiguracoesPage() {
           })}
         </div>
         <div className="mt-4">
-          <label className="mb-1 block text-xs font-semibold text-gray-600">
+          <label className="mb-1 block text-xs font-semibold text-[#8B949E]">
             Alimentos que não gosto (separados por vírgula)
           </label>
           <textarea value={prefs.alimentos_evitar} onChange={e => setField('alimentos_evitar', e.target.value)}
             placeholder="Ex: fígado, chuchu, jiló…" rows={2}
-            className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm placeholder:text-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" />
+            className="w-full resize-none rounded-xl border border-surface-border px-3.5 py-2.5 text-sm placeholder:text-[#8B949E] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20" />
         </div>
       </Section>
 
       {/* Notificações */}
       <Section icon={<Bell className="h-5 w-5 text-brand" />} title="Notificações">
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-[#2D333B]">
           {([
             { key: 'notif_planejamento', label: 'Lembrete de planejamento semanal', desc: 'Toda segunda-feira às 8h' },
             { key: 'notif_compras',      label: 'Lista de compras gerada',          desc: 'Quando a semana é planejada' },
@@ -200,8 +200,8 @@ export default function ConfiguracoesPage() {
           ] as { key: keyof UserPreferences; label: string; desc: string }[]).map(({ key, label, desc }) => (
             <div key={key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
               <div>
-                <p className="text-sm font-semibold text-gray-800">{label}</p>
-                <p className="text-xs text-gray-400">{desc}</p>
+                <p className="text-sm font-semibold text-[#E6EDF3]">{label}</p>
+                <p className="text-xs text-[#8B949E]">{desc}</p>
               </div>
               <Toggle checked={!!prefs[key]} onChange={v => setField(key, v as UserPreferences[typeof key])} />
             </div>
@@ -212,7 +212,7 @@ export default function ConfiguracoesPage() {
       {/* Actions */}
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
         <button onClick={handleLogout}
-          className="flex items-center gap-2 rounded-xl border border-red-200 px-5 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
+          className="flex items-center gap-2 rounded-xl border border-red-500/20 px-5 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors">
           <LogOut className="h-4 w-4" /> Sair da conta
         </button>
         <button onClick={handleSave} disabled={saving}

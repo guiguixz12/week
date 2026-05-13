@@ -129,10 +129,10 @@ const STATUS_COLORS: Record<Status, string> = {
 }
 
 const STATUS_BADGE: Record<Status, string> = {
-  success: 'bg-green-100 text-green-700',
-  warning: 'bg-amber-100 text-amber-700',
-  danger:  'bg-red-100 text-red-700',
-  neutral: 'bg-gray-100 text-gray-500',
+  success: 'bg-green-500/10 text-green-400',
+  warning: 'bg-amber-500/10 text-amber-400',
+  danger:  'bg-red-500/10 text-red-400',
+  neutral: 'bg-surface-hover text-[#8B949E]',
 }
 
 const STATUS_LABEL: Record<Status, string> = {
@@ -288,9 +288,9 @@ function CaloriesTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null
   const val = payload[0].value
   return (
-    <div className="rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-lg">
-      <p className="text-[11px] font-semibold text-gray-500">{label}</p>
-      <p className="text-base font-bold text-gray-900">{val.toLocaleString('pt-BR')} kcal</p>
+    <div className="rounded-xl border border-surface-border bg-surface px-3 py-2 shadow-lg">
+      <p className="text-[11px] font-semibold text-[#8B949E]">{label}</p>
+      <p className="text-base font-bold text-[#E6EDF3]">{val.toLocaleString('pt-BR')} kcal</p>
     </div>
   )
 }
@@ -302,9 +302,9 @@ function DonutTooltip({ active, payload }: {
   if (!active || !payload?.length) return null
   const { name, value, payload: p } = payload[0]
   return (
-    <div className="rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-lg">
-      <p className="text-[11px] font-semibold text-gray-500">{name}</p>
-      <p className="text-sm font-bold text-gray-900">{value}g — {p.pct}%</p>
+    <div className="rounded-xl border border-surface-border bg-surface px-3 py-2 shadow-lg">
+      <p className="text-[11px] font-semibold text-[#8B949E]">{name}</p>
+      <p className="text-sm font-bold text-[#E6EDF3]">{value}g — {p.pct}%</p>
     </div>
   )
 }
@@ -318,7 +318,7 @@ function PeriodSelector({ value, onChange }: { value: Period; onChange: (p: Peri
     { key: 'month',    label: 'Último mês' },
   ]
   return (
-    <div className="flex gap-1 rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
+    <div className="flex gap-1 rounded-xl border border-surface-border bg-surface p-1 shadow-sm">
       {options.map(o => (
         <button
           key={o.key}
@@ -327,7 +327,7 @@ function PeriodSelector({ value, onChange }: { value: Period; onChange: (p: Peri
             'rounded-lg px-3 py-1.5 text-xs font-semibold transition-all',
             value === o.key
               ? 'bg-brand text-white shadow-sm'
-              : 'text-gray-500 hover:text-gray-800',
+              : 'text-[#8B949E] hover:text-[#E6EDF3]',
           )}
         >
           {o.label}
@@ -349,14 +349,14 @@ interface SummaryCardProps {
 
 function SummaryCard({ icon, label, value, sub, status, iconBg, iconFg }: SummaryCardProps) {
   return (
-    <div className="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="flex items-start gap-4 rounded-xl border border-surface-border bg-surface p-5 shadow-sm">
       <div className={cn('flex h-11 w-11 shrink-0 items-center justify-center rounded-xl', iconBg)}>
         <span className={iconFg}>{icon}</span>
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{label}</p>
-        <p className="mt-0.5 text-2xl font-bold leading-none text-gray-900">{value}</p>
-        {sub && <p className="mt-1 text-xs text-gray-500">{sub}</p>}
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-[#8B949E]">{label}</p>
+        <p className="mt-0.5 text-2xl font-bold leading-none text-[#E6EDF3]">{value}</p>
+        {sub && <p className="mt-1 text-xs text-[#8B949E]">{sub}</p>}
         {status && status !== 'neutral' && (
           <span className={cn('mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold', STATUS_BADGE[status])}>
             {STATUS_LABEL[status]}
@@ -369,13 +369,13 @@ function SummaryCard({ icon, label, value, sub, status, iconBg, iconFg }: Summar
 
 function SkeletonCard() {
   return (
-    <div className="animate-pulse rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="animate-pulse rounded-xl border border-surface-border bg-surface p-5 shadow-sm">
       <div className="flex items-start gap-4">
-        <div className="h-11 w-11 rounded-xl bg-gray-200" />
+        <div className="h-11 w-11 rounded-xl bg-[#30363d]" />
         <div className="flex-1 space-y-2">
-          <div className="h-3 w-24 rounded bg-gray-200" />
-          <div className="h-7 w-32 rounded bg-gray-200" />
-          <div className="h-3 w-20 rounded bg-gray-200" />
+          <div className="h-3 w-24 rounded bg-[#30363d]" />
+          <div className="h-7 w-32 rounded bg-[#30363d]" />
+          <div className="h-3 w-20 rounded bg-[#30363d]" />
         </div>
       </div>
     </div>
@@ -397,7 +397,7 @@ function MacroDonut({ stats, goals }: { stats: Stats; goals: Goals }) {
   const proteinGoalStatus = macroStatus(avgProtein, goals.protein)
 
   return (
-    <div className="flex flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center">
+    <div className="flex flex-col gap-6 rounded-xl border border-surface-border bg-surface p-6 shadow-sm lg:flex-row lg:items-center">
       {/* Chart */}
       <div className="relative mx-auto h-52 w-52 shrink-0">
         <ResponsiveContainer width="100%" height="100%">
@@ -419,17 +419,17 @@ function MacroDonut({ stats, goals }: { stats: Stats; goals: Goals }) {
         </ResponsiveContainer>
         {/* Center label */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <p className="text-xl font-bold text-gray-900">
+          <p className="text-xl font-bold text-[#E6EDF3]">
             {stats.avgCalories > 0 ? stats.avgCalories.toLocaleString('pt-BR') : '—'}
           </p>
-          <p className="text-[11px] font-semibold text-gray-400">kcal/dia</p>
+          <p className="text-[11px] font-semibold text-[#8B949E]">kcal/dia</p>
         </div>
       </div>
 
       {/* Legend */}
       <div className="flex-1 space-y-4">
-        <h3 className="text-sm font-bold text-gray-800">Distribuição de Macros</h3>
-        <p className="text-xs text-gray-500">Médias diárias do período selecionado</p>
+        <h3 className="text-sm font-bold text-[#E6EDF3]">Distribuição de Macros</h3>
+        <p className="text-xs text-[#8B949E]">Médias diárias do período selecionado</p>
 
         <div className="space-y-3">
           {data.map(d => (
@@ -437,12 +437,12 @@ function MacroDonut({ stats, goals }: { stats: Stats; goals: Goals }) {
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full" style={{ background: d.color }} />
-                  <span className="font-semibold text-gray-700">{d.name}</span>
+                  <span className="font-semibold text-[#E6EDF3]">{d.name}</span>
                 </div>
-                <span className="font-bold text-gray-900">{d.value}g <span className="text-gray-400 font-normal">({d.pct}%)</span></span>
+                <span className="font-bold text-[#E6EDF3]">{d.value}g <span className="text-[#8B949E] font-normal">({d.pct}%)</span></span>
               </div>
               {/* Progress bar */}
-              <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+              <div className="h-1.5 w-full rounded-full bg-surface-hover overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{ width: `${d.pct}%`, background: d.color }}
@@ -455,11 +455,11 @@ function MacroDonut({ stats, goals }: { stats: Stats; goals: Goals }) {
         {/* Protein goal indicator */}
         <div className={cn(
           'mt-2 rounded-lg border px-3 py-2 text-xs',
-          proteinGoalStatus === 'success' ? 'border-green-200 bg-green-50'  :
-          proteinGoalStatus === 'warning' ? 'border-amber-200 bg-amber-50'  :
-                                           'border-red-200   bg-red-50',
+          proteinGoalStatus === 'success' ? 'border-green-500/20 bg-green-500/5'  :
+          proteinGoalStatus === 'warning' ? 'border-amber-500/20 bg-amber-500/5'  :
+                                           'border-red-500/20 bg-red-500/5',
         )}>
-          <span className="font-semibold text-gray-700">Meta de proteína: </span>
+          <span className="font-semibold text-[#E6EDF3]">Meta de proteína: </span>
           <span className="font-bold">{goals.protein}g/dia</span>
           <span className={cn(
             'ml-2 font-semibold',
@@ -480,11 +480,11 @@ function CaloriesBarChart({ data, goal }: { data: DayData[]; goal: number }) {
   const maxCal = Math.max(...data.map(d => d.calories), goal * 1.3)
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl border border-surface-border bg-surface p-6 shadow-sm">
       <div className="mb-5 flex items-start justify-between">
         <div>
-          <h3 className="text-sm font-bold text-gray-800">Calorias por Dia</h3>
-          <p className="mt-0.5 text-xs text-gray-500">Comparativo com a meta diária</p>
+          <h3 className="text-sm font-bold text-[#E6EDF3]">Calorias por Dia</h3>
+          <p className="mt-0.5 text-xs text-[#8B949E]">Comparativo com a meta diária</p>
         </div>
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-4 text-[11px]">
@@ -496,7 +496,7 @@ function CaloriesBarChart({ data, goal }: { data: DayData[]; goal: number }) {
           ].map(({ color, label }) => (
             <div key={label} className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-sm" style={{ background: color }} />
-              <span className="text-gray-500">{label}</span>
+              <span className="text-[#8B949E]">{label}</span>
             </div>
           ))}
         </div>
@@ -504,22 +504,22 @@ function CaloriesBarChart({ data, goal }: { data: DayData[]; goal: number }) {
 
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={data} barCategoryGap="30%" margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#2D333B" />
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 11, fill: '#6B7280', fontWeight: 600 }}
+            tick={{ fontSize: 11, fill: '#8B949E', fontWeight: 600 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: '#9CA3AF' }}
+            tick={{ fontSize: 11, fill: '#8B949E' }}
             axisLine={false}
             tickLine={false}
             domain={[0, Math.ceil(maxCal / 200) * 200]}
             tickFormatter={v => `${(v / 1000).toFixed(v >= 1000 ? 1 : 0)}k`}
             width={36}
           />
-          <Tooltip content={<CaloriesTooltip />} cursor={{ fill: '#F9FAFB', radius: 4 }} />
+          <Tooltip content={<CaloriesTooltip />} cursor={{ fill: '#21262d', radius: 4 }} />
           <ReferenceLine
             y={goal}
             stroke="#9CA3AF"
@@ -529,7 +529,7 @@ function CaloriesBarChart({ data, goal }: { data: DayData[]; goal: number }) {
               value: `Meta ${goal.toLocaleString('pt-BR')}`,
               position: 'insideTopRight',
               fontSize: 10,
-              fill: '#9CA3AF',
+              fill: '#8B949E',
               fontWeight: 600,
             }}
           />
@@ -604,8 +604,8 @@ export default function MacrosPage() {
       {/* ── Page header ─────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Macros &amp; Calorias</h1>
-          <p className="mt-0.5 text-sm text-gray-500">
+          <h1 className="text-xl font-bold text-[#E6EDF3]">Macros &amp; Calorias</h1>
+          <p className="mt-0.5 text-sm text-[#8B949E]">
             {periodLabel}
             {isDemo && (
               <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
@@ -631,7 +631,7 @@ export default function MacrosPage() {
               value={`${stats.avgCalories.toLocaleString('pt-BR')} kcal`}
               sub={`Meta: ${goals.calories.toLocaleString('pt-BR')} kcal`}
               status={calStatus}
-              iconBg="bg-orange-100"
+              iconBg="bg-orange-500/10"
               iconFg="text-orange-500"
             />
             <SummaryCard
@@ -640,7 +640,7 @@ export default function MacrosPage() {
               value={`${stats.totalProtein.toLocaleString('pt-BR')}g`}
               sub={`Média: ${stats.avgProtein}g/dia`}
               status={protStatus}
-              iconBg="bg-blue-100"
+              iconBg="bg-blue-500/10"
               iconFg="text-blue-500"
             />
             <SummaryCard
@@ -648,7 +648,7 @@ export default function MacrosPage() {
               label="Dia mais calórico"
               value={stats.maxDay ? `${stats.maxDay.calories.toLocaleString('pt-BR')} kcal` : '—'}
               sub={stats.maxDay?.label}
-              iconBg="bg-red-100"
+              iconBg="bg-red-500/10"
               iconFg="text-red-500"
             />
             <SummaryCard
@@ -656,7 +656,7 @@ export default function MacrosPage() {
               label="Dia menos calórico"
               value={stats.minDay ? `${stats.minDay.calories.toLocaleString('pt-BR')} kcal` : '—'}
               sub={stats.minDay?.label}
-              iconBg="bg-green-100"
+              iconBg="bg-green-500/10"
               iconFg="text-green-600"
             />
           </>
@@ -665,27 +665,27 @@ export default function MacrosPage() {
 
       {/* ── Bar chart ────────────────────────────────────────────────────── */}
       {loading ? (
-        <div className="h-[360px] animate-pulse rounded-xl border border-gray-200 bg-white shadow-sm" />
+        <div className="h-[360px] animate-pulse rounded-xl border border-surface-border bg-surface shadow-sm" />
       ) : (
         <CaloriesBarChart data={data} goal={goals.calories} />
       )}
 
       {/* ── Donut + macro breakdown ───────────────────────────────────────── */}
       {loading ? (
-        <div className="h-[260px] animate-pulse rounded-xl border border-gray-200 bg-white shadow-sm" />
+        <div className="h-[260px] animate-pulse rounded-xl border border-surface-border bg-surface shadow-sm" />
       ) : (
         <MacroDonut stats={stats} goals={goals} />
       )}
 
       {/* ── Day-by-day breakdown table ────────────────────────────────────── */}
       {!loading && data.length > 0 && period !== 'month' && (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-          <div className="border-b border-gray-100 bg-gray-50/60 px-5 py-3">
-            <h3 className="text-sm font-bold text-gray-800">Detalhamento por Dia</h3>
+        <div className="overflow-hidden rounded-xl border border-surface-border bg-surface shadow-sm">
+          <div className="border-b border-surface-border bg-surface-subtle/60 px-5 py-3">
+            <h3 className="text-sm font-bold text-[#E6EDF3]">Detalhamento por Dia</h3>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-[#2D333B]">
             {/* Header */}
-            <div className="grid grid-cols-5 px-5 py-2 text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            <div className="grid grid-cols-5 px-5 py-2 text-[11px] font-bold uppercase tracking-wider text-[#8B949E]">
               <span>Dia</span>
               <span className="text-right">Calorias</span>
               <span className="text-right" style={{ color: MACRO_COLORS.protein }}>Prot.</span>
@@ -696,7 +696,7 @@ export default function MacrosPage() {
               const st = calorieStatus(day.calories, goals.calories)
               return (
                 <div key={day.dateStr} className={cn(
-                  'grid grid-cols-5 px-5 py-3 text-sm transition-colors hover:bg-gray-50/60',
+                  'grid grid-cols-5 px-5 py-3 text-sm transition-colors hover:bg-surface-subtle/60',
                   day.calories === 0 && 'opacity-40',
                 )}>
                   <div className="flex items-center gap-2">
@@ -705,9 +705,9 @@ export default function MacrosPage() {
                       style={{ background: STATUS_COLORS[st] }}
                       title={STATUS_LABEL[st]}
                     />
-                    <span className="font-semibold text-gray-700">{day.label}</span>
+                    <span className="font-semibold text-[#E6EDF3]">{day.label}</span>
                   </div>
-                  <span className="text-right font-bold text-gray-900">
+                  <span className="text-right font-bold text-[#E6EDF3]">
                     {day.calories > 0 ? `${day.calories.toLocaleString('pt-BR')} kcal` : '—'}
                   </span>
                   <span className="text-right font-medium text-blue-600">
@@ -724,7 +724,7 @@ export default function MacrosPage() {
             })}
           </div>
           {/* Goal row */}
-          <div className="grid grid-cols-5 border-t border-gray-200 bg-gray-50/80 px-5 py-3 text-sm font-bold text-gray-500">
+          <div className="grid grid-cols-5 border-t border-surface-border bg-surface-subtle/80 px-5 py-3 text-sm font-bold text-[#8B949E]">
             <span>Meta/dia</span>
             <span className="text-right text-brand">{goals.calories.toLocaleString('pt-BR')} kcal</span>
             <span className="text-right" style={{ color: MACRO_COLORS.protein }}>{goals.protein}g</span>

@@ -142,16 +142,16 @@ function NumberField({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold text-gray-500">{label}</label>
+      <label className="mb-1.5 block text-xs font-semibold text-[#8B949E]">{label}</label>
       <div className="relative">
         <input
           type="number"
           min="0"
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 py-2.5 pl-3.5 pr-10 text-sm text-gray-800 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
+          className="w-full rounded-xl border border-surface-border py-2.5 pl-3.5 pr-10 text-sm text-[#E6EDF3] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400">
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-[#8B949E]">
           {unit}
         </span>
       </div>
@@ -169,7 +169,7 @@ function MacroTile({
       <p className={cn('text-xl font-bold leading-none', color)}>
         {value}<span className="text-sm font-medium">g</span>
       </p>
-      <p className="mt-1 text-[11px] font-medium text-gray-500">{label}</p>
+      <p className="mt-1 text-[11px] font-medium text-[#8B949E]">{label}</p>
     </div>
   )
 }
@@ -395,7 +395,7 @@ export function MealModal({
         aria-modal
         aria-label="Adicionar refeição"
         className={cn(
-          'relative z-10 flex w-full flex-col overflow-hidden bg-white',
+          'relative z-10 flex w-full flex-col overflow-hidden bg-surface',
           'rounded-t-2xl sm:max-w-lg sm:rounded-2xl',
           'max-h-[92dvh] sm:max-h-[88vh]',
           'shadow-2xl ring-1 ring-black/5',
@@ -407,15 +407,15 @@ export function MealModal({
       >
 
         {/* ── Header ──────────────────────────────────────────────────────── */}
-        <div className="flex shrink-0 items-start justify-between border-b border-gray-100 px-5 pb-4 pt-5">
+        <div className="flex shrink-0 items-start justify-between border-b border-surface-border px-5 pb-4 pt-5">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xl">{MEAL_EMOJIS[mealType]}</span>
-              <h2 className="text-base font-bold text-gray-900">
+              <h2 className="text-base font-bold text-[#E6EDF3]">
                 {existingSlot ? 'Editar refeição' : 'Adicionar refeição'}
               </h2>
             </div>
-            <p className="mt-0.5 text-xs capitalize text-gray-400">
+            <p className="mt-0.5 text-xs capitalize text-[#8B949E]">
               {MEAL_LABELS[mealType]}
               {dateLabel && ` · ${dateLabel}`}
             </p>
@@ -423,7 +423,7 @@ export function MealModal({
           <button
             onClick={handleClose}
             aria-label="Fechar"
-            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            className="rounded-lg p-1.5 text-[#8B949E] transition-colors hover:bg-surface-hover hover:text-[#8B949E]"
           >
             <X className="h-4 w-4" />
           </button>
@@ -435,21 +435,21 @@ export function MealModal({
           {view === 'search' ? (
             <>
               {/* Search + custom button (sticky) */}
-              <div className="sticky top-0 z-10 border-b border-gray-100 bg-white px-5 pb-3 pt-4">
+              <div className="sticky top-0 z-10 border-b border-surface-border bg-surface px-5 pb-3 pt-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8B949E]" />
                   <input
                     ref={searchRef}
                     type="text"
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     placeholder="Buscar alimento ou receita..."
-                    className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-9 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
+                    className="w-full rounded-xl border border-surface-border bg-surface-subtle py-2.5 pl-9 pr-9 text-sm text-[#E6EDF3] placeholder:text-[#8B949E] focus:border-brand focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
                   />
                   {query && (
                     <button
                       onClick={() => setQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8B949E] hover:text-[#8B949E]"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -458,7 +458,7 @@ export function MealModal({
 
                 <button
                   onClick={() => setView('custom')}
-                  className="mt-2.5 flex w-full items-center gap-2 rounded-xl border border-dashed border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-500 transition-all hover:border-brand hover:bg-brand/5 hover:text-brand"
+                  className="mt-2.5 flex w-full items-center gap-2 rounded-xl border border-dashed border-[#30363d] px-4 py-2.5 text-sm font-medium text-[#8B949E] transition-all hover:border-brand hover:bg-brand/5 hover:text-brand"
                 >
                   <Plus className="h-4 w-4" />
                   Adicionar alimento personalizado
@@ -468,7 +468,7 @@ export function MealModal({
               {/* Food results */}
               <ul className="space-y-1 px-5 py-3">
                 {results.length === 0 ? (
-                  <li className="py-10 text-center text-sm text-gray-400">
+                  <li className="py-10 text-center text-sm text-[#8B949E]">
                     Nenhum alimento encontrado para{' '}
                     <span className="font-medium">&ldquo;{query}&rdquo;</span>
                   </li>
@@ -483,7 +483,7 @@ export function MealModal({
                           'flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all',
                           isAdded
                             ? 'border-brand/20 bg-brand/5'
-                            : 'border-transparent hover:bg-gray-50',
+                            : 'border-transparent hover:bg-surface-subtle',
                         )}
                       >
                         <span className="shrink-0 text-xl">{food.emoji}</span>
@@ -491,7 +491,7 @@ export function MealModal({
                           <div className="flex items-center gap-1.5">
                             <p className={cn(
                               'truncate text-sm font-semibold',
-                              isAdded ? 'text-brand' : 'text-gray-800',
+                              isAdded ? 'text-brand' : 'text-[#E6EDF3]',
                             )}>
                               {food.name}
                             </p>
@@ -501,7 +501,7 @@ export function MealModal({
                               </span>
                             )}
                           </div>
-                          <p className="mt-0.5 text-xs text-gray-400">
+                          <p className="mt-0.5 text-xs text-[#8B949E]">
                             {food.defaultGrams}g ·{' '}
                             <span className="text-orange-500 font-medium">{preview.calories} kcal</span>
                             <span className="ml-2 text-blue-500">P {preview.protein}g</span>
@@ -513,7 +513,7 @@ export function MealModal({
                           'flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all',
                           isAdded
                             ? 'bg-brand text-white'
-                            : 'bg-gray-100 text-gray-400 hover:bg-gray-200',
+                            : 'bg-surface-hover text-[#8B949E] hover:bg-[#30363d]',
                         )}>
                           {isAdded
                             ? <Check className="h-3.5 w-3.5" />
@@ -531,19 +531,19 @@ export function MealModal({
             <div className="px-5 py-4">
               <button
                 onClick={() => setView('search')}
-                className="mb-5 flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-gray-700"
+                className="mb-5 flex items-center gap-1.5 text-sm font-medium text-[#8B949E] transition-colors hover:text-[#E6EDF3]"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Voltar à busca
               </button>
 
-              <h3 className="mb-4 text-sm font-bold text-gray-700">
+              <h3 className="mb-4 text-sm font-bold text-[#E6EDF3]">
                 Alimento personalizado
               </h3>
 
               <div className="space-y-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-gray-500">
+                  <label className="mb-1.5 block text-xs font-semibold text-[#8B949E]">
                     Nome do alimento
                   </label>
                   <input
@@ -551,7 +551,7 @@ export function MealModal({
                     value={draft.name}
                     onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
                     placeholder="Ex: Vitamina de banana com aveia"
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
+                    className="w-full rounded-xl border border-surface-border px-3.5 py-2.5 text-sm text-[#E6EDF3] placeholder:text-[#8B949E] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
                   />
                 </div>
 
@@ -587,12 +587,12 @@ export function MealModal({
 
           {/* ── Selected items + macro summary ───────────────────────────── */}
           {hasItems && (
-            <div className="mt-1 border-t border-gray-100 px-5 pb-4 pt-4">
+            <div className="mt-1 border-t border-surface-border px-5 pb-4 pt-4">
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#8B949E]">
                   Refeição sendo montada
                 </p>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-[#8B949E]">
                   {selectedItems.length} item{selectedItems.length !== 1 ? 'ns' : ''}
                 </span>
               </div>
@@ -603,7 +603,7 @@ export function MealModal({
                 value={mealName}
                 onChange={e => setMealName(e.target.value)}
                 placeholder="Nome da refeição..."
-                className="mb-3 w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2 text-sm font-semibold text-gray-800 placeholder:font-normal placeholder:text-gray-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
+                className="mb-3 w-full rounded-xl border border-surface-border bg-surface-subtle px-3.5 py-2 text-sm font-semibold text-[#E6EDF3] placeholder:font-normal placeholder:text-[#8B949E] focus:border-brand focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
               />
 
               {/* Item list */}
@@ -613,14 +613,14 @@ export function MealModal({
                   return (
                     <li
                       key={item.food.id}
-                      className="flex items-center gap-2.5 rounded-xl bg-gray-50 px-3 py-2.5"
+                      className="flex items-center gap-2.5 rounded-xl bg-surface-subtle px-3 py-2.5"
                     >
                       <span className="shrink-0 text-lg">{item.food.emoji}</span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-semibold text-gray-700">
+                        <p className="truncate text-xs font-semibold text-[#E6EDF3]">
                           {item.food.name}
                         </p>
-                        <p className="text-[11px] text-gray-400">
+                        <p className="text-[11px] text-[#8B949E]">
                           {m.calories} kcal
                         </p>
                       </div>
@@ -629,16 +629,16 @@ export function MealModal({
                       <div className="flex shrink-0 items-center gap-1">
                         <button
                           onClick={() => adjustGrams(item.food.id, -25)}
-                          className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-200 text-gray-600 text-sm font-bold transition-colors hover:bg-gray-300"
+                          className="flex h-6 w-6 items-center justify-center rounded-md bg-surface-hover text-[#8B949E] text-sm font-bold transition-colors hover:bg-[#30363d]"
                         >
                           –
                         </button>
-                        <span className="w-12 text-center text-xs font-semibold text-gray-700">
+                        <span className="w-12 text-center text-xs font-semibold text-[#E6EDF3]">
                           {item.grams}g
                         </span>
                         <button
                           onClick={() => adjustGrams(item.food.id, +25)}
-                          className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-200 text-gray-600 text-sm font-bold transition-colors hover:bg-gray-300"
+                          className="flex h-6 w-6 items-center justify-center rounded-md bg-surface-hover text-[#8B949E] text-sm font-bold transition-colors hover:bg-[#30363d]"
                         >
                           +
                         </button>
@@ -647,7 +647,7 @@ export function MealModal({
                       <button
                         onClick={() => removeItem(item.food.id)}
                         aria-label="Remover"
-                        className="ml-0.5 rounded-md p-1 text-gray-300 transition-colors hover:bg-rose-50 hover:text-rose-500"
+                        className="ml-0.5 rounded-md p-1 text-[#30363d] transition-colors hover:bg-rose-500/10 hover:text-rose-400"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -657,18 +657,18 @@ export function MealModal({
               </ul>
 
               {/* Macro summary card */}
-              <div className="mt-4 rounded-2xl bg-gray-50 p-4">
+              <div className="mt-4 rounded-2xl bg-surface-subtle p-4">
                 {/* Calorie headline */}
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#8B949E]">
                     Resumo nutricional
                   </p>
                   <div className="flex items-center gap-1.5">
                     <Flame className="h-4 w-4 text-orange-400" />
-                    <span className="text-xl font-bold text-gray-900 leading-none">
+                    <span className="text-xl font-bold text-[#E6EDF3] leading-none">
                       {totals.calories}
                     </span>
-                    <span className="text-xs font-medium text-gray-400">kcal</span>
+                    <span className="text-xs font-medium text-[#8B949E]">kcal</span>
                   </div>
                 </div>
 
@@ -699,7 +699,7 @@ export function MealModal({
                         { color: 'bg-amber-400', label: `Carbs ${carbsPct}%` },
                         { color: 'bg-rose-400',  label: `Gord ${100 - protPct - carbsPct}%` },
                       ].map(({ color, label }) => (
-                        <span key={label} className="flex items-center gap-1 text-[10px] text-gray-400">
+                        <span key={label} className="flex items-center gap-1 text-[10px] text-[#8B949E]">
                           <span className={cn('inline-block h-2 w-2 rounded-full', color)} />
                           {label}
                         </span>
@@ -713,7 +713,7 @@ export function MealModal({
         </div>
 
         {/* ── Footer ──────────────────────────────────────────────────────── */}
-        <div className="flex shrink-0 items-center gap-3 border-t border-gray-100 bg-white px-5 py-4">
+        <div className="flex shrink-0 items-center gap-3 border-t border-surface-border bg-surface px-5 py-4">
           {onDelete && (
             <button
               onClick={onDelete}
@@ -726,7 +726,7 @@ export function MealModal({
           <div className="flex flex-1 items-center justify-end gap-3">
             <button
               onClick={handleClose}
-              className="rounded-xl px-5 py-2.5 text-sm font-semibold text-gray-500 transition-colors hover:bg-gray-100"
+              className="rounded-xl px-5 py-2.5 text-sm font-semibold text-[#8B949E] transition-colors hover:bg-surface-hover"
             >
               Cancelar
             </button>

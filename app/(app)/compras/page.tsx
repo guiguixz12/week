@@ -192,9 +192,9 @@ function lsCheckedKey(weekStart: string) { return `nutriweek:shopping:checked:${
 function SkeletonRow() {
   return (
     <div className="flex items-center gap-3 px-4 py-3 animate-pulse">
-      <div className="h-5 w-5 rounded bg-gray-200 shrink-0" />
-      <div className="flex-1 h-4 bg-gray-200 rounded w-3/4" />
-      <div className="h-4 w-12 bg-gray-200 rounded" />
+      <div className="h-5 w-5 rounded bg-[#30363d] shrink-0" />
+      <div className="flex-1 h-4 bg-[#30363d] rounded w-3/4" />
+      <div className="h-4 w-12 bg-[#30363d] rounded" />
     </div>
   )
 }
@@ -207,21 +207,21 @@ interface ItemRowProps {
 
 function ItemRow({ item, checked, onToggle }: ItemRowProps) {
   return (
-    <div className={cn('flex items-center gap-3 px-4 py-3 transition-colors', checked ? 'bg-gray-50' : 'hover:bg-gray-50/60')}>
+    <div className={cn('flex items-center gap-3 px-4 py-3 transition-colors', checked ? 'bg-surface-subtle' : 'hover:bg-surface-subtle/60')}>
       <button
         onClick={onToggle}
         aria-label={checked ? 'Desmarcar' : 'Marcar como comprado'}
         className={cn(
           'flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-all',
-          checked ? 'border-brand bg-brand text-white' : 'border-gray-300 hover:border-brand',
+          checked ? 'border-brand bg-brand text-white' : 'border-[#30363d] hover:border-brand',
         )}
       >
         {checked && <Check className="h-3 w-3" strokeWidth={3} />}
       </button>
-      <span className={cn('flex-1 text-sm font-medium leading-tight', checked ? 'text-gray-400 line-through' : 'text-gray-800')}>
+      <span className={cn('flex-1 text-sm font-medium leading-tight', checked ? 'text-[#8B949E] line-through' : 'text-[#E6EDF3]')}>
         {item.name}
       </span>
-      <span className="text-xs text-gray-400">{item.qty}</span>
+      <span className="text-xs text-[#8B949E]">{item.qty}</span>
     </div>
   )
 }
@@ -238,16 +238,16 @@ function CategorySection({ category, items, checked, onToggle }: CategorySection
   const doneCount = items.filter(i => checked.has(i.id)).length
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50/60 px-4 py-3">
+    <div className="overflow-hidden rounded-xl border border-surface-border bg-surface shadow-sm">
+      <div className="flex items-center gap-2 border-b border-surface-border bg-surface-subtle/60 px-4 py-3">
         <span className="text-base">{meta.emoji}</span>
-        <h3 className="text-sm font-bold text-gray-800">{meta.label}</h3>
-        <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-bold text-gray-600">{items.length}</span>
+        <h3 className="text-sm font-bold text-[#E6EDF3]">{meta.label}</h3>
+        <span className="rounded-full bg-[#30363d] px-2 py-0.5 text-[10px] font-bold text-[#8B949E]">{items.length}</span>
         {doneCount > 0 && (
           <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">{doneCount} ✓</span>
         )}
       </div>
-      <div className="divide-y divide-gray-50">
+      <div className="divide-y divide-[#2D333B]">
         {items.map(item => (
           <ItemRow key={item.id} item={item} checked={checked.has(item.id)} onToggle={() => onToggle(item.id)} />
         ))}
@@ -289,24 +289,24 @@ function ShareModal({ text, weekLabel, onClose }: { text: string; weekLabel: str
   return (
     <div ref={overlayRef} onClick={e => { if (e.target === overlayRef.current) onClose() }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-          <h2 className="font-bold text-gray-900">Compartilhar lista</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100"><X className="h-4 w-4" /></button>
+      <div className="w-full max-w-sm rounded-2xl bg-surface shadow-2xl">
+        <div className="flex items-center justify-between border-b border-surface-border px-5 py-4">
+          <h2 className="font-bold text-[#E6EDF3]">Compartilhar lista</h2>
+          <button onClick={onClose} className="rounded-lg p-1.5 text-[#8B949E] hover:bg-surface-hover"><X className="h-4 w-4" /></button>
         </div>
         <div className="space-y-2.5 p-5">
           <button onClick={shareWhatsApp}
-            className="flex w-full items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-semibold text-gray-800 hover:border-green-400 hover:bg-green-50 transition-all">
+            className="flex w-full items-center gap-3 rounded-xl border border-surface-border px-4 py-3.5 text-left text-sm font-semibold text-[#E6EDF3] hover:border-green-400 hover:bg-green-500/10 transition-all">
             <MessageCircle className="h-5 w-5 text-green-500" /> Compartilhar via WhatsApp
           </button>
           <button onClick={shareEmail}
-            className="flex w-full items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-semibold text-gray-800 hover:border-blue-400 hover:bg-blue-50 transition-all">
+            className="flex w-full items-center gap-3 rounded-xl border border-surface-border px-4 py-3.5 text-left text-sm font-semibold text-[#E6EDF3] hover:border-blue-400 hover:bg-blue-500/10 transition-all">
             <Mail className="h-5 w-5 text-blue-500" /> Enviar por Email
           </button>
           <button onClick={copyText}
             className={cn('flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-semibold transition-all',
-              copied ? 'border-brand bg-brand text-white' : 'border-gray-200 text-gray-800 hover:border-brand hover:bg-brand/5')}>
-            {copied ? <Check className="h-5 w-5" /> : <ClipboardCopy className="h-5 w-5 text-gray-400" />}
+              copied ? 'border-brand bg-brand text-white' : 'border-surface-border text-[#E6EDF3] hover:border-brand hover:bg-brand/5')}>
+            {copied ? <Check className="h-5 w-5" /> : <ClipboardCopy className="h-5 w-5 text-[#8B949E]" />}
             {copied ? 'Copiado!' : 'Copiar texto da lista'}
           </button>
         </div>
@@ -389,9 +389,9 @@ export default function ComprasPage() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10">
               <ShoppingCart className="h-5 w-5 text-brand" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900">Lista de Compras</h1>
+            <h1 className="text-xl font-bold text-[#E6EDF3]">Lista de Compras</h1>
           </div>
-          <p className="mt-1 text-sm text-gray-500 pl-11">
+          <p className="mt-1 text-sm text-[#8B949E] pl-11">
             Semana de {weekLabel}
             {isDemo && <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">Dados de exemplo</span>}
           </p>
@@ -399,12 +399,12 @@ export default function ComprasPage() {
 
         <div className="flex shrink-0 items-center gap-2">
           <button onClick={() => loadMeals(true)} disabled={loading} title="Atualizar lista"
-            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-40">
+            className="rounded-lg p-2 text-[#8B949E] transition-colors hover:bg-surface-hover hover:text-[#8B949E] disabled:opacity-40">
             <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
           </button>
           <button onClick={copyList} disabled={loading || items.length === 0}
             className={cn('flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all',
-              copyState === 'copied' ? 'bg-green-500 text-white' : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
+              copyState === 'copied' ? 'bg-green-500 text-white' : 'border border-surface-border bg-surface text-[#E6EDF3] hover:bg-surface-subtle',
               (loading || items.length === 0) && 'opacity-40 cursor-not-allowed')}>
             {copyState === 'copied' ? <><Check className="h-3.5 w-3.5" /> Copiado!</> : <><ClipboardCopy className="h-3.5 w-3.5" /> Copiar lista</>}
           </button>
@@ -418,13 +418,13 @@ export default function ComprasPage() {
 
       {/* Progress summary */}
       {!loading && items.length > 0 && checked.size > 0 && (
-        <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface px-4 py-3 shadow-sm">
           <div className="flex-1">
             <div className="mb-1 flex justify-between text-xs font-semibold">
-              <span className="text-gray-600">Progresso das compras</span>
+              <span className="text-[#8B949E]">Progresso das compras</span>
               <span className="text-brand">{checked.size} / {items.length} itens</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-hover">
               <div className="h-full rounded-full bg-brand transition-all duration-300"
                 style={{ width: `${Math.round((checked.size / items.length) * 100)}%` }} />
             </div>
@@ -436,9 +436,9 @@ export default function ComprasPage() {
       {loading && (
         <div className="space-y-4">
           {(['proteinas', 'vegetais', 'cereais'] as Category[]).map(cat => (
-            <div key={cat} className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-              <div className="border-b border-gray-100 bg-gray-50/60 px-4 py-3">
-                <div className="h-4 w-28 animate-pulse rounded bg-gray-200" />
+            <div key={cat} className="overflow-hidden rounded-xl border border-surface-border bg-surface shadow-sm">
+              <div className="border-b border-surface-border bg-surface-subtle/60 px-4 py-3">
+                <div className="h-4 w-28 animate-pulse rounded bg-[#30363d]" />
               </div>
               {[1, 2, 3].map(i => <SkeletonRow key={i} />)}
             </div>
@@ -457,7 +457,7 @@ export default function ComprasPage() {
 
           {checked.size > 0 && (
             <button onClick={() => { setChecked(new Set()); try { localStorage.removeItem(lsCheckedKey(weekStartStr)) } catch { /* noop */ } }}
-              className="w-full rounded-xl border border-gray-200 py-2.5 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-50">
+              className="w-full rounded-xl border border-surface-border py-2.5 text-xs font-medium text-[#8B949E] transition-colors hover:bg-surface-subtle">
               Desmarcar todos os itens ({checked.size})
             </button>
           )}
@@ -470,13 +470,13 @@ export default function ComprasPage() {
 
       {/* Empty state */}
       {!loading && items.length === 0 && (
-        <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100">
-            <ShoppingCart className="h-8 w-8 text-gray-400" />
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-surface-border bg-surface py-16 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-hover">
+            <ShoppingCart className="h-8 w-8 text-[#8B949E]" />
           </div>
           <div>
-            <p className="font-semibold text-gray-800">Nenhuma refeição planejada</p>
-            <p className="mt-1 text-sm text-gray-500">Adicione refeições no calendário semanal para gerar sua lista de compras.</p>
+            <p className="font-semibold text-[#E6EDF3]">Nenhuma refeição planejada</p>
+            <p className="mt-1 text-sm text-[#8B949E]">Adicione refeições no calendário semanal para gerar sua lista de compras.</p>
           </div>
           <a href="/dashboard" className="rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors">
             Ir para o calendário

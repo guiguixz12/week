@@ -21,7 +21,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">
+          <label className="mb-1.5 block text-sm font-medium text-[#E6EDF3]">
             {label}
           </label>
         )}
@@ -29,7 +29,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <div className="relative">
           {/* Left icon */}
           {leftIcon && (
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E]">
               {leftIcon}
             </span>
           )}
@@ -38,13 +38,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             type={inputType}
             className={cn(
-              'w-full rounded-xl border bg-gray-50 py-2.5 text-sm text-gray-900',
-              'placeholder:text-gray-400',
+              'w-full rounded-xl border bg-surface-subtle py-2.5 text-sm text-[#E6EDF3]',
+              'placeholder:text-[#8B949E]',
               'transition-all duration-150',
-              'focus:bg-white focus:outline-none focus:ring-2',
+              'focus:bg-surface focus:outline-none focus:ring-2',
               error
                 ? 'border-red-300 bg-red-50/50 focus:border-red-400 focus:ring-red-400/20'
-                : 'border-gray-200 focus:border-brand focus:ring-brand/20',
+                : 'border-surface-border focus:border-brand focus:ring-brand/20',
               leftIcon  ? 'pl-10' : 'pl-4',
               (rightAction || isPassword) ? 'pr-10' : 'pr-4',
               className,
@@ -53,12 +53,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           />
 
           {/* Right action or password toggle */}
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8B949E]">
             {isPassword ? (
               <button
                 type="button"
                 onClick={() => setShowPwd(v => !v)}
-                className="hover:text-gray-600 transition-colors"
+                className="hover:text-[#8B949E] transition-colors"
                 tabIndex={-1}
                 aria-label={showPwd ? 'Ocultar senha' : 'Mostrar senha'}
               >
@@ -76,7 +76,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <p className="mt-1.5 text-xs text-red-600">{error}</p>
         )}
         {!error && hint && (
-          <p className="mt-1.5 text-xs text-gray-400">{hint}</p>
+          <p className="mt-1.5 text-xs text-[#8B949E]">{hint}</p>
         )}
       </div>
     )

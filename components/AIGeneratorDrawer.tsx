@@ -226,24 +226,24 @@ export function AIGeneratorDrawer({
       {/* Drawer panel */}
       <aside
         className={cn(
-          'fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-white shadow-2xl',
+          'fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-surface shadow-2xl',
           'transition-transform duration-300 ease-in-out',
           visible ? 'translate-x-0' : 'translate-x-full',
         )}
       >
         {/* Header */}
-        <div className="flex h-16 shrink-0 items-center justify-between border-b border-gray-100 px-5">
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-surface-border px-5">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10">
               <Sparkles className="h-4 w-4 text-brand" />
             </div>
-            <h2 className="text-base font-bold text-gray-900">Gerador IA</h2>
+            <h2 className="text-base font-bold text-[#E6EDF3]">Gerador IA</h2>
           </div>
           <button
             type="button"
             onClick={e => { e.stopPropagation(); if (!loading) onClose() }}
             aria-label="Fechar"
-            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-40"
+            className="rounded-lg p-1.5 text-[#8B949E] transition-colors hover:bg-surface-hover hover:text-[#8B949E] disabled:opacity-40"
           >
             <X className="h-4 w-4" />
           </button>
@@ -255,7 +255,7 @@ export function AIGeneratorDrawer({
           {/* ── Calorie slider ──────────────────────────────────────────── */}
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-sm font-semibold text-[#E6EDF3]">
                 Calorias diárias
               </label>
               <span className="text-sm font-bold text-brand">
@@ -275,12 +275,12 @@ export function AIGeneratorDrawer({
             />
 
             <div className="mt-1 flex justify-between">
-              <span className="text-[11px] text-gray-400">1.200</span>
-              <span className="text-[11px] text-gray-400">3.500</span>
+              <span className="text-[11px] text-[#8B949E]">1.200</span>
+              <span className="text-[11px] text-[#8B949E]">3.500</span>
             </div>
 
-            <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-gray-50 px-3 py-2">
-              <span className="text-[11px] text-gray-500">Objetivo detectado:</span>
+            <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-surface-subtle px-3 py-2">
+              <span className="text-[11px] text-[#8B949E]">Objetivo detectado:</span>
               <span className="text-[11px] font-semibold text-brand">
                 {caloriesLabel(calories)}
               </span>
@@ -289,7 +289,7 @@ export function AIGeneratorDrawer({
 
           {/* ── Preference toggles ──────────────────────────────────────── */}
           <div>
-            <p className="mb-3 text-sm font-semibold text-gray-700">
+            <p className="mb-3 text-sm font-semibold text-[#E6EDF3]">
               Preferências alimentares
             </p>
             <div className="flex flex-wrap gap-2">
@@ -302,7 +302,7 @@ export function AIGeneratorDrawer({
                     'rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all',
                     prefs.has(p.id)
                       ? 'border-brand bg-brand text-white'
-                      : 'border-gray-200 bg-white text-gray-600 hover:border-brand hover:text-brand',
+                      : 'border-surface-border text-[#8B949E] hover:border-brand hover:text-brand',
                     loading && 'cursor-not-allowed opacity-50',
                   )}
                 >
@@ -314,7 +314,7 @@ export function AIGeneratorDrawer({
 
           {/* ── Avoid foods ─────────────────────────────────────────────── */}
           <div>
-            <label className="mb-2 block text-sm font-semibold text-gray-700">
+            <label className="mb-2 block text-sm font-semibold text-[#E6EDF3]">
               Alimentos que não gosto
             </label>
             <textarea
@@ -323,7 +323,7 @@ export function AIGeneratorDrawer({
               disabled={loading}
               placeholder="Ex: fígado, chuchu, jiló..."
               rows={3}
-              className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 disabled:bg-gray-50 disabled:opacity-50"
+              className="w-full resize-none rounded-xl border border-surface-border px-3.5 py-2.5 text-sm text-[#E6EDF3] placeholder:text-[#8B949E] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 disabled:opacity-50 disabled:opacity-50"
             />
           </div>
 
@@ -345,8 +345,8 @@ export function AIGeneratorDrawer({
             <div className="flex flex-col items-center gap-3 rounded-xl border border-brand/20 bg-brand/5 py-6 text-center">
               <Loader2 className="h-7 w-7 animate-spin text-brand" />
               <div>
-                <p className="text-sm font-semibold text-gray-800">Gerando seu plano…</p>
-                <p className="mt-0.5 text-xs text-gray-500">
+                <p className="text-sm font-semibold text-[#E6EDF3]">Gerando seu plano…</p>
+                <p className="mt-0.5 text-xs text-[#8B949E]">
                   Isso pode levar alguns segundos
                 </p>
               </div>
@@ -355,7 +355,7 @@ export function AIGeneratorDrawer({
         </div>
 
         {/* Footer actions */}
-        <div className="shrink-0 space-y-2.5 border-t border-gray-100 px-5 py-4">
+        <div className="shrink-0 space-y-2.5 border-t border-surface-border px-5 py-4">
           <button
             onClick={generate}
             disabled={loading}
@@ -382,7 +382,7 @@ export function AIGeneratorDrawer({
           {hasGenerated && !loading && (
             <button
               onClick={onClose}
-              className="w-full rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+              className="w-full rounded-xl border border-surface-border py-2.5 text-sm font-medium text-[#8B949E] transition-colors hover:bg-surface-subtle"
             >
               Fechar e usar plano
             </button>

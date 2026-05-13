@@ -37,10 +37,10 @@ export function ToastProvider() {
           )}
         >
           <span className="mt-0.5 shrink-0">{ICONS[t.type]}</span>
-          <p className="flex-1 text-sm font-medium text-gray-800">{t.message}</p>
+          <p className="flex-1 text-sm font-medium text-[#E6EDF3]">{t.message}</p>
           <button
             onClick={() => dismissToast(t.id)}
-            className="shrink-0 text-gray-400 hover:text-gray-600"
+            className="shrink-0 text-[#8B949E] hover:text-[#8B949E]"
           >
             <X className="h-3.5 w-3.5" />
           </button>

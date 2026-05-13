@@ -9,7 +9,11 @@
   }
 
   body {
-    @apply bg-[#0d1117] text-white;
+    @apply bg-[#0F1117] text-[#E6EDF3];
+  }
+
+  input, textarea, select {
+    @apply bg-surface-subtle text-[#E6EDF3] placeholder:text-[#8B949E];
   }
 
   * {

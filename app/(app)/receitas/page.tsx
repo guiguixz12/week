@@ -69,7 +69,7 @@ function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
   return (
     <div
       onClick={onEdit}
-      className="group relative flex cursor-pointer flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
+      className="group relative flex cursor-pointer flex-col rounded-2xl border border-surface-border bg-surface p-5 shadow-sm transition-all hover:border-brand/40 hover:shadow-md"
     >
       {/* Delete button */}
       <button
@@ -77,8 +77,8 @@ function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
         className={cn(
           'absolute right-3 top-3 rounded-lg p-1.5 text-xs font-semibold transition-all opacity-0 group-hover:opacity-100',
           confirmDel
-            ? 'bg-red-100 text-red-700 opacity-100'
-            : 'bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500',
+            ? 'bg-red-500/20 text-red-400 opacity-100'
+            : 'bg-surface-hover text-[#8B949E] hover:bg-red-500/10 hover:text-red-400',
         )}
         title={confirmDel ? 'Clique para confirmar' : 'Remover'}
       >
@@ -89,8 +89,8 @@ function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
       <div className="mb-3 flex items-start gap-3">
         <span className="text-3xl leading-none">{recipe.emoji}</span>
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-gray-900 leading-tight line-clamp-2 pr-8">{recipe.nome}</h3>
-          <div className="mt-1 flex items-center gap-3 text-xs text-gray-400">
+          <h3 className="font-bold text-[#E6EDF3] leading-tight line-clamp-2 pr-8">{recipe.nome}</h3>
+          <div className="mt-1 flex items-center gap-3 text-xs text-[#8B949E]">
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />{recipe.tempo_preparo} min
             </span>
@@ -102,17 +102,17 @@ function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
       </div>
 
       {/* Calories */}
-      <div className="mb-3 flex items-center gap-1.5 rounded-xl bg-orange-50 px-3 py-2">
+      <div className="mb-3 flex items-center gap-1.5 rounded-xl bg-orange-500/10 px-3 py-2">
         <Flame className="h-4 w-4 text-orange-400" />
-        <span className="font-bold text-orange-700">{recipe.calorias} kcal</span>
+        <span className="font-bold text-orange-400">{recipe.calorias} kcal</span>
         <span className="text-xs text-orange-400">/ porção</span>
       </div>
 
       {/* Macros */}
       <div className="flex flex-wrap gap-1 mb-3">
-        <MacroPill label="P" value={recipe.proteina} color="bg-blue-50 text-blue-700" />
-        <MacroPill label="C" value={recipe.carbs}    color="bg-amber-50 text-amber-700" />
-        <MacroPill label="G" value={recipe.gordura}  color="bg-rose-50 text-rose-600" />
+        <MacroPill label="P" value={recipe.proteina} color="bg-blue-500/10 text-blue-400" />
+        <MacroPill label="C" value={recipe.carbs}    color="bg-amber-500/10 text-amber-400" />
+        <MacroPill label="G" value={recipe.gordura}  color="bg-rose-500/10 text-rose-400" />
       </div>
 
       {/* Tags */}
@@ -124,7 +124,7 @@ function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
             </span>
           ))}
           {recipe.tags.length > 3 && (
-            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-[11px] text-gray-500">
+            <span className="rounded-full bg-surface-hover px-2.5 py-0.5 text-[11px] text-[#8B949E]">
               +{recipe.tags.length - 3}
             </span>
           )}
@@ -196,13 +196,13 @@ function RecipeModal({ recipe, editId, onClose, onSaved }: RecipeModalProps) {
       onClick={e => { if (e.target === overlayRef.current) onClose() }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
     >
-      <div className="relative flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl bg-white shadow-2xl">
+      <div className="relative flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl bg-surface shadow-2xl">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-6 py-4">
-          <h2 className="text-lg font-bold text-gray-900">
+        <div className="flex shrink-0 items-center justify-between border-b border-surface-border px-6 py-4">
+          <h2 className="text-lg font-bold text-[#E6EDF3]">
             {editId ? 'Editar receita' : 'Nova receita'}
           </h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+          <button onClick={onClose} className="rounded-lg p-1.5 text-[#8B949E] hover:bg-surface-hover hover:text-[#8B949E]">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -216,19 +216,19 @@ function RecipeModal({ recipe, editId, onClose, onSaved }: RecipeModalProps) {
               <button
                 type="button"
                 onClick={() => setShowEmojis(s => !s)}
-                className="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-200 text-2xl hover:border-brand"
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border text-2xl hover:border-brand"
               >
                 {form.emoji}
               </button>
               {showEmojis && (
-                <div className="absolute left-0 top-14 z-10 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
+                <div className="absolute left-0 top-14 z-10 rounded-xl border border-surface-border bg-surface p-2 shadow-lg">
                   <div className="grid grid-cols-6 gap-1">
                     {EMOJIS.map(e => (
                       <button
                         key={e}
                         type="button"
                         onClick={() => { setField('emoji', e); setShowEmojis(false) }}
-                        className="rounded-lg p-1.5 text-xl hover:bg-gray-100"
+                        className="rounded-lg p-1.5 text-xl hover:bg-surface-hover"
                       >
                         {e}
                       </button>
@@ -238,19 +238,19 @@ function RecipeModal({ recipe, editId, onClose, onSaved }: RecipeModalProps) {
               )}
             </div>
             <div className="flex-1">
-              <label className="mb-1 block text-sm font-semibold text-gray-700">Nome da receita *</label>
+              <label className="mb-1 block text-sm font-semibold text-[#E6EDF3]">Nome da receita *</label>
               <input
                 value={form.nome}
                 onChange={e => setField('nome', e.target.value)}
                 placeholder="Ex: Frango grelhado com legumes"
-                className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-800 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                className="w-full rounded-xl border border-surface-border px-3.5 py-2.5 text-sm text-[#E6EDF3] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
               />
             </div>
           </div>
 
           {/* Macros grid */}
           <div>
-            <p className="mb-2 text-sm font-semibold text-gray-700">Informações nutricionais (por porção)</p>
+            <p className="mb-2 text-sm font-semibold text-[#E6EDF3]">Informações nutricionais (por porção)</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {(
                 [
@@ -261,18 +261,18 @@ function RecipeModal({ recipe, editId, onClose, onSaved }: RecipeModalProps) {
                 ] as const
               ).map(({ key, label, suffix, icon }) => (
                 <div key={key}>
-                  <label className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-600">
+                  <label className="mb-1 flex items-center gap-1 text-xs font-semibold text-[#8B949E]">
                     {icon}{label}
                   </label>
-                  <div className="flex items-center rounded-xl border border-gray-200 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
+                  <div className="flex items-center rounded-xl border border-surface-border focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
                     <input
                       type="number"
                       min={0}
                       value={form[key] || ''}
                       onChange={e => setField(key, Number(e.target.value))}
-                      className="w-full rounded-l-xl bg-transparent px-3 py-2 text-sm text-gray-800 focus:outline-none"
+                      className="w-full rounded-l-xl bg-transparent px-3 py-2 text-sm text-[#E6EDF3] focus:outline-none"
                     />
-                    <span className="pr-3 text-xs text-gray-400">{suffix}</span>
+                    <span className="pr-3 text-xs text-[#8B949E]">{suffix}</span>
                   </div>
                 </div>
               ))}
@@ -282,30 +282,30 @@ function RecipeModal({ recipe, editId, onClose, onSaved }: RecipeModalProps) {
           {/* Time + servings */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-gray-600">Tempo de preparo (min)</label>
+              <label className="mb-1 block text-xs font-semibold text-[#8B949E]">Tempo de preparo (min)</label>
               <input
                 type="number"
                 min={1}
                 value={form.tempo_preparo || ''}
                 onChange={e => setField('tempo_preparo', Number(e.target.value))}
-                className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                className="w-full rounded-xl border border-surface-border px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-gray-600">Porções</label>
+              <label className="mb-1 block text-xs font-semibold text-[#8B949E]">Porções</label>
               <input
                 type="number"
                 min={1}
                 value={form.porcoes || ''}
                 onChange={e => setField('porcoes', Number(e.target.value))}
-                className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                className="w-full rounded-xl border border-surface-border px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
               />
             </div>
           </div>
 
           {/* Tags */}
           <div>
-            <p className="mb-2 text-sm font-semibold text-gray-700">Tags</p>
+            <p className="mb-2 text-sm font-semibold text-[#E6EDF3]">Tags</p>
             <div className="flex flex-wrap gap-2">
               {ALL_TAGS.map(tag => (
                 <button
@@ -316,7 +316,7 @@ function RecipeModal({ recipe, editId, onClose, onSaved }: RecipeModalProps) {
                     'rounded-full border px-3 py-1 text-xs font-semibold transition-all',
                     form.tags.includes(tag)
                       ? 'border-brand bg-brand text-white'
-                      : 'border-gray-200 text-gray-600 hover:border-brand hover:text-brand',
+                      : 'border-surface-border text-[#8B949E] hover:border-brand hover:text-brand',
                   )}
                 >
                   {tag}
@@ -327,7 +327,7 @@ function RecipeModal({ recipe, editId, onClose, onSaved }: RecipeModalProps) {
 
           {/* Ingredients */}
           <div>
-            <p className="mb-2 text-sm font-semibold text-gray-700">Ingredientes</p>
+            <p className="mb-2 text-sm font-semibold text-[#E6EDF3]">Ingredientes</p>
             <div className="space-y-2">
               {form.ingredientes.map((ing, idx) => (
                 <div key={idx} className="flex gap-2">
@@ -335,19 +335,19 @@ function RecipeModal({ recipe, editId, onClose, onSaved }: RecipeModalProps) {
                     value={ing.nome}
                     onChange={e => setIngredient(idx, 'nome', e.target.value)}
                     placeholder="Ingrediente"
-                    className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-brand focus:outline-none"
+                    className="flex-1 rounded-xl border border-surface-border px-3 py-2 text-sm focus:border-brand focus:outline-none"
                   />
                   <input
                     value={ing.quantidade}
                     onChange={e => setIngredient(idx, 'quantidade', e.target.value)}
                     placeholder="Qtd (ex: 100g)"
-                    className="w-28 rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-brand focus:outline-none"
+                    className="w-28 rounded-xl border border-surface-border px-3 py-2 text-sm focus:border-brand focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => removeIngredient(idx)}
                     disabled={form.ingredientes.length === 1}
-                    className="rounded-xl p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-30"
+                    className="rounded-xl p-2 text-[#8B949E] hover:bg-red-500/10 hover:text-red-400 disabled:opacity-30"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -365,20 +365,20 @@ function RecipeModal({ recipe, editId, onClose, onSaved }: RecipeModalProps) {
 
           {/* Preparation mode */}
           <div>
-            <label className="mb-1 block text-sm font-semibold text-gray-700">Modo de preparo</label>
+            <label className="mb-1 block text-sm font-semibold text-[#E6EDF3]">Modo de preparo</label>
             <textarea
               value={form.modo_preparo}
               onChange={e => setField('modo_preparo', e.target.value)}
               placeholder="Descreva os passos do preparo..."
               rows={4}
-              className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+              className="w-full resize-none rounded-xl border border-surface-border px-3.5 py-2.5 text-sm text-[#E6EDF3] placeholder:text-[#8B949E] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
             />
           </div>
         </form>
 
         {/* Footer */}
-        <div className="flex shrink-0 justify-end gap-3 border-t border-gray-100 px-6 py-4">
-          <button type="button" onClick={onClose} className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
+        <div className="flex shrink-0 justify-end gap-3 border-t border-surface-border px-6 py-4">
+          <button type="button" onClick={onClose} className="rounded-xl border border-surface-border px-5 py-2.5 text-sm font-medium text-[#8B949E] hover:bg-surface-subtle">
             Cancelar
           </button>
           <button
@@ -438,8 +438,8 @@ export default function ReceitasPage() {
       {/* Header bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Minhas Receitas</h2>
-          <p className="text-sm text-gray-500">{recipes.length} receita{recipes.length !== 1 ? 's' : ''} salva{recipes.length !== 1 ? 's' : ''}</p>
+          <h2 className="text-xl font-bold text-[#E6EDF3]">Minhas Receitas</h2>
+          <p className="text-sm text-[#8B949E]">{recipes.length} receita{recipes.length !== 1 ? 's' : ''} salva{recipes.length !== 1 ? 's' : ''}</p>
         </div>
         <button
           onClick={openNew}
@@ -453,12 +453,12 @@ export default function ReceitasPage() {
       {/* Search + filter */}
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8B949E]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar receitas..."
-            className="w-full rounded-xl border border-gray-200 py-2.5 pl-10 pr-4 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="w-full rounded-xl border border-surface-border py-2.5 pl-10 pr-4 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
         <div className="flex flex-wrap gap-2">
@@ -466,7 +466,7 @@ export default function ReceitasPage() {
             onClick={() => setFilterTag('')}
             className={cn(
               'rounded-full border px-3 py-1.5 text-xs font-semibold transition-all',
-              filterTag === '' ? 'border-brand bg-brand text-white' : 'border-gray-200 text-gray-600 hover:border-brand',
+              filterTag === '' ? 'border-brand bg-brand text-white' : 'border-surface-border text-[#8B949E] hover:border-brand',
             )}
           >
             Todos
@@ -477,7 +477,7 @@ export default function ReceitasPage() {
               onClick={() => setFilterTag(filterTag === tag ? '' : tag)}
               className={cn(
                 'rounded-full border px-3 py-1.5 text-xs font-semibold transition-all',
-                filterTag === tag ? 'border-brand bg-brand text-white' : 'border-gray-200 text-gray-600 hover:border-brand',
+                filterTag === tag ? 'border-brand bg-brand text-white' : 'border-surface-border text-[#8B949E] hover:border-brand',
               )}
             >
               {tag}
@@ -488,12 +488,12 @@ export default function ReceitasPage() {
 
       {/* Grid or empty state */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 py-20">
-          <ChefHat className="mb-4 h-12 w-12 text-gray-300" />
-          <p className="text-lg font-semibold text-gray-400">
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-surface-border py-20">
+          <ChefHat className="mb-4 h-12 w-12 text-[#30363d]" />
+          <p className="text-lg font-semibold text-[#8B949E]">
             {recipes.length === 0 ? 'Nenhuma receita ainda' : 'Nenhuma receita encontrada'}
           </p>
-          <p className="mt-1 text-sm text-gray-400">
+          <p className="mt-1 text-sm text-[#8B949E]">
             {recipes.length === 0
               ? 'Clique em "Nova receita" para começar'
               : 'Tente ajustar o filtro ou busca'}
