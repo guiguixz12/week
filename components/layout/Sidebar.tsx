@@ -17,10 +17,10 @@ import { usePathname, useRouter } from 'next/navigation'
 // ─── Nav config ───────────────────────────────────────────────────────────────
 
 const NAV_MAIN = [
-  { href: '/dashboard', label: 'Minha Semana',    icon: CalendarDays },
+  { href: '/dashboard', label: 'Minha semana',    icon: CalendarDays },
   { href: '/receitas',  label: 'Receitas',         icon: ChefHat },
   { href: '/macros',    label: 'Macros',           icon: BarChart2 },
-  { href: '/compras',   label: 'Lista de Compras', icon: ShoppingCart },
+  { href: '/compras',   label: 'Lista de compras', icon: ShoppingCart },
 ]
 
 const NAV_ACCOUNT = [
@@ -53,7 +53,7 @@ function NavItem({ href, label, icon: Icon, active, onClick }: NavItemProps) {
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
         active
-          ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold'
+          ? 'bg-white/10 text-emerald-400 font-semibold'
           : 'text-slate-400 hover:text-slate-200 hover:bg-white/5',
       )}
     >
@@ -109,7 +109,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             onClick={onClose}
             className="flex items-center gap-2.5 group"
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 group-hover:from-emerald-500/30 group-hover:to-emerald-600/30 transition-colors">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-600 to-emerald-700 group-hover:from-emerald-500 group-hover:to-emerald-600 transition-colors">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"

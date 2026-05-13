@@ -175,32 +175,33 @@ function DayColumn({ date, dayName, isToday, dayPlan, onAddMeal, onEditMeal }: D
       {MEAL_ORDER.map((mealType, i) => {
         const slot = dayPlan?.meals[mealType]
         const Icon = MEAL_ICONS[mealType]
+
+        if (!slot) {
+          return (
+            <button
+              key={mealType}
+              onClick={() => onAddMeal(date, mealType)}
+              className="flex items-start gap-2 py-2 text-left w-full border-b border-[#21262d] opacity-50 cursor-pointer hover:opacity-75 transition-opacity"
+            >
+              <Icon className="h-4 w-4 text-slate-600 shrink-0 mt-0.5" />
+              <span className="text-sm text-slate-600 italic">Adicionar...</span>
+            </button>
+          )
+        }
+
         return (
           <button
             key={mealType}
-            onClick={() =>
-              slot ? onEditMeal(slot, date) : onAddMeal(date, mealType)
-            }
+            onClick={() => onEditMeal(slot, date)}
             className={cn(
               'flex items-start gap-2 py-2 text-left w-full group',
               i < 3 && 'border-b border-[#21262d]',
             )}
           >
-            <Icon
-              className={cn(
-                'h-3.5 w-3.5 leading-tight mt-0.5 shrink-0',
-                slot ? 'text-slate-400' : 'text-slate-600',
-              )}
-            />
-            {slot ? (
-              <span className="text-sm text-slate-200 leading-tight line-clamp-2 group-hover:text-white transition-colors">
-                {slot.name}
-              </span>
-            ) : (
-              <span className="text-xs italic text-slate-600 group-hover:text-slate-400 transition-colors">
-                Adicionar...
-              </span>
-            )}
+            <Icon className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+            <span className="text-sm text-slate-200 leading-tight line-clamp-2 group-hover:text-white transition-colors">
+              {slot.name}
+            </span>
           </button>
         )
       })}
@@ -354,7 +355,7 @@ export function WeeklyCalendar({
           </div>
           <div>
             <p className="text-xs text-slate-400">Semana de {weekLabel}</p>
-            <h1 className="text-xl font-bold text-white leading-tight">Minha semana alimentar</h1>
+            <h1 className="text-2xl font-bold text-white">Minha semana alimentar</h1>
           </div>
         </div>
 
@@ -407,7 +408,7 @@ export function WeeklyCalendar({
             statusOk
           />
           <MetricCard
-            label="Proteína média/dia"
+            label="Proteína média"
             value={`${metrics.avgProtein}g`}
             status={protStatus}
             statusOk={protOk}
