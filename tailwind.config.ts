@@ -22,6 +22,11 @@ const config: Config = {
           800: '#0B523A',
           900: '#063826',
         },
+        sidebar: {
+          dark: '#0f172a',
+          border: '#1e293b',
+          hover: '#1e293b',
+        },
       },
     },
   },
