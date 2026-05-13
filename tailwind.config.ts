@@ -27,6 +27,12 @@ const config: Config = {
           border: '#1e293b',
           hover: '#1e293b',
         },
+        surface: {
+          DEFAULT: '#161b22',
+          subtle: '#1c2128',
+          hover: '#21262d',
+          border: '#30363d',
+        },
       },
     },
   },

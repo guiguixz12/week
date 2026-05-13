@@ -2,14 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import {
-  CalendarCheck,
   ChevronLeft,
   ChevronRight,
-  Dumbbell,
-  Flame,
-  Plus,
+  ShoppingCart,
   Sparkles,
 } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { PENDING_PLAN_KEY, getProfile } from '@/lib/profile'
 import { getWeekPlan, saveWeekPlan } from '@/lib/store'
@@ -17,16 +15,17 @@ import type { DayPlan, MealSlot, MealType, WeekPlan } from '@/types'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const MEAL_LABELS: Record<MealType, string> = {
-  breakfast: 'Café da manhã',
-  snack:     'Lanche',
-  lunch:     'Almoço',
-  dinner:    'Jantar',
+const MEAL_ICONS: Record<MealType, string> = {
+  breakfast: '☀️',
+  snack:     '🍎',
+  lunch:     '🍽️',
+  dinner:    '🌙',
 }
+
 
 const MEAL_ORDER: MealType[] = ['breakfast', 'snack', 'lunch', 'dinner']
 
-const DAY_NAMES = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+const DAY_NAMES_SHORT = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM']
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
@@ -107,93 +106,97 @@ function buildSamplePlan(monday: Date): WeekPlan {
 
 // ─── MetricCard ───────────────────────────────────────────────────────────────
 
-interface MetricCardProps {
-  icon: React.ReactNode
+function MetricCard({
+  label,
+  value,
+  status,
+  statusOk,
+}: {
   label: string
   value: string
-  bg: string
-  fg: string
-  tooltip?: string
-}
-
-function MetricCard({ icon, label, value, bg, fg, tooltip }: MetricCardProps) {
+  status: string
+  statusOk: boolean
+}) {
   return (
-    <div className="relative flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm group">
-      <div className={cn('shrink-0 rounded-xl p-3', bg)}>
-        <span className={fg}>{icon}</span>
-      </div>
-      <div className="min-w-0">
-        <p className="truncate text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-          {label}
-        </p>
-        <p className="mt-0.5 text-2xl font-bold leading-none text-gray-900">{value}</p>
-      </div>
-      {tooltip && (
-        <div className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 group-hover:block z-10 pointer-events-none">
-          <div className="rounded-lg bg-gray-800 px-3 py-1.5 text-[11px] text-white shadow-lg whitespace-nowrap">
-            {tooltip}
-          </div>
-        </div>
-      )}
+    <div className="rounded-xl bg-[#161b22] p-5 border border-[#21262d]">
+      <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{label}</p>
+      <p className="mt-2 text-3xl font-bold text-white">{value}</p>
+      <p
+        className={cn(
+          'mt-1.5 text-xs font-medium flex items-center gap-1',
+          statusOk ? 'text-emerald-400' : 'text-rose-400',
+        )}
+      >
+        {statusOk ? '✓' : '↓'} {status}
+      </p>
     </div>
   )
 }
 
-// ─── MealCell ─────────────────────────────────────────────────────────────────
+// ─── DayColumn ────────────────────────────────────────────────────────────────
 
-interface MealCellProps {
-  slot: MealSlot | undefined
-  mealType: MealType
-  onAdd: () => void
-  onEdit: () => void
+interface DayColumnProps {
+  date: string
+  dayName: string
+  isToday: boolean
+  dayPlan: DayPlan | undefined
+  onAddMeal: (date: string, mealType: MealType) => void
+  onEditMeal: (slot: MealSlot, date: string) => void
 }
 
-function MealCell({ slot, mealType, onAdd, onEdit }: MealCellProps) {
-
-  if (!slot) {
-    return (
-      <button
-        onClick={onAdd}
-        className="flex h-[92px] w-full flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-gray-200 transition-all group hover:border-green-400 hover:bg-green-50"
-      >
-        <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-gray-200 transition-colors group-hover:border-green-400">
-          <Plus className="h-3.5 w-3.5 text-gray-300 transition-colors group-hover:text-green-500" />
-        </div>
-        <span className="text-[11px] font-medium leading-none text-gray-300 transition-colors group-hover:text-green-500">
-          {MEAL_LABELS[mealType]}
-        </span>
-      </button>
-    )
-  }
-
+function DayColumn({ date, dayName, isToday, dayPlan, onAddMeal, onEditMeal }: DayColumnProps) {
   return (
-    <button
-      onClick={onEdit}
-      className="flex h-[92px] w-full flex-col justify-between rounded-lg border border-gray-200 bg-white p-2.5 text-left transition-all group hover:border-green-400 hover:shadow-md"
+    <div
+      className={cn(
+        'flex flex-col rounded-xl bg-[#161b22] border p-3 min-w-[150px] flex-1',
+        isToday
+          ? 'border-emerald-500/50 shadow-[0_0_0_1px_rgba(16,185,129,0.2)]'
+          : 'border-[#21262d]',
+      )}
     >
-      <div className="min-h-0 flex-1">
-        <p className="line-clamp-2 text-xs font-semibold leading-tight text-gray-800 transition-colors group-hover:text-green-700">
-          {slot.name}
-        </p>
-        <p className="mt-1 flex items-center gap-0.5 text-[11px] leading-none text-gray-400">
-          <Flame className="h-3 w-3 shrink-0 text-orange-400" />
-          <span>{slot.calories} kcal</span>
+      {/* Day header */}
+      <div className="mb-3">
+        <p
+          className={cn(
+            'text-xs font-bold uppercase tracking-widest',
+            isToday ? 'text-emerald-400' : 'text-slate-400',
+          )}
+        >
+          {dayName}
+          {isToday && ' · HOJE'}
         </p>
       </div>
-      <div className="mt-1.5 flex flex-wrap gap-1">
-        <MacroBadge label={`P ${slot.macros.protein}g`} bg="bg-blue-50"  fg="text-blue-600" />
-        <MacroBadge label={`C ${slot.macros.carbs}g`}   bg="bg-amber-50" fg="text-amber-600" />
-        <MacroBadge label={`G ${slot.macros.fat}g`}     bg="bg-rose-50"  fg="text-rose-500" />
-      </div>
-    </button>
-  )
-}
 
-function MacroBadge({ label, bg, fg }: { label: string; bg: string; fg: string }) {
-  return (
-    <span className={cn('inline-flex rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-none', bg, fg)}>
-      {label}
-    </span>
+      {/* Meal slots */}
+      {MEAL_ORDER.map((mealType, i) => {
+        const slot = dayPlan?.meals[mealType]
+        return (
+          <button
+            key={mealType}
+            onClick={() =>
+              slot ? onEditMeal(slot, date) : onAddMeal(date, mealType)
+            }
+            className={cn(
+              'flex items-start gap-2 py-2 text-left w-full group',
+              i < 3 && 'border-b border-[#21262d]',
+            )}
+          >
+            <span className="text-sm leading-tight mt-0.5 shrink-0">
+              {MEAL_ICONS[mealType]}
+            </span>
+            {slot ? (
+              <span className="text-sm text-slate-200 leading-tight line-clamp-2 group-hover:text-white transition-colors">
+                {slot.name}
+              </span>
+            ) : (
+              <span className="text-xs text-slate-600 group-hover:text-slate-400 transition-colors">
+                Adicionar...
+              </span>
+            )}
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -208,19 +211,17 @@ export interface WeeklyCalendarProps {
   refreshKey?: number
 }
 
-type ViewMode = 'week' | 'day'
-
-export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekStartChange, onGeneratePlan, refreshKey }: WeeklyCalendarProps) {
-  const [weekStart,  setWeekStart]  = useState<Date>(() => getMondayOf(new Date()))
-  const [aiPlan,     setAiPlan]     = useState<WeekPlan | null>(null)
-  const [localPlan,  setLocalPlan]  = useState<WeekPlan | null>(null)
-  const [viewMode,   setViewMode]   = useState<ViewMode>('week')
-  const [selectedDay,  setSelectedDay]  = useState<number>(() => {
-    const today = new Date()
-    const monday = getMondayOf(today)
-    const diff = Math.round((today.getTime() - monday.getTime()) / 86400000)
-    return Math.max(0, Math.min(6, diff))
-  })
+export function WeeklyCalendar({
+  initialWeekPlan,
+  onAddMeal,
+  onEditMeal,
+  onWeekStartChange,
+  onGeneratePlan,
+  refreshKey,
+}: WeeklyCalendarProps) {
+  const [weekStart, setWeekStart] = useState<Date>(() => getMondayOf(new Date()))
+  const [aiPlan,    setAiPlan]    = useState<WeekPlan | null>(null)
+  const [localPlan, setLocalPlan] = useState<WeekPlan | null>(null)
 
   const profile  = useMemo(() => getProfile(), [])
   const todayStr = toLocalISODate(new Date())
@@ -285,330 +286,135 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekS
     }
   }, [weekPlan])
 
-  const weekLabel = `${fmtDay(weekStart)} – ${fmtDay(addDays(weekStart, 6))}/${weekDays[6].getFullYear()}`
+  // Metric status computation
+  const kcalGoal = profile.metas.kcal_dia || 2000
+  const protGoal = profile.metas.proteina_g || 150
+
+  const kcalDiff = metrics.avgCalories - kcalGoal
+  const kcalOk   = Math.abs(kcalDiff) <= 100
+  const kcalStatus = kcalOk
+    ? 'Dentro da meta'
+    : kcalDiff > 0
+      ? `${kcalDiff} kcal acima da meta`
+      : `${Math.abs(kcalDiff)} kcal abaixo da meta`
+
+  const protPct = protGoal > 0 ? metrics.avgProtein / protGoal : 0
+  const protOk  = protPct >= 0.9
+  const protStatus = protOk
+    ? 'Dentro da meta'
+    : `${Math.round((1 - protPct) * 100)}% abaixo da meta`
+
+  const daysOk     = metrics.plannedDays >= 7
+  const daysStatus = daysOk
+    ? 'Semana completa'
+    : `${7 - metrics.plannedDays} ${7 - metrics.plannedDays === 1 ? 'dia em aberto' : 'dias em aberto'}`
+
+  const weekLabel = `${fmtDay(weekStart)} a ${fmtDay(addDays(weekStart, 6))}`
 
   function prevWeek() { setWeekStart(d => addDays(d, -7)) }
   function nextWeek() { setWeekStart(d => addDays(d, 7))  }
   function goToday()  { setWeekStart(getMondayOf(new Date())) }
 
-  // ── Daily view derived state ───────────────────────────────────────────────
-  const selectedDate    = toLocalISODate(addDays(weekStart, selectedDay))
-  const selectedDayPlan = dayPlanMap[selectedDate]
-  const daySlots        = Object.values(selectedDayPlan?.meals ?? {}) as MealSlot[]
-  const dayKcal         = daySlots.reduce((s, m) => s + m.calories, 0)
-  const dayProt         = daySlots.reduce((s, m) => s + m.macros.protein, 0)
-  const dayCarbs        = daySlots.reduce((s, m) => s + m.macros.carbs, 0)
-  const dayFat          = daySlots.reduce((s, m) => s + m.macros.fat, 0)
-  const kcalGoal        = profile.metas.kcal_dia || 2000
-  const protGoal        = profile.metas.proteina_g || 150
-  const kcalPct         = Math.min(100, Math.round((dayKcal / kcalGoal) * 100))
-  const protPct         = Math.min(100, Math.round((dayProt / protGoal) * 100))
-
   return (
-    <>
-      <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6">
 
-        {/* ── Metric cards ───────────────────────────────────────────────── */}
-        <div className="grid grid-cols-3 gap-4">
-          <MetricCard
-            icon={<Flame className="h-5 w-5" />}
-            label="Calorias médias"
-            value={`${metrics.avgCalories.toLocaleString('pt-BR')} kcal`}
-            bg="bg-orange-100" fg="text-orange-500"
-            tooltip={`Média dos ${metrics.plannedDays} dias com refeições planejadas`}
-          />
-          <MetricCard
-            icon={<Dumbbell className="h-5 w-5" />}
-            label="Proteína média"
-            value={`${metrics.avgProtein} g`}
-            bg="bg-blue-100" fg="text-blue-500"
-          />
-          <MetricCard
-            icon={<CalendarCheck className="h-5 w-5" />}
-            label="Dias planejados"
-            value={`${metrics.plannedDays} / 7`}
-            bg="bg-green-100" fg="text-green-600"
-          />
+      {/* ── Page header ────────────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm text-slate-400">Semana de {weekLabel}</p>
+          <h1 className="text-2xl font-bold text-white">Minha semana alimentar</h1>
         </div>
 
-        {/* ── Calendar card ──────────────────────────────────────────────── */}
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-
-          {/* Navigation header */}
-          <div className="flex items-center gap-3 border-b border-gray-100 px-6 py-4">
-            {/* Title */}
-            <div className="flex-1">
-              <h2 className="text-base font-bold text-gray-900">Planejamento Semanal</h2>
-              <p className="mt-0.5 text-xs text-gray-400">{weekLabel}</p>
-            </div>
-
-            {/* Generate plan button */}
-            {onGeneratePlan && (
-              <button
-                onClick={() => onGeneratePlan(toLocalISODate(weekStart))}
-                className="flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-xs font-bold text-white hover:bg-brand-600 transition-colors shadow-sm"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                Gerar Dieta
-              </button>
-            )}
-
-            {/* View mode toggle */}
-            <div className="flex gap-0.5 rounded-lg border border-gray-200 bg-gray-50 p-0.5">
-              <button
-                onClick={() => setViewMode('week')}
-                className={cn('rounded-md px-2.5 py-1 text-xs font-semibold transition-all',
-                  viewMode === 'week' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700')}
-              >
-                📅 Semanal
-              </button>
-              <button
-                onClick={() => setViewMode('day')}
-                className={cn('rounded-md px-2.5 py-1 text-xs font-semibold transition-all',
-                  viewMode === 'day' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700')}
-              >
-                ☀️ Diário
-              </button>
-            </div>
-
-            {/* Week navigation */}
-            <div className="flex items-center gap-1">
-              <button
-                onClick={prevWeek}
-                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
-                aria-label="Semana anterior"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
-                onClick={goToday}
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
-              >
-                Hoje
-              </button>
-              <button
-                onClick={nextWeek}
-                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
-                aria-label="Próxima semana"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Daily view */}
-          {viewMode === 'day' && (
-            <div className="px-6 py-5 space-y-5">
-              {/* Day selector strip */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setSelectedDay(d => Math.max(0, d - 1))}
-                  disabled={selectedDay === 0}
-                  className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <div className="flex flex-1 justify-center gap-1">
-                  {weekDays.map((day, i) => {
-                    const ds = toLocalISODate(day)
-                    const isSelected = i === selectedDay
-                    const isToday   = ds === todayStr
-                    return (
-                      <button
-                        key={ds}
-                        onClick={() => setSelectedDay(i)}
-                        className={cn(
-                          'flex flex-col items-center gap-1 rounded-xl px-2.5 py-2 text-xs font-semibold transition-all',
-                          isSelected ? 'bg-brand text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100',
-                        )}
-                      >
-                        <span>{DAY_NAMES[i]}</span>
-                        <span className={cn('flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold',
-                          isSelected ? 'bg-white/20' : isToday ? 'bg-green-100 text-green-700' : '')}>
-                          {day.getDate()}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-                <button
-                  onClick={() => setSelectedDay(d => Math.min(6, d + 1))}
-                  disabled={selectedDay === 6}
-                  className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Progress bars */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                  <div className="mb-2 flex justify-between text-xs font-semibold">
-                    <span className="text-gray-600">Calorias</span>
-                    <span className="text-gray-900">{dayKcal.toLocaleString('pt-BR')} / {kcalGoal.toLocaleString('pt-BR')} kcal ({kcalPct}%)</span>
-                  </div>
-                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
-                    <div
-                      className={cn('h-full rounded-full transition-all duration-500',
-                        kcalPct >= 90 && kcalPct <= 110 ? 'bg-green-500' :
-                        kcalPct >= 75 ? 'bg-amber-400' : 'bg-red-400')}
-                      style={{ width: `${kcalPct}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                  <div className="mb-2 flex justify-between text-xs font-semibold">
-                    <span className="text-gray-600">Proteína</span>
-                    <span className="text-gray-900">{dayProt}g / {protGoal}g ({protPct}%)</span>
-                  </div>
-                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
-                    <div
-                      className={cn('h-full rounded-full transition-all duration-500',
-                        protPct >= 85 ? 'bg-blue-500' : protPct >= 65 ? 'bg-amber-400' : 'bg-red-400')}
-                      style={{ width: `${protPct}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Meal cards */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                {MEAL_ORDER.map(mealType => {
-                  const slot = selectedDayPlan?.meals[mealType]
-                  return (
-                    <div key={mealType} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                      <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">{MEAL_LABELS[mealType]}</p>
-                      {slot ? (
-                        <button
-                          onClick={() => onEditMeal?.(slot, selectedDate)}
-                          className="w-full text-left group"
-                        >
-                          <p className="font-semibold text-gray-800 group-hover:text-brand transition-colors">{slot.name}</p>
-                          <div className="mt-2 flex flex-wrap gap-1.5">
-                            <span className="rounded-md bg-orange-50 px-2 py-0.5 text-[10px] font-bold text-orange-500">🔥 {slot.calories} kcal</span>
-                            <MacroBadge label={`P ${slot.macros.protein}g`} bg="bg-blue-50"  fg="text-blue-600" />
-                            <MacroBadge label={`C ${slot.macros.carbs}g`}   bg="bg-amber-50" fg="text-amber-600" />
-                            <MacroBadge label={`G ${slot.macros.fat}g`}     bg="bg-rose-50"  fg="text-rose-500" />
-                          </div>
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => onAddMeal?.(selectedDate, mealType)}
-                          className="flex w-full items-center gap-2 rounded-lg border-2 border-dashed border-gray-200 px-3 py-4 text-sm text-gray-400 hover:border-brand/40 hover:text-brand transition-all"
-                        >
-                          <Plus className="h-4 w-4" />
-                          Adicionar {MEAL_LABELS[mealType].toLowerCase()}
-                        </button>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Daily macro summary */}
-              {daySlots.length > 0 && (
-                <div className="grid grid-cols-4 gap-2 rounded-xl border border-gray-200 bg-gray-50 p-3 text-center">
-                  {[
-                    { label: 'Calorias', value: `${dayKcal}`, unit: 'kcal', color: 'text-orange-500' },
-                    { label: 'Proteína', value: `${dayProt}`, unit: 'g',    color: 'text-blue-500'   },
-                    { label: 'Carbs',    value: `${dayCarbs}`, unit: 'g',   color: 'text-amber-500'  },
-                    { label: 'Gordura',  value: `${dayFat}`,  unit: 'g',    color: 'text-rose-500'   },
-                  ].map(({ label, value, unit, color }) => (
-                    <div key={label}>
-                      <p className={cn('text-lg font-bold leading-none', color)}>{value}<span className="text-xs font-medium text-gray-400">{unit}</span></p>
-                      <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400">{label}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Gerar com IA */}
+          {onGeneratePlan && (
+            <button
+              onClick={() => onGeneratePlan(toLocalISODate(weekStart))}
+              className="flex items-center gap-1.5 rounded-lg border border-[#30363d] bg-[#161b22] px-3.5 py-2 text-sm font-semibold text-white hover:border-emerald-500/50 hover:text-emerald-400 transition-all"
+            >
+              <Sparkles className="h-4 w-4" />
+              Gerar com IA
+            </button>
           )}
 
-          {/* Grid */}
-          <div className={cn('overflow-x-auto', viewMode === 'day' && 'hidden')}>
-            <div className="min-w-[860px]">
+          {/* Ver lista */}
+          <Link
+            href="/compras"
+            className="flex items-center gap-1.5 rounded-lg border border-[#30363d] bg-[#161b22] px-3.5 py-2 text-sm font-semibold text-white hover:border-slate-500 transition-all"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Ver lista
+          </Link>
 
-              {/* Day header row */}
-              <div className="grid grid-cols-[128px_repeat(7,minmax(0,1fr))] border-b border-gray-100 bg-gray-50">
-                <div className="px-4 py-3" />
-                {weekDays.map((day, i) => {
-                  const dateStr = toLocalISODate(day)
-                  const isToday = dateStr === todayStr
-                  return (
-                    <div
-                      key={dateStr}
-                      className={cn(
-                        'border-l border-gray-100 px-3 py-3 text-center',
-                        isToday && 'bg-green-50',
-                      )}
-                    >
-                      <p className={cn(
-                        'text-[11px] font-bold uppercase tracking-widest',
-                        isToday ? 'text-green-600' : 'text-gray-400',
-                      )}>
-                        {DAY_NAMES[i]}
-                      </p>
-                      <div className="mt-1 flex justify-center">
-                        <span className={cn(
-                          'text-sm font-bold leading-none',
-                          isToday
-                            ? 'flex h-7 w-7 items-center justify-center rounded-full bg-green-500 text-white'
-                            : 'text-gray-700',
-                        )}>
-                          {day.getDate()}
-                        </span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Meal rows */}
-              {MEAL_ORDER.map((mealType, rowIdx) => (
-                <div
-                  key={mealType}
-                  className={cn(
-                    'grid grid-cols-[128px_repeat(7,minmax(0,1fr))]',
-                    rowIdx < MEAL_ORDER.length - 1 && 'border-b border-gray-100',
-                  )}
-                >
-                  {/* Row label */}
-                  <div className="flex items-center border-r border-gray-100 bg-gray-50/60 px-4 py-3">
-                    <span className="text-xs font-semibold leading-tight text-gray-500">
-                      {MEAL_LABELS[mealType]}
-                    </span>
-                  </div>
-
-                  {/* Cells */}
-                  {weekDays.map((day) => {
-                    const dateStr = toLocalISODate(day)
-                    const isToday = dateStr === todayStr
-                    const slot = dayPlanMap[dateStr]?.meals[mealType]
-                    return (
-                      <div
-                        key={dateStr}
-                        className={cn(
-                          'border-l border-gray-100 p-2',
-                          isToday && 'bg-green-50/40',
-                        )}
-                      >
-                        <MealCell
-                          slot={slot}
-                          mealType={mealType}
-                          onAdd={() => onAddMeal?.(dateStr, mealType)}
-                          onEdit={() => slot && onEditMeal?.(slot, dateStr)}
-                        />
-                      </div>
-                    )
-                  })}
-                </div>
-              ))}
-
-            </div>
+          {/* Week navigation */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={prevWeek}
+              aria-label="Semana anterior"
+              className="rounded-lg p-2 text-slate-400 hover:bg-[#161b22] hover:text-white transition-colors"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={goToday}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+            >
+              Hoje
+            </button>
+            <button
+              onClick={nextWeek}
+              aria-label="Próxima semana"
+              className="rounded-lg p-2 text-slate-400 hover:bg-[#161b22] hover:text-white transition-colors"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </div>
 
-    </>
+      {/* ── Metric cards ───────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-4">
+        <MetricCard
+          label="Calorias médias/dia"
+          value={`${metrics.avgCalories.toLocaleString('pt-BR')} kcal`}
+          status={kcalStatus}
+          statusOk={kcalOk}
+        />
+        <MetricCard
+          label="Proteína média/dia"
+          value={`${metrics.avgProtein} g`}
+          status={protStatus}
+          statusOk={protOk}
+        />
+        <MetricCard
+          label="Dias planejados"
+          value={`${metrics.plannedDays} / 7`}
+          status={daysStatus}
+          statusOk={daysOk}
+        />
+      </div>
+
+      {/* ── Day columns ────────────────────────────────────────────────────── */}
+      <div className="overflow-x-auto">
+        <div className="flex gap-3 min-w-max">
+          {weekDays.map((day, i) => {
+            const dateStr = toLocalISODate(day)
+            const isToday = dateStr === todayStr
+            return (
+              <DayColumn
+                key={dateStr}
+                date={dateStr}
+                dayName={DAY_NAMES_SHORT[i]}
+                isToday={isToday}
+                dayPlan={dayPlanMap[dateStr]}
+                onAddMeal={(d, m) => onAddMeal?.(d, m)}
+                onEditMeal={(s, d) => onEditMeal?.(s, d)}
+              />
+            )
+          })}
+        </div>
+      </div>
+
+    </div>
   )
 }
