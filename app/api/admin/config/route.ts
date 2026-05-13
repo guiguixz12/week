@@ -1,25 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { readAdminConfig, writeAdminConfig } from '@/lib/admin-config'
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? '7808'
 
-export async function POST(req: NextRequest) {
-  const { password } = (await req.json()) as { password?: string }
+function validate(password: string | undefined): boolean {
+  return password === ADMIN_PASSWORD
+}
 
-  if (password !== ADMIN_PASSWORD) {
+function buildConfig(req: NextRequest) {
+  const host   = req.headers.get('host') ?? 'localhost:3000'
+  const proto  = host.startsWith('localhost') ? 'http' : 'https'
+  const appUrl = `${proto}://${host}`
+
+  const fileConfig = readAdminConfig()
+
+  // File config takes priority over env vars
+  const n8nWebhookUrl = fileConfig.n8nWebhookUrl || process.env.N8N_WEBHOOK_URL || null
+  const webhookSecret = fileConfig.webhookSecret  || process.env.WEBHOOK_SECRET  || null
+
+  return {
+    n8nWebhookUrl,
+    webhookSecret,
+    receivePlanUrl:   `${appUrl}/api/webhook/receive-plan`,
+    appUrl,
+    n8nConfigured:    !!n8nWebhookUrl,
+    secretConfigured: !!webhookSecret,
+    openAiConfigured: !!process.env.OPENAI_API_KEY,
+    savedAt:          fileConfig.updatedAt || null,
+  }
+}
+
+// POST — validate password and return config
+export async function POST(req: NextRequest) {
+  const body = (await req.json()) as { password?: string }
+  if (!validate(body.password)) {
+    return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 })
+  }
+  return NextResponse.json(buildConfig(req))
+}
+
+// PUT — validate password and save new config values
+export async function PUT(req: NextRequest) {
+  const body = (await req.json()) as {
+    password?: string
+    n8nWebhookUrl?: string
+    webhookSecret?: string
+  }
+
+  if (!validate(body.password)) {
     return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 })
   }
 
-  const host = req.headers.get('host') ?? 'localhost:3000'
-  const proto = host.startsWith('localhost') ? 'http' : 'https'
-  const appUrl = `${proto}://${host}`
-
-  return NextResponse.json({
-    n8nWebhookUrl:        process.env.N8N_WEBHOOK_URL           ?? null,
-    webhookSecret:        process.env.WEBHOOK_SECRET             ?? null,
-    receivePlanUrl:       `${appUrl}/api/webhook/receive-plan`,
-    appUrl,
-    n8nConfigured:        !!process.env.N8N_WEBHOOK_URL,
-    secretConfigured:     !!process.env.WEBHOOK_SECRET,
-    openAiConfigured:     !!process.env.OPENAI_API_KEY,
+  writeAdminConfig({
+    n8nWebhookUrl: body.n8nWebhookUrl ?? '',
+    webhookSecret: body.webhookSecret ?? '',
   })
+
+  return NextResponse.json({ ok: true, config: buildConfig(req) })
 }

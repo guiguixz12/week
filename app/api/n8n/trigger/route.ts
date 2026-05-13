@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { readAdminConfig } from '@/lib/admin-config'
 
 // ─── Current week Monday ──────────────────────────────────────────────────────
 
@@ -14,7 +15,8 @@ function getCurrentWeekStart(): string {
 // ─── Route ────────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const webhookUrl = process.env.N8N_WEBHOOK_URL
+  const fileConfig = readAdminConfig()
+  const webhookUrl = fileConfig.n8nWebhookUrl || process.env.N8N_WEBHOOK_URL
   if (!webhookUrl) {
     return NextResponse.json(
       { error: 'N8N_WEBHOOK_URL não configurada no servidor.' },
