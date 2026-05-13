@@ -1,6 +1,6 @@
 import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
-import { getOpenAiKey } from '@/lib/admin-config'
+import { getOpenAiKeyAsync } from '@/lib/admin-config'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -112,8 +112,8 @@ function extractJSON(text: string): WeeklyPlan {
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  // Admin panel key takes priority over env var
-  const apiKey = getOpenAiKey()
+  // Admin panel key (from Supabase) takes priority over env var
+  const apiKey = await getOpenAiKeyAsync()
   if (!apiKey) {
     return NextResponse.json(
       { error: 'OPENAI_API_KEY não configurada. Adicione no Painel Admin ou no EasyPanel.' },

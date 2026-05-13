@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readAdminConfig, writeAdminConfig, getOpenAiKey } from '@/lib/admin-config'
+import { readAdminConfigAsync, writeAdminConfig } from '@/lib/admin-config'
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? '7808'
 
 function validate(p: string | undefined) { return p === ADMIN_PASSWORD }
 
-function buildConfig() {
-  const file          = readAdminConfig()
+async function buildConfig() {
+  const file          = await readAdminConfigAsync()
   const n8nWebhookUrl = file.n8nWebhookUrl || process.env.N8N_WEBHOOK_URL || null
-  const openAiKey     = getOpenAiKey()
+  const openAiKey     = file.openAiKey || process.env.OPENAI_API_KEY || ''
   const openAiSource  = file.openAiKey ? 'admin' : (process.env.OPENAI_API_KEY ? 'env' : null)
 
   const mode: 'n8n' | 'openai' | 'none' =
@@ -17,7 +17,7 @@ function buildConfig() {
   return {
     n8nWebhookUrl,
     openAiConfigured: !!openAiKey,
-    openAiSource,            // 'admin' | 'env' | null
+    openAiSource,
     openAiKeyMasked: openAiKey ? `sk-...${openAiKey.slice(-4)}` : null,
     mode,
     savedAt: file.updatedAt || null,
@@ -27,7 +27,7 @@ function buildConfig() {
 export async function POST(req: NextRequest) {
   const { password } = (await req.json()) as { password?: string }
   if (!validate(password)) return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 })
-  return NextResponse.json(buildConfig())
+  return NextResponse.json(await buildConfig())
 }
 
 export async function PUT(req: NextRequest) {
@@ -46,5 +46,5 @@ export async function PUT(req: NextRequest) {
     )
   }
 
-  return NextResponse.json({ ok: true, config: buildConfig() })
+  return NextResponse.json({ ok: true, config: await buildConfig() })
 }
