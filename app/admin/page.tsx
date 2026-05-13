@@ -125,6 +125,7 @@ function ConfigForm({ config, password, onSaved }: {
   const [secret,    setSecret]    = useState(config.webhookSecret ?? '')
   const [showSec,   setShowSec]   = useState(false)
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'ok' | 'error'>('idle')
+  const [saveError, setSaveError] = useState('')
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -135,11 +136,12 @@ function ConfigForm({ config, password, onSaved }: {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ password, n8nWebhookUrl: url.trim(), webhookSecret: secret.trim() }),
       })
-      if (!res.ok) throw new Error()
-      const { config: newConfig } = await res.json() as { config: Config }
-      onSaved(newConfig)
+      const json = await res.json() as { config?: Config; error?: string }
+      if (!res.ok) throw new Error(json.error ?? 'Erro desconhecido')
+      onSaved(json.config!)
       setSaveState('ok')
-    } catch {
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Erro ao salvar')
       setSaveState('error')
     }
     setTimeout(() => setSaveState('idle'), 3000)
@@ -159,8 +161,19 @@ function ConfigForm({ config, password, onSaved }: {
           placeholder="https://seu-n8n.dominio.com/webhook/nutriweek-plan"
           className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
         />
+        {url.includes('/webhook-test/') && (
+          <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+            <AlertCircle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
+            <p className="text-xs text-amber-700">
+              <strong>URL de teste detectada</strong> — <code className="font-mono">/webhook-test/</code> só funciona com o editor do n8n aberto.
+              Para produção, troque por <code className="font-mono">/webhook/</code> na URL.
+              <br />
+              Exemplo: <span className="font-mono break-all">{url.replace('/webhook-test/', '/webhook/')}</span>
+            </p>
+          </div>
+        )}
         <p className="text-xs text-gray-400">
-          Esta é a URL do nó Webhook no seu fluxo n8n. O SaaS enviará o perfil do usuário para cá quando ele concluir o onboarding.
+          URL do nó Webhook no n8n. Use <span className="font-mono">/webhook/</span> (não <span className="font-mono">/webhook-test/</span>) para produção.
         </p>
       </div>
 
@@ -186,6 +199,13 @@ function ConfigForm({ config, password, onSaved }: {
           Envie este valor no header <span className="font-mono text-gray-600">X-Webhook-Secret</span> quando o n8n chamar o SaaS. Deixe em branco para desativar a verificação.
         </p>
       </div>
+
+      {saveState === 'error' && saveError && (
+        <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5">
+          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
+          <p className="text-xs text-red-600">{saveError}</p>
+        </div>
+      )}
 
       <div className="flex items-center justify-between pt-1">
         {config.savedAt && (

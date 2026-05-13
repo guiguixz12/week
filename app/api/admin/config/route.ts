@@ -51,10 +51,18 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 })
   }
 
-  writeAdminConfig({
-    n8nWebhookUrl: body.n8nWebhookUrl ?? '',
-    webhookSecret: body.webhookSecret ?? '',
-  })
+  try {
+    writeAdminConfig({
+      n8nWebhookUrl: body.n8nWebhookUrl ?? '',
+      webhookSecret: body.webhookSecret ?? '',
+    })
+  } catch (err) {
+    console.error('[admin/config PUT]', err)
+    return NextResponse.json(
+      { error: `Erro ao salvar: ${err instanceof Error ? err.message : String(err)}` },
+      { status: 500 },
+    )
+  }
 
   return NextResponse.json({ ok: true, config: buildConfig(req) })
 }

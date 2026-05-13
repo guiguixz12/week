@@ -1,8 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { join } from 'path'
 
-// Persiste em /app/nw-config.json no container (sobrevive enquanto o processo roda)
-const CONFIG_PATH = join(process.cwd(), 'nw-config.json')
+// /tmp é sempre gravável em qualquer container Linux
+const CONFIG_PATH = '/tmp/nw-config.json'
 
 interface AdminConfig {
   n8nWebhookUrl: string
