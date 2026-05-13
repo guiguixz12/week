@@ -5,7 +5,6 @@ import {
   CalendarCheck,
   ChevronLeft,
   ChevronRight,
-  DollarSign,
   Dumbbell,
   Flame,
   Plus,
@@ -279,12 +278,10 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekS
     const plannedDays = weekPlan.days.filter(d => Object.keys(d.meals).length > 0).length
     const totalCals   = allSlots.reduce((s, m) => s + m.calories, 0)
     const totalProt   = allSlots.reduce((s, m) => s + m.macros.protein, 0)
-    const totalCost   = allSlots.reduce((s, m) => s + (m.cost ?? 0), 0)
     return {
       avgCalories: plannedDays > 0 ? Math.round(totalCals / plannedDays) : 0,
       avgProtein:  plannedDays > 0 ? Math.round(totalProt / plannedDays) : 0,
       plannedDays,
-      totalCost,
     }
   }, [weekPlan])
 
@@ -312,7 +309,7 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekS
       <div className="flex flex-col gap-6">
 
         {/* ── Metric cards ───────────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-3 gap-4">
           <MetricCard
             icon={<Flame className="h-5 w-5" />}
             label="Calorias médias"
@@ -331,12 +328,6 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekS
             label="Dias planejados"
             value={`${metrics.plannedDays} / 7`}
             bg="bg-green-100" fg="text-green-600"
-          />
-          <MetricCard
-            icon={<DollarSign className="h-5 w-5" />}
-            label="Custo estimado"
-            value={`R$ ${metrics.totalCost.toFixed(2).replace('.', ',')}`}
-            bg="bg-purple-100" fg="text-purple-600"
           />
         </div>
 

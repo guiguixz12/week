@@ -8,7 +8,6 @@ import {
   ClipboardCopy,
   Mail,
   MessageCircle,
-  Pencil,
   RefreshCw,
   Share2,
   ShoppingCart,
@@ -23,11 +22,10 @@ import { getWeekPlan } from '@/lib/store'
 type Category = 'proteinas' | 'vegetais' | 'laticinios' | 'cereais' | 'outros'
 
 interface CatalogItem {
-  id: string
-  name: string
+  id:       string
+  name:     string
   category: Category
-  qty: string
-  weeklyPrice: number
+  qty:      string
   keywords: string[]
 }
 
@@ -35,61 +33,61 @@ interface CatalogItem {
 
 const CATALOG: CatalogItem[] = [
   // Proteínas
-  { id: 'frango',      name: 'Filé de frango',        category: 'proteinas',  qty: '800g',    weeklyPrice: 19.00, keywords: ['frango', 'peito de frango', 'frango grelhado', 'frango ao'] },
-  { id: 'carne-moida', name: 'Carne moída',            category: 'proteinas',  qty: '500g',    weeklyPrice: 17.50, keywords: ['carne moída', 'carne bovina', 'carne moi'] },
-  { id: 'salmon',      name: 'Salmão',                 category: 'proteinas',  qty: '400g',    weeklyPrice: 38.00, keywords: ['salmão', 'salmon'] },
-  { id: 'tilapia',     name: 'Tilápia',                category: 'proteinas',  qty: '500g',    weeklyPrice: 22.00, keywords: ['tilápia', 'tilapia'] },
-  { id: 'ovos',        name: 'Ovos',                   category: 'proteinas',  qty: '1 dúzia', weeklyPrice: 14.40, keywords: ['ovo ', 'omelete', 'ovo mexido', 'panqueca', 'ovos'] },
-  { id: 'atum',        name: 'Atum em lata',            category: 'proteinas',  qty: '2 un',    weeklyPrice: 10.00, keywords: ['atum em', 'atum na'] },
-  { id: 'camarao',     name: 'Camarão',                category: 'proteinas',  qty: '300g',    weeklyPrice: 36.00, keywords: ['camarão', 'camarao'] },
-  { id: 'patinho',     name: 'Patinho bovino',          category: 'proteinas',  qty: '500g',    weeklyPrice: 24.00, keywords: ['patinho', 'bife', 'alcatra'] },
+  { id: 'frango',      name: 'Filé de frango',       category: 'proteinas',  qty: '800g',     keywords: ['frango', 'peito de frango', 'frango grelhado', 'frango ao'] },
+  { id: 'carne-moida', name: 'Carne moída',           category: 'proteinas',  qty: '500g',     keywords: ['carne moída', 'carne bovina', 'carne moi'] },
+  { id: 'salmon',      name: 'Salmão',                category: 'proteinas',  qty: '400g',     keywords: ['salmão', 'salmon'] },
+  { id: 'tilapia',     name: 'Tilápia',               category: 'proteinas',  qty: '500g',     keywords: ['tilápia', 'tilapia'] },
+  { id: 'ovos',        name: 'Ovos',                  category: 'proteinas',  qty: '1 dúzia',  keywords: ['ovo ', 'omelete', 'ovo mexido', 'panqueca', 'ovos'] },
+  { id: 'atum',        name: 'Atum em lata',           category: 'proteinas',  qty: '2 un',     keywords: ['atum em', 'atum na'] },
+  { id: 'camarao',     name: 'Camarão',               category: 'proteinas',  qty: '300g',     keywords: ['camarão', 'camarao'] },
+  { id: 'patinho',     name: 'Patinho bovino',         category: 'proteinas',  qty: '500g',     keywords: ['patinho', 'bife', 'alcatra'] },
 
   // Vegetais
-  { id: 'brocolis',         name: 'Brócolis',          category: 'vegetais',   qty: '400g',    weeklyPrice: 4.80,  keywords: ['brócolis', 'brocolis'] },
-  { id: 'couve',            name: 'Couve',             category: 'vegetais',   qty: '1 maço',  weeklyPrice: 3.50,  keywords: ['couve'] },
-  { id: 'espinafre',        name: 'Espinafre',         category: 'vegetais',   qty: '200g',    weeklyPrice: 5.90,  keywords: ['espinafre'] },
-  { id: 'abobrinha',        name: 'Abobrinha',         category: 'vegetais',   qty: '500g',    weeklyPrice: 5.00,  keywords: ['abobrinha'] },
-  { id: 'cenoura',          name: 'Cenoura',           category: 'vegetais',   qty: '500g',    weeklyPrice: 3.50,  keywords: ['cenoura'] },
-  { id: 'tomate',           name: 'Tomate',            category: 'vegetais',   qty: '500g',    weeklyPrice: 5.50,  keywords: ['tomate'] },
-  { id: 'alface',           name: 'Alface',            category: 'vegetais',   qty: '1 pé',    weeklyPrice: 3.00,  keywords: ['alface', 'salada verde'] },
-  { id: 'batata-doce',      name: 'Batata-doce',       category: 'vegetais',   qty: '600g',    weeklyPrice: 6.00,  keywords: ['batata-doce', 'batata doce'] },
-  { id: 'mandioca',         name: 'Mandioca',          category: 'vegetais',   qty: '500g',    weeklyPrice: 3.50,  keywords: ['mandioca', 'aipim', 'macaxeira'] },
-  { id: 'frutas-vermelhas', name: 'Frutas vermelhas',  category: 'vegetais',   qty: '300g',    weeklyPrice: 22.00, keywords: ['frutas vermelhas', 'morango', 'mirtilo'] },
-  { id: 'banana',           name: 'Banana',            category: 'vegetais',   qty: '6 un',    weeklyPrice: 4.50,  keywords: ['banana'] },
-  { id: 'maca',             name: 'Maçã',              category: 'vegetais',   qty: '4 un',    weeklyPrice: 8.00,  keywords: ['maçã', 'maca '] },
-  { id: 'pepino',           name: 'Pepino',            category: 'vegetais',   qty: '2 un',    weeklyPrice: 3.00,  keywords: ['pepino'] },
-  { id: 'beterraba',        name: 'Beterraba',         category: 'vegetais',   qty: '3 un',    weeklyPrice: 4.50,  keywords: ['beterraba'] },
+  { id: 'brocolis',         name: 'Brócolis',         category: 'vegetais',   qty: '400g',     keywords: ['brócolis', 'brocolis'] },
+  { id: 'couve',            name: 'Couve',            category: 'vegetais',   qty: '1 maço',   keywords: ['couve'] },
+  { id: 'espinafre',        name: 'Espinafre',        category: 'vegetais',   qty: '200g',     keywords: ['espinafre'] },
+  { id: 'abobrinha',        name: 'Abobrinha',        category: 'vegetais',   qty: '500g',     keywords: ['abobrinha'] },
+  { id: 'cenoura',          name: 'Cenoura',          category: 'vegetais',   qty: '500g',     keywords: ['cenoura'] },
+  { id: 'tomate',           name: 'Tomate',           category: 'vegetais',   qty: '500g',     keywords: ['tomate'] },
+  { id: 'alface',           name: 'Alface',           category: 'vegetais',   qty: '1 pé',     keywords: ['alface', 'salada verde'] },
+  { id: 'batata-doce',      name: 'Batata-doce',      category: 'vegetais',   qty: '600g',     keywords: ['batata-doce', 'batata doce'] },
+  { id: 'mandioca',         name: 'Mandioca',         category: 'vegetais',   qty: '500g',     keywords: ['mandioca', 'aipim', 'macaxeira'] },
+  { id: 'frutas-vermelhas', name: 'Frutas vermelhas', category: 'vegetais',   qty: '300g',     keywords: ['frutas vermelhas', 'morango', 'mirtilo'] },
+  { id: 'banana',           name: 'Banana',           category: 'vegetais',   qty: '6 un',     keywords: ['banana'] },
+  { id: 'maca',             name: 'Maçã',             category: 'vegetais',   qty: '4 un',     keywords: ['maçã', 'maca '] },
+  { id: 'pepino',           name: 'Pepino',           category: 'vegetais',   qty: '2 un',     keywords: ['pepino'] },
+  { id: 'beterraba',        name: 'Beterraba',        category: 'vegetais',   qty: '3 un',     keywords: ['beterraba'] },
 
   // Laticínios
-  { id: 'iogurte-grego',  name: 'Iogurte grego',           category: 'laticinios', qty: '2 un',  weeklyPrice: 13.00, keywords: ['iogurte grego', 'iogurte natural'] },
-  { id: 'queijo-minas',   name: 'Queijo minas frescal',     category: 'laticinios', qty: '400g', weeklyPrice: 17.00, keywords: ['queijo minas', 'queijo frescal', 'queijo e ', 'queijo,'] },
-  { id: 'queijo-cottage', name: 'Queijo cottage',           category: 'laticinios', qty: '200g', weeklyPrice: 8.50,  keywords: ['queijo cottage', 'cottage'] },
-  { id: 'leite',          name: 'Leite desnatado',          category: 'laticinios', qty: '1L',   weeklyPrice: 4.90,  keywords: ['leite'] },
-  { id: 'manteiga',       name: 'Manteiga s/ sal',          category: 'laticinios', qty: '200g', weeklyPrice: 9.00,  keywords: ['manteiga'] },
-  { id: 'requeijao',      name: 'Requeijão light',          category: 'laticinios', qty: '200g', weeklyPrice: 7.50,  keywords: ['requeijão', 'requeijao'] },
+  { id: 'iogurte-grego',  name: 'Iogurte grego',          category: 'laticinios', qty: '2 un',  keywords: ['iogurte grego', 'iogurte natural'] },
+  { id: 'queijo-minas',   name: 'Queijo minas frescal',    category: 'laticinios', qty: '400g',  keywords: ['queijo minas', 'queijo frescal', 'queijo e ', 'queijo,'] },
+  { id: 'queijo-cottage', name: 'Queijo cottage',          category: 'laticinios', qty: '200g',  keywords: ['queijo cottage', 'cottage'] },
+  { id: 'leite',          name: 'Leite',                   category: 'laticinios', qty: '1L',    keywords: ['leite'] },
+  { id: 'manteiga',       name: 'Manteiga',                category: 'laticinios', qty: '200g',  keywords: ['manteiga'] },
+  { id: 'requeijao',      name: 'Requeijão',               category: 'laticinios', qty: '200g',  keywords: ['requeijão', 'requeijao'] },
 
   // Cereais
-  { id: 'arroz-integral',    name: 'Arroz integral',       category: 'cereais', qty: '1kg',   weeklyPrice: 8.00,  keywords: ['arroz integral', 'arroz'] },
-  { id: 'feijao',            name: 'Feijão carioca',       category: 'cereais', qty: '500g',  weeklyPrice: 5.50,  keywords: ['feijão', 'feijao'] },
-  { id: 'quinoa',            name: 'Quinoa',               category: 'cereais', qty: '400g',  weeklyPrice: 19.00, keywords: ['quinoa'] },
-  { id: 'aveia',             name: 'Aveia em flocos',      category: 'cereais', qty: '500g',  weeklyPrice: 8.90,  keywords: ['aveia'] },
-  { id: 'granola',           name: 'Granola',              category: 'cereais', qty: '300g',  weeklyPrice: 15.00, keywords: ['granola'] },
-  { id: 'macarrao-integral', name: 'Macarrão integral',    category: 'cereais', qty: '500g',  weeklyPrice: 6.50,  keywords: ['macarrão integral', 'macarrao integral'] },
-  { id: 'tapioca',           name: 'Goma de tapioca',      category: 'cereais', qty: '500g',  weeklyPrice: 7.90,  keywords: ['tapioca'] },
-  { id: 'pao-integral',      name: 'Pão integral',         category: 'cereais', qty: '1 un',  weeklyPrice: 12.00, keywords: ['pão integral', 'torrada integral', 'torrada'] },
-  { id: 'lentilha',          name: 'Lentilha',             category: 'cereais', qty: '500g',  weeklyPrice: 8.90,  keywords: ['lentilha'] },
-  { id: 'grao-de-bico',      name: 'Grão-de-bico',         category: 'cereais', qty: '400g',  weeklyPrice: 9.00,  keywords: ['grão-de-bico', 'grao-de-bico', 'grao de bico'] },
+  { id: 'arroz-integral',    name: 'Arroz integral',      category: 'cereais', qty: '1kg',   keywords: ['arroz integral', 'arroz'] },
+  { id: 'feijao',            name: 'Feijão',              category: 'cereais', qty: '500g',  keywords: ['feijão', 'feijao'] },
+  { id: 'quinoa',            name: 'Quinoa',              category: 'cereais', qty: '400g',  keywords: ['quinoa'] },
+  { id: 'aveia',             name: 'Aveia em flocos',     category: 'cereais', qty: '500g',  keywords: ['aveia'] },
+  { id: 'granola',           name: 'Granola',             category: 'cereais', qty: '300g',  keywords: ['granola'] },
+  { id: 'macarrao-integral', name: 'Macarrão integral',   category: 'cereais', qty: '500g',  keywords: ['macarrão integral', 'macarrao integral'] },
+  { id: 'tapioca',           name: 'Goma de tapioca',     category: 'cereais', qty: '500g',  keywords: ['tapioca'] },
+  { id: 'pao-integral',      name: 'Pão integral',        category: 'cereais', qty: '1 un',  keywords: ['pão integral', 'torrada integral', 'torrada'] },
+  { id: 'lentilha',          name: 'Lentilha',            category: 'cereais', qty: '500g',  keywords: ['lentilha'] },
+  { id: 'grao-de-bico',      name: 'Grão-de-bico',        category: 'cereais', qty: '400g',  keywords: ['grão-de-bico', 'grao-de-bico', 'grao de bico'] },
 
   // Outros
-  { id: 'azeite',        name: 'Azeite de oliva',    category: 'outros', qty: '500ml',   weeklyPrice: 29.00, keywords: ['azeite'] },
-  { id: 'mel',           name: 'Mel',                category: 'outros', qty: '300g',    weeklyPrice: 15.00, keywords: ['mel '] },
-  { id: 'castanhas',     name: 'Mix de castanhas',   category: 'outros', qty: '200g',    weeklyPrice: 22.00, keywords: ['castanhas', 'mix de castanhas'] },
-  { id: 'molho-tomate',  name: 'Molho de tomate',    category: 'outros', qty: '2 un',    weeklyPrice: 8.00,  keywords: ['sugo', 'molho de tomate', 'ao sugo'] },
-  { id: 'limao',         name: 'Limão',              category: 'outros', qty: '6 un',    weeklyPrice: 3.00,  keywords: ['limão', 'limao'] },
-  { id: 'alho',          name: 'Alho',               category: 'outros', qty: '1 cabeça', weeklyPrice: 4.50, keywords: [' alho'] },
-  { id: 'cebola',        name: 'Cebola',             category: 'outros', qty: '500g',    weeklyPrice: 3.50,  keywords: ['cebola'] },
-  { id: 'caldo-legumes', name: 'Caldo de legumes',   category: 'outros', qty: '2 un',    weeklyPrice: 4.50,  keywords: ['sopa de', 'caldo de legumes'] },
-  { id: 'oleo-coco',     name: 'Óleo de coco',       category: 'outros', qty: '200ml',   weeklyPrice: 16.00, keywords: ['óleo de coco', 'oleo de coco'] },
+  { id: 'azeite',        name: 'Azeite de oliva',   category: 'outros', qty: '500ml',    keywords: ['azeite'] },
+  { id: 'mel',           name: 'Mel',               category: 'outros', qty: '300g',     keywords: ['mel '] },
+  { id: 'castanhas',     name: 'Mix de castanhas',  category: 'outros', qty: '200g',     keywords: ['castanhas', 'mix de castanhas'] },
+  { id: 'molho-tomate',  name: 'Molho de tomate',   category: 'outros', qty: '2 un',     keywords: ['sugo', 'molho de tomate', 'ao sugo'] },
+  { id: 'limao',         name: 'Limão',             category: 'outros', qty: '6 un',     keywords: ['limão', 'limao'] },
+  { id: 'alho',          name: 'Alho',              category: 'outros', qty: '1 cabeça', keywords: [' alho'] },
+  { id: 'cebola',        name: 'Cebola',            category: 'outros', qty: '500g',     keywords: ['cebola'] },
+  { id: 'caldo-legumes', name: 'Caldo de legumes',  category: 'outros', qty: '2 un',     keywords: ['sopa de', 'caldo de legumes'] },
+  { id: 'oleo-coco',     name: 'Óleo de coco',      category: 'outros', qty: '200ml',    keywords: ['óleo de coco', 'oleo de coco'] },
 ]
 
 const CATEGORY_META: Record<Category, { label: string; emoji: string; order: number }> = {
@@ -100,7 +98,7 @@ const CATEGORY_META: Record<Category, { label: string; emoji: string; order: num
   outros:     { label: 'Outros',     emoji: '🏪', order: 4 },
 }
 
-// ─── Demo meals (shown when no Supabase data available) ───────────────────────
+// ─── Demo meals ───────────────────────────────────────────────────────────────
 
 const DEMO_MEAL_NAMES = [
   'Aveia com frutas vermelhas',
@@ -141,91 +139,52 @@ function fmtDay(date: Date): string {
   return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
 }
 
-function fmtBRL(value: number): string {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
-
 // ─── Shopping list builder ────────────────────────────────────────────────────
 
 function normalize(s: string): string {
-  return s
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
 }
 
 function generateList(mealNames: string[]): CatalogItem[] {
   const combined = ' ' + mealNames.map(n => normalize(n)).join(' ') + ' '
   const found = new Set<string>()
   const result: CatalogItem[] = []
-
   for (const item of CATALOG) {
     for (const kw of item.keywords) {
       if (combined.includes(normalize(kw))) {
-        if (!found.has(item.id)) {
-          found.add(item.id)
-          result.push(item)
-        }
+        if (!found.has(item.id)) { found.add(item.id); result.push(item) }
         break
       }
     }
   }
-
   return result
-}
-
-function formatListText(
-  items: CatalogItem[],
-  prices: Record<string, number>,
-  checked: Set<string>,
-  weekLabel: string,
-): string {
-  const lines: string[] = [
-    `LISTA DE COMPRAS — ${weekLabel}`,
-    '',
-  ]
-
-  const byCategory = groupByCategory(items)
-
-  for (const category of Object.keys(CATEGORY_META) as Category[]) {
-    const group = byCategory[category] ?? []
-    if (group.length === 0) continue
-
-    lines.push(CATEGORY_META[category].label.toUpperCase())
-    for (const item of group) {
-      const price = prices[item.id] ?? item.weeklyPrice
-      const mark = checked.has(item.id) ? '✓' : '☐'
-      const name = `${mark} ${item.name}`.padEnd(30, ' ')
-      const qty = item.qty.padEnd(10, ' ')
-      lines.push(`${name}${qty}${fmtBRL(price)}`)
-    }
-    lines.push('')
-  }
-
-  const total = items.reduce((s, i) => s + (prices[i.id] ?? i.weeklyPrice), 0)
-  const done  = items.filter(i => checked.has(i.id)).reduce((s, i) => s + (prices[i.id] ?? i.weeklyPrice), 0)
-
-  lines.push('—'.repeat(40))
-  lines.push(`Total estimado: ${fmtBRL(total)}`)
-  lines.push(`Já comprado:    ${fmtBRL(done)}`)
-  lines.push(`Restante:       ${fmtBRL(total - done)}`)
-  lines.push('')
-  lines.push('Gerado pelo NutriWeek')
-
-  return lines.join('\n')
 }
 
 function groupByCategory(items: CatalogItem[]): Partial<Record<Category, CatalogItem[]>> {
   const groups: Partial<Record<Category, CatalogItem[]>> = {}
-  for (const item of items) {
-    ;(groups[item.category] ??= []).push(item)
-  }
+  for (const item of items) { (groups[item.category] ??= []).push(item) }
   return groups
 }
 
-// ─── localStorage keys ────────────────────────────────────────────────────────
+function formatListText(items: CatalogItem[], checked: Set<string>, weekLabel: string): string {
+  const lines: string[] = [`LISTA DE COMPRAS — ${weekLabel}`, '']
+  const byCategory = groupByCategory(items)
+  for (const category of Object.keys(CATEGORY_META) as Category[]) {
+    const group = byCategory[category] ?? []
+    if (group.length === 0) continue
+    lines.push(CATEGORY_META[category].label.toUpperCase())
+    for (const item of group) {
+      const mark = checked.has(item.id) ? '✓' : '☐'
+      lines.push(`${mark} ${item.name} — ${item.qty}`)
+    }
+    lines.push('')
+  }
+  lines.push('Gerado pelo NutriWeek')
+  return lines.join('\n')
+}
 
-const LS_PRICES = 'nutriweek:shopping:prices'
+// ─── localStorage ─────────────────────────────────────────────────────────────
+
 function lsCheckedKey(weekStart: string) { return `nutriweek:shopping:checked:${weekStart}` }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -236,152 +195,61 @@ function SkeletonRow() {
       <div className="h-5 w-5 rounded bg-gray-200 shrink-0" />
       <div className="flex-1 h-4 bg-gray-200 rounded w-3/4" />
       <div className="h-4 w-12 bg-gray-200 rounded" />
-      <div className="h-4 w-16 bg-gray-200 rounded" />
     </div>
   )
 }
 
 interface ItemRowProps {
-  item: CatalogItem
-  checked: boolean
-  price: number
-  isEditing: boolean
-  editValue: string
+  item:     CatalogItem
+  checked:  boolean
   onToggle: () => void
-  onEditStart: () => void
-  onEditChange: (v: string) => void
-  onEditCommit: () => void
 }
 
-function ItemRow({
-  item, checked, price, isEditing, editValue,
-  onToggle, onEditStart, onEditChange, onEditCommit,
-}: ItemRowProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (isEditing) inputRef.current?.focus()
-  }, [isEditing])
-
+function ItemRow({ item, checked, onToggle }: ItemRowProps) {
   return (
-    <div
-      className={cn(
-        'flex items-center gap-3 px-4 py-3 transition-colors',
-        checked ? 'bg-gray-50' : 'hover:bg-gray-50/60',
-      )}
-    >
-      {/* Checkbox */}
+    <div className={cn('flex items-center gap-3 px-4 py-3 transition-colors', checked ? 'bg-gray-50' : 'hover:bg-gray-50/60')}>
       <button
         onClick={onToggle}
         aria-label={checked ? 'Desmarcar' : 'Marcar como comprado'}
         className={cn(
           'flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-all',
-          checked
-            ? 'border-brand bg-brand text-white'
-            : 'border-gray-300 hover:border-brand',
+          checked ? 'border-brand bg-brand text-white' : 'border-gray-300 hover:border-brand',
         )}
       >
         {checked && <Check className="h-3 w-3" strokeWidth={3} />}
       </button>
-
-      {/* Name */}
-      <span className={cn(
-        'flex-1 text-sm font-medium leading-tight',
-        checked ? 'text-gray-400 line-through' : 'text-gray-800',
-      )}>
+      <span className={cn('flex-1 text-sm font-medium leading-tight', checked ? 'text-gray-400 line-through' : 'text-gray-800')}>
         {item.name}
       </span>
-
-      {/* Quantity */}
-      <span className="text-xs text-gray-400 min-w-[52px] text-right">{item.qty}</span>
-
-      {/* Price — editable */}
-      <div className="min-w-[72px] text-right">
-        {isEditing ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={editValue}
-            onChange={e => onEditChange(e.target.value)}
-            onBlur={onEditCommit}
-            onKeyDown={e => e.key === 'Enter' && onEditCommit()}
-            className="w-20 rounded border border-brand px-1.5 py-0.5 text-right text-xs font-semibold text-brand focus:outline-none"
-          />
-        ) : (
-          <button
-            onClick={onEditStart}
-            title="Editar preço"
-            className={cn(
-              'group flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-semibold transition-colors',
-              checked ? 'text-gray-400' : 'text-gray-700 hover:bg-brand/5 hover:text-brand',
-            )}
-          >
-            {fmtBRL(price)}
-            <Pencil className="h-2.5 w-2.5 opacity-0 group-hover:opacity-60 transition-opacity" />
-          </button>
-        )}
-      </div>
+      <span className="text-xs text-gray-400">{item.qty}</span>
     </div>
   )
 }
 
 interface CategorySectionProps {
   category: Category
-  items: CatalogItem[]
-  checked: Set<string>
-  prices: Record<string, number>
-  editingId: string | null
-  editValue: string
+  items:    CatalogItem[]
+  checked:  Set<string>
   onToggle: (id: string) => void
-  onEditStart: (item: CatalogItem) => void
-  onEditChange: (v: string) => void
-  onEditCommit: () => void
 }
 
-function CategorySection({
-  category, items, checked, prices, editingId, editValue,
-  onToggle, onEditStart, onEditChange, onEditCommit,
-}: CategorySectionProps) {
-  const meta = CATEGORY_META[category]
-  const subtotal = items.reduce((s, i) => s + (prices[i.id] ?? i.weeklyPrice), 0)
+function CategorySection({ category, items, checked, onToggle }: CategorySectionProps) {
+  const meta      = CATEGORY_META[category]
   const doneCount = items.filter(i => checked.has(i.id)).length
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      {/* Category header */}
-      <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/60 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="text-base">{meta.emoji}</span>
-          <h3 className="text-sm font-bold text-gray-800">{meta.label}</h3>
-          <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-bold text-gray-600">
-            {items.length}
-          </span>
-          {doneCount > 0 && (
-            <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">
-              {doneCount} ✓
-            </span>
-          )}
-        </div>
-        <span className="text-xs font-semibold text-gray-500">
-          {fmtBRL(subtotal)}
-        </span>
+      <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50/60 px-4 py-3">
+        <span className="text-base">{meta.emoji}</span>
+        <h3 className="text-sm font-bold text-gray-800">{meta.label}</h3>
+        <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-bold text-gray-600">{items.length}</span>
+        {doneCount > 0 && (
+          <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">{doneCount} ✓</span>
+        )}
       </div>
-
-      {/* Items */}
       <div className="divide-y divide-gray-50">
         {items.map(item => (
-          <ItemRow
-            key={item.id}
-            item={item}
-            checked={checked.has(item.id)}
-            price={prices[item.id] ?? item.weeklyPrice}
-            isEditing={editingId === item.id}
-            editValue={editValue}
-            onToggle={() => onToggle(item.id)}
-            onEditStart={() => onEditStart(item)}
-            onEditChange={onEditChange}
-            onEditCommit={onEditCommit}
-          />
+          <ItemRow key={item.id} item={item} checked={checked.has(item.id)} onToggle={() => onToggle(item.id)} />
         ))}
       </div>
     </div>
@@ -390,13 +258,7 @@ function CategorySection({
 
 // ─── ShareModal ───────────────────────────────────────────────────────────────
 
-interface ShareModalProps {
-  text: string
-  weekLabel: string
-  onClose: () => void
-}
-
-function ShareModal({ text, weekLabel, onClose }: ShareModalProps) {
+function ShareModal({ text, weekLabel, onClose }: { text: string; weekLabel: string; onClose: () => void }) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
 
@@ -414,58 +276,36 @@ function ShareModal({ text, weekLabel, onClose }: ShareModalProps) {
   }
 
   function shareWhatsApp() {
-    const encoded = encodeURIComponent(text.slice(0, 1500))
-    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank')
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text.slice(0, 1500))}`, '_blank')
     onClose()
   }
 
   function shareEmail() {
     const subject = encodeURIComponent(`Lista de Compras NutriWeek — ${weekLabel}`)
-    const body = encodeURIComponent(text)
-    window.location.href = `mailto:?subject=${subject}&body=${body}`
+    window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(text)}`
     onClose()
   }
 
   return (
-    <div
-      ref={overlayRef}
-      onClick={e => { if (e.target === overlayRef.current) onClose() }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
-    >
+    <div ref={overlayRef} onClick={e => { if (e.target === overlayRef.current) onClose() }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <h2 className="font-bold text-gray-900">Compartilhar lista</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100">
-            <X className="h-4 w-4" />
-          </button>
+          <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100"><X className="h-4 w-4" /></button>
         </div>
-
         <div className="space-y-2.5 p-5">
-          <button
-            onClick={shareWhatsApp}
-            className="flex w-full items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-semibold text-gray-800 hover:border-green-400 hover:bg-green-50 transition-all"
-          >
-            <MessageCircle className="h-5 w-5 text-green-500" />
-            Compartilhar via WhatsApp
+          <button onClick={shareWhatsApp}
+            className="flex w-full items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-semibold text-gray-800 hover:border-green-400 hover:bg-green-50 transition-all">
+            <MessageCircle className="h-5 w-5 text-green-500" /> Compartilhar via WhatsApp
           </button>
-
-          <button
-            onClick={shareEmail}
-            className="flex w-full items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-semibold text-gray-800 hover:border-blue-400 hover:bg-blue-50 transition-all"
-          >
-            <Mail className="h-5 w-5 text-blue-500" />
-            Enviar por Email
+          <button onClick={shareEmail}
+            className="flex w-full items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-semibold text-gray-800 hover:border-blue-400 hover:bg-blue-50 transition-all">
+            <Mail className="h-5 w-5 text-blue-500" /> Enviar por Email
           </button>
-
-          <button
-            onClick={copyText}
-            className={cn(
-              'flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-semibold transition-all',
-              copied
-                ? 'border-brand bg-brand text-white'
-                : 'border-gray-200 text-gray-800 hover:border-brand hover:bg-brand/5',
-            )}
-          >
+          <button onClick={copyText}
+            className={cn('flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-semibold transition-all',
+              copied ? 'border-brand bg-brand text-white' : 'border-gray-200 text-gray-800 hover:border-brand hover:bg-brand/5')}>
             {copied ? <Check className="h-5 w-5" /> : <ClipboardCopy className="h-5 w-5 text-gray-400" />}
             {copied ? 'Copiado!' : 'Copiar texto da lista'}
           </button>
@@ -478,93 +318,47 @@ function ShareModal({ text, weekLabel, onClose }: ShareModalProps) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ComprasPage() {
-  const [mealNames,   setMealNames]   = useState<string[]>([])
-  const [isDemo,      setIsDemo]      = useState(false)
-  const [loading,     setLoading]     = useState(true)
-  const [weekStart] = useState<Date>(() => getMondayOf(new Date()))
-
-  const [checked,     setChecked]     = useState<Set<string>>(new Set())
-  const [prices,      setPrices]      = useState<Record<string, number>>({})
-  const [editingId,   setEditingId]   = useState<string | null>(null)
-  const [editValue,   setEditValue]   = useState('')
-
-  const [copyState,   setCopyState]   = useState<'idle' | 'copied'>('idle')
+  const [mealNames,      setMealNames]      = useState<string[]>([])
+  const [isDemo,         setIsDemo]         = useState(false)
+  const [loading,        setLoading]        = useState(true)
+  const [weekStart]                         = useState<Date>(() => getMondayOf(new Date()))
+  const [checked,        setChecked]        = useState<Set<string>>(new Set())
+  const [copyState,      setCopyState]      = useState<'idle' | 'copied'>('idle')
   const [shareModalOpen, setShareModalOpen] = useState(false)
 
-  // ── Derived ──────────────────────────────────────────────────────────────
-
-  const items = useMemo(() => generateList(mealNames), [mealNames])
-
+  const items      = useMemo(() => generateList(mealNames), [mealNames])
   const byCategory = useMemo(() => groupByCategory(items), [items])
 
-  const weekLabel = useMemo(() => {
-    const end = new Date(weekStart)
-    end.setDate(end.getDate() + 6)
-    return `${fmtDay(weekStart)} – ${fmtDay(end)}`
-  }, [weekStart])
-
+  const weekLabel    = useMemo(() => { const e = new Date(weekStart); e.setDate(e.getDate() + 6); return `${fmtDay(weekStart)} – ${fmtDay(e)}` }, [weekStart])
   const weekStartStr = useMemo(() => toLocalISODate(weekStart), [weekStart])
-
-  const totals = useMemo(() => {
-    const total   = items.reduce((s, i) => s + (prices[i.id] ?? i.weeklyPrice), 0)
-    const done    = items.filter(i => checked.has(i.id)).reduce((s, i) => s + (prices[i.id] ?? i.weeklyPrice), 0)
-    const pending = total - done
-    return { total, done, pending, checkedCount: checked.size }
-  }, [items, prices, checked])
-
-  // ── Data fetch ────────────────────────────────────────────────────────────
 
   const loadMeals = useCallback((showToast = false) => {
     setLoading(true)
     try {
       const plan = getWeekPlan(toLocalISODate(weekStart))
       if (plan) {
-        const names = plan.days
-          .flatMap(d => Object.values(d.meals))
-          .filter(Boolean)
-          .map(m => m!.name)
+        const names = plan.days.flatMap(d => Object.values(d.meals)).filter(Boolean).map(m => m!.name)
         if (names.length > 0) {
-          setMealNames(names)
-          setIsDemo(false)
+          setMealNames(names); setIsDemo(false)
           if (showToast) toast('Lista atualizada', 'success')
           return
         }
       }
-      setMealNames(DEMO_MEAL_NAMES)
-      setIsDemo(true)
+      setMealNames(DEMO_MEAL_NAMES); setIsDemo(true)
       if (showToast) toast('Lista atualizada', 'success')
     } finally {
       setLoading(false)
     }
   }, [weekStart])
 
-  // ── Persistence ───────────────────────────────────────────────────────────
+  useEffect(() => { loadMeals() }, [loadMeals])
 
-  useEffect(() => {
-    loadMeals()
-  }, [loadMeals])
-
-  // Load checked items from localStorage (per week)
   useEffect(() => {
     try {
       const raw = localStorage.getItem(lsCheckedKey(weekStartStr))
       setChecked(new Set(raw ? (JSON.parse(raw) as string[]) : []))
-    } catch {
-      setChecked(new Set())
-    }
+    } catch { setChecked(new Set()) }
   }, [weekStartStr])
-
-  // Load price overrides from localStorage (global)
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_PRICES)
-      setPrices(raw ? (JSON.parse(raw) as Record<string, number>) : {})
-    } catch {
-      setPrices({})
-    }
-  }, [])
-
-  // ── Handlers ──────────────────────────────────────────────────────────────
 
   function toggleItem(id: string) {
     setChecked(prev => {
@@ -575,48 +369,20 @@ export default function ComprasPage() {
     })
   }
 
-  function startEdit(item: CatalogItem) {
-    setEditingId(item.id)
-    const current = prices[item.id] ?? item.weeklyPrice
-    setEditValue(current.toFixed(2).replace('.', ','))
-  }
-
-  function commitEdit() {
-    if (!editingId) return
-    const value = parseFloat(editValue.replace(',', '.'))
-    if (!isNaN(value) && value >= 0) {
-      const next = { ...prices, [editingId]: value }
-      setPrices(next)
-      try { localStorage.setItem(LS_PRICES, JSON.stringify(next)) } catch { /* noop */ }
-    }
-    setEditingId(null)
-  }
-
-  function resetPrices() {
-    setPrices({})
-    try { localStorage.removeItem(LS_PRICES) } catch { /* noop */ }
-  }
-
   async function copyList() {
-    const text = formatListText(items, prices, checked, weekLabel)
+    const text = formatListText(items, checked, weekLabel)
     await navigator.clipboard.writeText(text)
     setCopyState('copied')
     toast('Lista copiada!', 'success')
     setTimeout(() => setCopyState('idle'), 2500)
   }
 
-  function openShareModal() { setShareModalOpen(true) }
-
-  // ── Render ────────────────────────────────────────────────────────────────
-
-  const categories = (Object.keys(CATEGORY_META) as Category[]).filter(
-    c => (byCategory[c]?.length ?? 0) > 0,
-  )
+  const categories = (Object.keys(CATEGORY_META) as Category[]).filter(c => (byCategory[c]?.length ?? 0) > 0)
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-10">
 
-      {/* ── Page header ─────────────────────────────────────────────────── */}
+      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
@@ -627,73 +393,46 @@ export default function ComprasPage() {
           </div>
           <p className="mt-1 text-sm text-gray-500 pl-11">
             Semana de {weekLabel}
-            {isDemo && (
-              <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                Dados de exemplo
-              </span>
-            )}
+            {isDemo && <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">Dados de exemplo</span>}
           </p>
         </div>
 
-        {/* Action buttons */}
         <div className="flex shrink-0 items-center gap-2">
-          <button
-            onClick={() => loadMeals(true)}
-            disabled={loading}
-            title="Atualizar lista"
-            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-40"
-          >
+          <button onClick={() => loadMeals(true)} disabled={loading} title="Atualizar lista"
+            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-40">
             <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
           </button>
-
-          <button
-            onClick={copyList}
-            disabled={loading || items.length === 0}
-            className={cn(
-              'flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all',
-              copyState === 'copied'
-                ? 'bg-green-500 text-white'
-                : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
-              (loading || items.length === 0) && 'opacity-40 cursor-not-allowed',
-            )}
-          >
-            {copyState === 'copied'
-              ? <><Check className="h-3.5 w-3.5" /> Copiado!</>
-              : <><ClipboardCopy className="h-3.5 w-3.5" /> Copiar lista</>
-            }
+          <button onClick={copyList} disabled={loading || items.length === 0}
+            className={cn('flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all',
+              copyState === 'copied' ? 'bg-green-500 text-white' : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
+              (loading || items.length === 0) && 'opacity-40 cursor-not-allowed')}>
+            {copyState === 'copied' ? <><Check className="h-3.5 w-3.5" /> Copiado!</> : <><ClipboardCopy className="h-3.5 w-3.5" /> Copiar lista</>}
           </button>
-
-          <button
-            onClick={openShareModal}
-            disabled={loading || items.length === 0}
-            className={cn(
-              'flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all',
-              'bg-brand text-white hover:bg-brand-600',
-              (loading || items.length === 0) && 'opacity-40 cursor-not-allowed',
-            )}
-          >
+          <button onClick={() => setShareModalOpen(true)} disabled={loading || items.length === 0}
+            className={cn('flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all bg-brand text-white hover:bg-brand-600',
+              (loading || items.length === 0) && 'opacity-40 cursor-not-allowed')}>
             <Share2 className="h-3.5 w-3.5" /> Compartilhar
           </button>
         </div>
       </div>
 
-      {/* ── Summary strip ───────────────────────────────────────────────── */}
-      {!loading && items.length > 0 && (
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: 'Total estimado', value: fmtBRL(totals.total),    color: 'text-gray-900' },
-            { label: 'Já comprado',    value: fmtBRL(totals.done),     color: 'text-green-600' },
-            { label: 'Restante',       value: fmtBRL(totals.pending),  color: 'text-brand'     },
-          ].map(({ label, value, color }) => (
-            <div key={label} className="rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{label}</p>
-              <p className={cn('mt-1 text-lg font-bold leading-none', color)}>{value}</p>
+      {/* Progress summary */}
+      {!loading && items.length > 0 && checked.size > 0 && (
+        <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+          <div className="flex-1">
+            <div className="mb-1 flex justify-between text-xs font-semibold">
+              <span className="text-gray-600">Progresso das compras</span>
+              <span className="text-brand">{checked.size} / {items.length} itens</span>
             </div>
-          ))}
+            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+              <div className="h-full rounded-full bg-brand transition-all duration-300"
+                style={{ width: `${Math.round((checked.size / items.length) * 100)}%` }} />
+            </div>
+          </div>
         </div>
       )}
 
-      {/* ── Loading state ────────────────────────────────────────────────── */}
+      {/* Loading */}
       {loading && (
         <div className="space-y-4">
           {(['proteinas', 'vegetais', 'cereais'] as Category[]).map(cat => (
@@ -707,68 +446,29 @@ export default function ComprasPage() {
         </div>
       )}
 
-      {/* ── Category sections ────────────────────────────────────────────── */}
+      {/* Category sections */}
       {!loading && items.length > 0 && (
         <>
           <div className="space-y-4">
             {categories.map(category => (
-              <CategorySection
-                key={category}
-                category={category}
-                items={byCategory[category]!}
-                checked={checked}
-                prices={prices}
-                editingId={editingId}
-                editValue={editValue}
-                onToggle={toggleItem}
-                onEditStart={startEdit}
-                onEditChange={setEditValue}
-                onEditCommit={commitEdit}
-              />
+              <CategorySection key={category} category={category} items={byCategory[category]!} checked={checked} onToggle={toggleItem} />
             ))}
           </div>
 
-          {/* Price reset hint */}
-          {Object.keys(prices).length > 0 && (
-            <div className="flex items-center justify-between rounded-xl border border-dashed border-gray-200 px-4 py-3">
-              <p className="text-xs text-gray-500">
-                Você editou {Object.keys(prices).length} preço(s) manualmente.
-              </p>
-              <button
-                onClick={resetPrices}
-                className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-red-500 transition-colors"
-              >
-                <X className="h-3.5 w-3.5" />
-                Restaurar preços padrão
-              </button>
-            </div>
-          )}
-
-          {/* Uncheck all */}
           {checked.size > 0 && (
-            <button
-              onClick={() => {
-                setChecked(new Set())
-                try { localStorage.removeItem(lsCheckedKey(weekStartStr)) } catch { /* noop */ }
-              }}
-              className="w-full rounded-xl border border-gray-200 py-2.5 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-50"
-            >
+            <button onClick={() => { setChecked(new Set()); try { localStorage.removeItem(lsCheckedKey(weekStartStr)) } catch { /* noop */ } }}
+              className="w-full rounded-xl border border-gray-200 py-2.5 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-50">
               Desmarcar todos os itens ({checked.size})
             </button>
           )}
         </>
       )}
 
-      {/* Share modal */}
       {shareModalOpen && (
-        <ShareModal
-          text={formatListText(items, prices, checked, weekLabel)}
-          weekLabel={weekLabel}
-          onClose={() => setShareModalOpen(false)}
-        />
+        <ShareModal text={formatListText(items, checked, weekLabel)} weekLabel={weekLabel} onClose={() => setShareModalOpen(false)} />
       )}
 
-      {/* ── Empty state ──────────────────────────────────────────────────── */}
+      {/* Empty state */}
       {!loading && items.length === 0 && (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100">
@@ -776,14 +476,9 @@ export default function ComprasPage() {
           </div>
           <div>
             <p className="font-semibold text-gray-800">Nenhuma refeição planejada</p>
-            <p className="mt-1 text-sm text-gray-500">
-              Adicione refeições no calendário semanal para gerar sua lista de compras.
-            </p>
+            <p className="mt-1 text-sm text-gray-500">Adicione refeições no calendário semanal para gerar sua lista de compras.</p>
           </div>
-          <a
-            href="/dashboard"
-            className="rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
-          >
+          <a href="/dashboard" className="rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors">
             Ir para o calendário
           </a>
         </div>
