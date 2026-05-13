@@ -16,8 +16,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from '@/lib/toast'
-import { supabase } from '@/lib/supabase'
-import { getWeekPlanWithSlots } from '@/lib/db'
+import { getWeekPlan } from '@/lib/store'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -515,31 +514,25 @@ export default function ComprasPage() {
 
   // ── Data fetch ────────────────────────────────────────────────────────────
 
-  const loadMeals = useCallback(async (showToast = false) => {
+  const loadMeals = useCallback((showToast = false) => {
     setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        setMealNames(DEMO_MEAL_NAMES)
-        setIsDemo(true)
-        if (showToast) toast('Lista atualizada', 'success')
-        return
+      const plan = getWeekPlan(toLocalISODate(weekStart))
+      if (plan) {
+        const names = plan.days
+          .flatMap(d => Object.values(d.meals))
+          .filter(Boolean)
+          .map(m => m!.name)
+        if (names.length > 0) {
+          setMealNames(names)
+          setIsDemo(false)
+          if (showToast) toast('Lista atualizada', 'success')
+          return
+        }
       }
-
-      const result = await getWeekPlanWithSlots(user.id, toLocalISODate(weekStart))
-      if (!result || result.slots.length === 0) {
-        setMealNames(DEMO_MEAL_NAMES)
-        setIsDemo(true)
-        if (showToast) toast('Lista atualizada', 'success')
-        return
-      }
-
-      setMealNames(result.slots.map(s => s.nome))
-      setIsDemo(false)
-      if (showToast) toast('Lista atualizada com sucesso', 'success')
-    } catch {
       setMealNames(DEMO_MEAL_NAMES)
       setIsDemo(true)
+      if (showToast) toast('Lista atualizada', 'success')
     } finally {
       setLoading(false)
     }
