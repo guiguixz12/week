@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Moon,
-  Plus,
   ShoppingCart,
   Sparkles,
   Sun,
@@ -54,8 +53,16 @@ function toLocalISODate(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
-function fmtDay(date: Date): string {
-  return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+function fmtWeekLabel(start: Date, end: Date): string {
+  const startDay = start.getDate()
+  const endDay   = end.getDate()
+  if (start.getMonth() === end.getMonth()) {
+    const month = end.toLocaleDateString('pt-BR', { month: 'long' })
+    return `${startDay} a ${endDay} de ${month}`
+  }
+  const startMonth = start.toLocaleDateString('pt-BR', { month: 'long' })
+  const endMonth   = end.toLocaleDateString('pt-BR', { month: 'long' })
+  return `${startDay} de ${startMonth} a ${endDay} de ${endMonth}`
 }
 
 // ─── Demo data ────────────────────────────────────────────────────────────────
@@ -122,13 +129,13 @@ function MetricCard({
   statusOk: boolean
 }) {
   return (
-    <div className="rounded-xl bg-[#161b22] p-4 border border-[#21262d]">
-      <p className="text-sm font-medium text-slate-400">{label}</p>
-      <p className="mt-2 text-4xl font-bold text-white">{value}</p>
+    <div className="rounded-xl bg-surface border border-surface-border p-4">
+      <p className="text-xs font-medium text-[#8B949E]">{label}</p>
+      <p className="mt-2 text-3xl font-bold text-[#E6EDF3]">{value}</p>
       <p
         className={cn(
           'mt-1.5 text-xs font-medium flex items-center gap-1',
-          statusOk ? 'text-emerald-400' : 'text-rose-400',
+          statusOk ? 'text-[#1D9E75]' : 'text-rose-400',
         )}
       >
         {statusOk ? '✓' : '↓'} {status}
@@ -152,18 +159,18 @@ function DayColumn({ date, dayName, isToday, dayPlan, onAddMeal, onEditMeal }: D
   return (
     <div
       className={cn(
-        'flex flex-col rounded-xl border p-4 min-w-[160px] w-[175px] flex-shrink-0',
+        'flex flex-col rounded-xl border p-3 min-w-0',
         isToday
-          ? 'bg-emerald-500/5 border-emerald-500/50 shadow-[0_0_0_1px_rgba(16,185,129,0.2)]'
-          : 'bg-[#161b22] border-[#21262d]',
+          ? 'bg-[#1D9E75]/5 border-[#1D9E75]'
+          : 'bg-surface border-surface-border',
       )}
     >
       {/* Day header */}
       <div className="mb-2">
         <p
           className={cn(
-            'text-xs font-bold uppercase tracking-wider',
-            isToday ? 'text-emerald-400' : 'text-slate-400',
+            'text-[10px] font-bold uppercase tracking-wider',
+            isToday ? 'text-[#1D9E75]' : 'text-[#8B949E]',
           )}
         >
           {dayName}
@@ -181,10 +188,13 @@ function DayColumn({ date, dayName, isToday, dayPlan, onAddMeal, onEditMeal }: D
             <button
               key={mealType}
               onClick={() => onAddMeal(date, mealType)}
-              className="flex items-start gap-2 py-2 text-left w-full border-b border-[#21262d] opacity-50 cursor-pointer hover:opacity-75 transition-opacity"
+              className={cn(
+                'flex items-start gap-1.5 py-1.5 text-left w-full opacity-40 hover:opacity-70 transition-opacity',
+                i < 3 && 'border-b border-surface-border',
+              )}
             >
-              <Icon className="h-4 w-4 text-slate-600 shrink-0 mt-0.5" />
-              <span className="text-sm text-slate-600 italic">Adicionar...</span>
+              <Icon className="h-3.5 w-3.5 text-[#8B949E] shrink-0 mt-0.5" />
+              <span className="text-xs text-[#8B949E] italic truncate">Adicionar...</span>
             </button>
           )
         }
@@ -194,12 +204,12 @@ function DayColumn({ date, dayName, isToday, dayPlan, onAddMeal, onEditMeal }: D
             key={mealType}
             onClick={() => onEditMeal(slot, date)}
             className={cn(
-              'flex items-start gap-2 py-2 text-left w-full group',
-              i < 3 && 'border-b border-[#21262d]',
+              'flex items-start gap-1.5 py-1.5 text-left w-full group',
+              i < 3 && 'border-b border-surface-border',
             )}
           >
-            <Icon className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
-            <span className="text-sm text-slate-200 leading-tight line-clamp-2 group-hover:text-white transition-colors">
+            <Icon className="h-3.5 w-3.5 text-[#8B949E] shrink-0 mt-0.5" />
+            <span className="text-xs text-[#E6EDF3] leading-tight line-clamp-2 group-hover:text-white transition-colors">
               {slot.name}
             </span>
           </button>
@@ -240,14 +250,12 @@ export function WeeklyCalendar({
     [weekStart],
   )
 
-  // Notify parent of weekStart and load plan from localStorage
   useEffect(() => {
     const s = toLocalISODate(weekStart)
     onWeekStartChange?.(s)
     setLocalPlan(getWeekPlan(s))
   }, [weekStart, onWeekStartChange])
 
-  // Reload plan from localStorage when parent signals a change (save/delete)
   useEffect(() => {
     if (refreshKey === undefined) return
     const s = toLocalISODate(weekStart)
@@ -255,7 +263,6 @@ export function WeeklyCalendar({
     setAiPlan(null)
   }, [refreshKey, weekStart])
 
-  // Apply pending plan generated during onboarding (one-shot)
   useEffect(() => {
     const raw = localStorage.getItem(PENDING_PLAN_KEY)
     if (!raw) return
@@ -270,7 +277,6 @@ export function WeeklyCalendar({
     }
   }, [])
 
-  // AI plan is week-specific; clear it when navigating away
   useEffect(() => { setAiPlan(null) }, [weekStart])
 
   const weekPlan = useMemo(
@@ -295,20 +301,19 @@ export function WeeklyCalendar({
     }
   }, [weekPlan])
 
-  // Metric status computation
   const kcalGoal = profile.metas.kcal_dia || 2000
   const protGoal = profile.metas.proteina_g || 150
 
-  const kcalDiff = metrics.avgCalories - kcalGoal
-  const kcalOk   = Math.abs(kcalDiff) <= 100
+  const kcalDiff   = metrics.avgCalories - kcalGoal
+  const kcalOk     = Math.abs(kcalDiff) <= 100
   const kcalStatus = kcalOk
     ? 'Dentro da meta'
     : kcalDiff > 0
       ? `${kcalDiff} kcal acima da meta`
       : `${Math.abs(kcalDiff)} kcal abaixo da meta`
 
-  const protPct = protGoal > 0 ? metrics.avgProtein / protGoal : 0
-  const protOk  = protPct >= 0.9
+  const protPct    = protGoal > 0 ? metrics.avgProtein / protGoal : 0
+  const protOk     = protPct >= 0.9
   const protStatus = protOk
     ? 'Dentro da meta'
     : `${Math.round((1 - protPct) * 100)}% abaixo da meta`
@@ -318,73 +323,53 @@ export function WeeklyCalendar({
     ? 'Semana completa'
     : `${7 - metrics.plannedDays} ${7 - metrics.plannedDays === 1 ? 'dia em aberto' : 'dias em aberto'}`
 
-  const weekLabel = `${fmtDay(weekStart)} a ${fmtDay(addDays(weekStart, 6))}`
+  const weekEnd   = addDays(weekStart, 6)
+  const weekLabel = fmtWeekLabel(weekStart, weekEnd)
 
   function prevWeek() { setWeekStart(d => addDays(d, -7)) }
   function nextWeek() { setWeekStart(d => addDays(d, 7))  }
-  function goToday()  { setWeekStart(getMondayOf(new Date())) }
 
   return (
     <div className="flex flex-col gap-6">
 
       {/* ── Page header ────────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* Left: week nav + title */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        {/* Left: title + week label with inline nav */}
+        <div>
+          <div className="flex items-center gap-1 mb-0.5">
             <button
               onClick={prevWeek}
               aria-label="Semana anterior"
-              className="rounded-lg p-2 text-slate-400 hover:bg-[#161b22] hover:text-white transition-colors"
+              className="rounded p-0.5 text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3.5 w-3.5" />
             </button>
-            <button
-              onClick={goToday}
-              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/10 transition-colors"
-            >
-              Hoje
-            </button>
+            <p className="text-sm text-[#8B949E]">Semana de {weekLabel}</p>
             <button
               onClick={nextWeek}
               aria-label="Próxima semana"
-              className="rounded-lg p-2 text-slate-400 hover:bg-[#161b22] hover:text-white transition-colors"
+              className="rounded p-0.5 text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>
-          <div>
-            <p className="text-xs text-slate-400">Semana de {weekLabel}</p>
-            <h1 className="text-2xl font-bold text-white">Minha semana alimentar</h1>
-          </div>
+          <h1 className="text-2xl font-bold text-[#E6EDF3]">Minha semana alimentar</h1>
         </div>
 
-        {/* Right: action buttons + Plus */}
+        {/* Right: Gerar com IA + Ver lista */}
         <div className="flex items-center gap-2">
-          {/* Quick add */}
-          <button
-            onClick={() => onAddMeal?.(todayStr, 'breakfast')}
-            aria-label="Adicionar refeição"
-            className="flex items-center justify-center rounded-lg border border-[#30363d] bg-[#161b22] p-2 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-400 transition-all"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
-
-          {/* Gerar com IA */}
           {onGeneratePlan && (
             <button
               onClick={() => onGeneratePlan(toLocalISODate(weekStart))}
-              className="flex items-center gap-1.5 rounded-lg border border-[#30363d] bg-[#161b22] px-3.5 py-2 text-sm font-semibold text-white hover:border-emerald-500/50 hover:text-emerald-400 transition-all"
+              className="flex items-center gap-1.5 rounded-lg border border-surface-border bg-surface px-3.5 py-2 text-sm font-semibold text-[#E6EDF3] hover:border-[#1D9E75]/50 hover:text-[#1D9E75] transition-all"
             >
               <Sparkles className="h-4 w-4" />
               Gerar com IA
             </button>
           )}
-
-          {/* Ver lista */}
           <Link
             href="/compras"
-            className="flex items-center gap-1.5 rounded-lg border border-[#30363d] bg-[#161b22] px-3.5 py-2 text-sm font-semibold text-white hover:border-slate-500 transition-all"
+            className="flex items-center gap-1.5 rounded-lg border border-surface-border bg-surface px-3.5 py-2 text-sm font-semibold text-[#E6EDF3] hover:border-[#8B949E] transition-all"
           >
             <ShoppingCart className="h-4 w-4" />
             Ver lista
@@ -392,39 +377,31 @@ export function WeeklyCalendar({
         </div>
       </div>
 
-      {/* ── Metric cards ───────────────────────────────────────────────────── */}
-      <div className="overflow-x-auto">
-        <div className="grid grid-cols-4 gap-4 min-w-max">
-          <MetricCard
-            label="Calorias médias/dia"
-            value={metrics.avgCalories.toLocaleString('pt-BR')}
-            status={kcalStatus}
-            statusOk={kcalOk}
-          />
-          <MetricCard
-            label="Meta calórica"
-            value={kcalGoal.toLocaleString('pt-BR')}
-            status="kcal por dia"
-            statusOk
-          />
-          <MetricCard
-            label="Proteína média"
-            value={`${metrics.avgProtein}g`}
-            status={protStatus}
-            statusOk={protOk}
-          />
-          <MetricCard
-            label="Dias planejados"
-            value={`${metrics.plannedDays}/7`}
-            status={daysStatus}
-            statusOk={daysOk}
-          />
-        </div>
+      {/* ── Metric cards — 3 cards, fluid grid ─────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-4">
+        <MetricCard
+          label="Calorias médias/dia"
+          value={metrics.avgCalories.toLocaleString('pt-BR')}
+          status={kcalStatus}
+          statusOk={kcalOk}
+        />
+        <MetricCard
+          label="Proteína média"
+          value={`${metrics.avgProtein}g`}
+          status={protStatus}
+          statusOk={protOk}
+        />
+        <MetricCard
+          label="Dias planejados"
+          value={`${metrics.plannedDays}/7`}
+          status={daysStatus}
+          statusOk={daysOk}
+        />
       </div>
 
-      {/* ── Day columns ────────────────────────────────────────────────────── */}
-      <div className="overflow-x-auto">
-        <div className="flex gap-3 min-w-max">
+      {/* ── Day columns — 7 cols, horizontal scroll only on small screens ───── */}
+      <div className="overflow-x-auto scroll-smooth -mx-1 px-1">
+        <div className="grid grid-cols-7 gap-2 min-w-[560px]">
           {weekDays.map((day, i) => {
             const dateStr = toLocalISODate(day)
             const isToday = dateStr === todayStr
