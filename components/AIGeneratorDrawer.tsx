@@ -329,13 +329,13 @@ export function AIGeneratorDrawer({
 
           {/* ── Feedback messages ───────────────────────────────────────── */}
           {error && (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
               {error}
             </div>
           )}
 
           {hasGenerated && !loading && !error && (
-            <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+            <div className="rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400">
               Plano gerado! O calendário foi atualizado com suas refeições.
             </div>
           )}

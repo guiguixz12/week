@@ -674,9 +674,9 @@ export function MealModal({
 
                 {/* Macro tiles */}
                 <div className="flex gap-2">
-                  <MacroTile label="Proteína"    value={totals.protein} color="text-blue-600"  bg="bg-blue-50" />
-                  <MacroTile label="Carboidratos" value={totals.carbs}   color="text-amber-600" bg="bg-amber-50" />
-                  <MacroTile label="Gorduras"     value={totals.fat}     color="text-rose-500"  bg="bg-rose-50" />
+                  <MacroTile label="Proteína"    value={totals.protein} color="text-blue-400"  bg="bg-blue-500/10" />
+                  <MacroTile label="Carboidratos" value={totals.carbs}   color="text-amber-400" bg="bg-amber-500/10" />
+                  <MacroTile label="Gorduras"     value={totals.fat}     color="text-rose-400"  bg="bg-rose-500/10" />
                 </div>
 
                 {/* Distribution bar */}
@@ -717,7 +717,7 @@ export function MealModal({
           {onDelete && (
             <button
               onClick={onDelete}
-              className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-red-500 transition-colors hover:bg-red-50"
+              className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/10"
             >
               <Trash2 className="h-4 w-4" />
               Excluir

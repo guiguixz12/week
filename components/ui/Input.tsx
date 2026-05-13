@@ -43,7 +43,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               'transition-all duration-150',
               'focus:bg-surface focus:outline-none focus:ring-2',
               error
-                ? 'border-red-300 bg-red-50/50 focus:border-red-400 focus:ring-red-400/20'
+                ? 'border-red-500/50 bg-red-500/5 focus:border-red-400 focus:ring-red-400/20'
                 : 'border-surface-border focus:border-brand focus:ring-brand/20',
               leftIcon  ? 'pl-10' : 'pl-4',
               (rightAction || isPassword) ? 'pr-10' : 'pr-4',

@@ -51,7 +51,7 @@ export default function LoginPage() {
       <BrandPanel />
 
       {/* ── Right form panel ────────────────────────────────────────────── */}
-      <div className="flex flex-1 flex-col items-center justify-center bg-white p-8">
+      <div className="flex flex-1 flex-col items-center justify-center bg-[#0F1117] p-8">
         <div className="w-full max-w-sm">
 
           {/* Logo — visible only on mobile */}
@@ -59,16 +59,16 @@ export default function LoginPage() {
             <NutriWeekLogo size="md" dark />
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">
             Bem-vindo de volta
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-[#8B949E]">
             Entre na sua conta para continuar
           </p>
 
           {/* Error banner */}
           {error && (
-            <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="mt-4 rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400">
               {error}
             </div>
           )}
@@ -118,12 +118,12 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
-            <span className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs text-gray-400">ou</span>
-            <span className="h-px flex-1 bg-gray-200" />
+            <span className="h-px flex-1 bg-[#2D333B]" />
+            <span className="text-xs text-[#8B949E]">ou</span>
+            <span className="h-px flex-1 bg-[#2D333B]" />
           </div>
 
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-[#8B949E]">
             Não tem conta?{' '}
             <Link href="/signup" className="font-semibold text-brand hover:underline">
               Criar conta grátis

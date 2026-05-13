@@ -12,9 +12,9 @@ const ICONS = {
 }
 
 const BORDERS = {
-  success: 'border-green-200 bg-green-50',
-  error:   'border-red-200   bg-red-50',
-  info:    'border-blue-200  bg-blue-50',
+  success: 'border-green-500/30 bg-green-500/10',
+  error:   'border-red-500/30   bg-red-500/10',
+  info:    'border-blue-500/30  bg-blue-500/10',
 }
 
 export function ToastProvider() {

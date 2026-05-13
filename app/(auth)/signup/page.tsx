@@ -84,15 +84,15 @@ export default function SignupPage() {
   // ── Email sent confirmation screen ──────────────────────────────────────────
   if (emailSent) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-8">
+      <div className="flex min-h-screen items-center justify-center bg-[#0F1117] p-8">
         <div className="w-full max-w-sm text-center">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand/10">
             <Mail className="h-8 w-8 text-brand" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900">Verifique seu email</h1>
-          <p className="mt-2 text-sm text-gray-500">
+          <h1 className="text-xl font-bold text-[#E6EDF3]">Verifique seu email</h1>
+          <p className="mt-2 text-sm text-[#8B949E]">
             Enviamos um link de confirmação para{' '}
-            <span className="font-medium text-gray-700">{email}</span>.
+            <span className="font-medium text-[#E6EDF3]">{email}</span>.
             Clique no link para ativar sua conta.
           </p>
           <Link
@@ -112,7 +112,7 @@ export default function SignupPage() {
       <BrandPanel />
 
       {/* ── Right form panel ─────────────────────────────────────────────── */}
-      <div className="flex flex-1 flex-col items-center justify-center bg-white p-8">
+      <div className="flex flex-1 flex-col items-center justify-center bg-[#0F1117] p-8">
         <div className="w-full max-w-sm">
 
           {/* Logo — mobile only */}
@@ -120,16 +120,16 @@ export default function SignupPage() {
             <NutriWeekLogo size="md" dark />
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">
             Crie sua conta
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-[#8B949E]">
             Comece a planejar sua dieta em minutos
           </p>
 
           {/* Error banner */}
           {error && (
-            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
               {error}
             </div>
           )}
@@ -193,7 +193,7 @@ export default function SignupPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-xs text-gray-400">
+          <p className="mt-6 text-center text-xs text-[#8B949E]">
             Ao criar uma conta, você concorda com nossos{' '}
             <Link href="/terms" className="text-brand hover:underline">
               Termos de Uso
@@ -206,12 +206,12 @@ export default function SignupPage() {
           </p>
 
           <div className="my-4 flex items-center gap-3">
-            <span className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs text-gray-400">ou</span>
-            <span className="h-px flex-1 bg-gray-200" />
+            <span className="h-px flex-1 bg-[#2D333B]" />
+            <span className="text-xs text-[#8B949E]">ou</span>
+            <span className="h-px flex-1 bg-[#2D333B]" />
           </div>
 
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-[#8B949E]">
             Já tem conta?{' '}
             <Link href="/login" className="font-semibold text-brand hover:underline">
               Entrar

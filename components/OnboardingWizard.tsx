@@ -97,7 +97,7 @@ function Logo() {
             <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
           </svg>
         </div>
-        <span className="text-base font-bold tracking-tight text-gray-900">NutriWeek</span>
+        <span className="text-base font-bold tracking-tight text-[#E6EDF3]">NutriWeek</span>
       </div>
     </div>
   )
@@ -107,12 +107,12 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
   return (
     <div className="mb-7">
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-xs font-semibold text-gray-500">Passo {current} de {total}</span>
-        <span className="text-xs text-gray-400">{Math.round((current / total) * 100)}%</span>
+        <span className="text-xs font-semibold text-[#8B949E]">Passo {current} de {total}</span>
+        <span className="text-xs text-[#8B949E]">{Math.round((current / total) * 100)}%</span>
       </div>
       <div className="flex gap-1.5">
         {Array.from({ length: total }, (_, i) => (
-          <div key={i} className={cn('h-1.5 flex-1 rounded-full transition-all duration-500', i < current ? 'bg-brand' : 'bg-gray-100')} />
+          <div key={i} className={cn('h-1.5 flex-1 rounded-full transition-all duration-500', i < current ? 'bg-brand' : 'bg-[#2D333B]')} />
         ))}
       </div>
     </div>
@@ -147,12 +147,12 @@ function Step1({
     <div>
       <div className="mb-8 text-center">
         <div className="mb-4 text-6xl leading-none">🥗</div>
-        <h1 className="text-[1.6rem] font-extrabold text-gray-900">Bem-vindo ao NutriWeek!</h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <h1 className="text-[1.6rem] font-extrabold text-[#E6EDF3]">Bem-vindo ao NutriWeek!</h1>
+        <p className="mt-2 text-sm text-[#8B949E]">
           Vamos montar sua dieta personalizada em menos de 2 minutos.
         </p>
       </div>
-      <label className="mb-1.5 block text-sm font-semibold text-gray-700">Como posso te chamar?</label>
+      <label className="mb-1.5 block text-sm font-semibold text-[#E6EDF3]">Como posso te chamar?</label>
       <input
         value={data.nome}
         onChange={e => setField('nome', e.target.value)}
@@ -160,8 +160,8 @@ function Step1({
         placeholder="Seu primeiro nome"
         autoFocus
         className={cn(
-          'w-full rounded-xl border px-4 py-3 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/20',
-          errors.nome ? 'border-red-300' : 'border-gray-200 focus:border-brand',
+          'w-full rounded-xl border px-4 py-3 text-base text-[#E6EDF3] placeholder:text-[#8B949E] focus:outline-none focus:ring-2 focus:ring-brand/20',
+          errors.nome ? 'border-red-300' : 'border-[#2D333B] focus:border-brand',
         )}
       />
       <Err msg={errors.nome} />
@@ -184,8 +184,8 @@ function Step2({
 
   const numField = (key: keyof WizardData, label: string, unit: string, placeholder: string, min: number, max: number) => (
     <div>
-      <label className="mb-1 block text-xs font-semibold text-gray-600">{label}</label>
-      <div className={cn('flex items-center rounded-xl border focus-within:ring-2 focus-within:ring-brand/20', errors[key] ? 'border-red-300' : 'border-gray-200 focus-within:border-brand')}>
+      <label className="mb-1 block text-xs font-semibold text-[#8B949E]">{label}</label>
+      <div className={cn('flex items-center rounded-xl border focus-within:ring-2 focus-within:ring-brand/20', errors[key] ? 'border-red-300' : 'border-[#2D333B] focus-within:border-brand')}>
         <input
           type="number"
           value={data[key] as string}
@@ -193,9 +193,9 @@ function Step2({
           placeholder={placeholder}
           min={min}
           max={max}
-          className="w-full rounded-l-xl bg-transparent px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none"
+          className="w-full rounded-l-xl bg-transparent px-3 py-2.5 text-sm text-[#E6EDF3] placeholder:text-[#8B949E] focus:outline-none"
         />
-        <span className="pr-3 text-xs text-gray-400 shrink-0">{unit}</span>
+        <span className="pr-3 text-xs text-[#8B949E] shrink-0">{unit}</span>
       </div>
       <Err msg={errors[key]} />
     </div>
@@ -203,15 +203,15 @@ function Step2({
 
   return (
     <div>
-      <h2 className="text-xl font-extrabold text-gray-900">Me conta sobre você</h2>
-      <p className="mt-1 mb-5 text-sm text-gray-500">Esses dados calculam suas necessidades calóricas reais.</p>
+      <h2 className="text-xl font-extrabold text-[#E6EDF3]">Me conta sobre você</h2>
+      <p className="mt-1 mb-5 text-sm text-[#8B949E]">Esses dados calculam suas necessidades calóricas reais.</p>
 
       <div className="mb-4">
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Sexo biológico</label>
+        <label className="mb-2 block text-sm font-semibold text-[#E6EDF3]">Sexo biológico</label>
         <div className="grid grid-cols-2 gap-2">
           {(['masculino', 'feminino'] as Sex[]).map(s => (
             <button key={s} type="button" onClick={() => setField('sexo', s)}
-              className={cn('rounded-xl border py-2.5 text-sm font-semibold transition-all', data.sexo === s ? 'border-brand bg-brand text-white' : 'border-gray-200 text-gray-600 hover:border-brand/50')}
+              className={cn('rounded-xl border py-2.5 text-sm font-semibold transition-all', data.sexo === s ? 'border-brand bg-brand text-white' : 'border-[#2D333B] text-[#8B949E] hover:border-brand/50')}
             >
               {s === 'masculino' ? '👨 Masculino' : '👩 Feminino'}
             </button>
@@ -230,7 +230,7 @@ function Step2({
 
       {diff !== null && (
         <div className={cn('mt-4 rounded-xl px-4 py-2.5 text-center text-sm font-semibold',
-          diff < -0.1 ? 'bg-orange-50 text-orange-700' : diff > 0.1 ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700',
+          diff < -0.1 ? 'bg-orange-500/10 text-orange-400' : diff > 0.1 ? 'bg-blue-500/10 text-blue-400' : 'bg-green-500/10 text-green-400',
         )}>
           {diff < -0.1 ? `Você quer perder ${Math.abs(diff).toFixed(1)}kg` : diff > 0.1 ? `Você quer ganhar ${diff.toFixed(1)}kg` : 'Você quer manter seu peso atual'}
         </div>
@@ -250,19 +250,19 @@ function Step3({
 }) {
   return (
     <div>
-      <h2 className="text-xl font-extrabold text-gray-900">Qual é seu nível de atividade?</h2>
-      <p className="mt-1 mb-5 text-sm text-gray-500">Seja honesto — isso impacta diretamente sua meta calórica.</p>
+      <h2 className="text-xl font-extrabold text-[#E6EDF3]">Qual é seu nível de atividade?</h2>
+      <p className="mt-1 mb-5 text-sm text-[#8B949E]">Seja honesto — isso impacta diretamente sua meta calórica.</p>
       <div className="space-y-2">
         {ACTIVITY_OPTS.map(opt => {
           const sel = data.nivel_atividade === opt.value
           return (
             <button key={opt.value} type="button" onClick={() => setField('nivel_atividade', opt.value)}
-              className={cn('flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all', sel ? 'border-brand bg-brand/5 ring-1 ring-brand' : 'border-gray-200 hover:border-brand/30 hover:bg-gray-50')}
+              className={cn('flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all', sel ? 'border-brand bg-brand/5 ring-1 ring-brand' : 'border-[#2D333B] hover:border-brand/30 hover:bg-[#21262d]')}
             >
               <span className="text-xl leading-none shrink-0">{opt.icon}</span>
               <div className="flex-1 min-w-0">
-                <p className={cn('text-sm font-bold', sel ? 'text-brand' : 'text-gray-800')}>{opt.label}</p>
-                <p className="text-xs text-gray-400">{opt.desc}</p>
+                <p className={cn('text-sm font-bold', sel ? 'text-brand' : 'text-[#E6EDF3]')}>{opt.label}</p>
+                <p className="text-xs text-[#8B949E]">{opt.desc}</p>
               </div>
               {sel && <CheckIcon />}
             </button>
@@ -293,21 +293,21 @@ function Step4({
 
   return (
     <div>
-      <h2 className="text-xl font-extrabold text-gray-900">Qual é seu objetivo?</h2>
-      <p className="mt-1 mb-5 text-sm text-gray-500">Isso define seu déficit ou superávit calórico diário.</p>
+      <h2 className="text-xl font-extrabold text-[#E6EDF3]">Qual é seu objetivo?</h2>
+      <p className="mt-1 mb-5 text-sm text-[#8B949E]">Isso define seu déficit ou superávit calórico diário.</p>
       <div className="space-y-3">
         {GOAL_OPTS.map(opt => {
           const sel  = data.objetivo === opt.value
           const kcal = sel ? previewKcal(opt.value) : null
           return (
             <button key={opt.value} type="button" onClick={() => setField('objetivo', opt.value)}
-              className={cn('flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition-all', sel ? 'border-brand bg-brand/5 ring-1 ring-brand' : 'border-gray-200 hover:border-brand/30 hover:bg-gray-50')}
+              className={cn('flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition-all', sel ? 'border-brand bg-brand/5 ring-1 ring-brand' : 'border-[#2D333B] hover:border-brand/30 hover:bg-[#21262d]')}
             >
               <span className="text-3xl leading-none mt-0.5 shrink-0">{opt.icon}</span>
               <div className="flex-1 min-w-0">
-                <p className={cn('font-bold text-sm', sel ? 'text-brand' : 'text-gray-900')}>{opt.label}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{opt.desc}</p>
-                <p className="text-xs text-gray-400 mt-1">• {opt.impact}</p>
+                <p className={cn('font-bold text-sm', sel ? 'text-brand' : 'text-[#E6EDF3]')}>{opt.label}</p>
+                <p className="text-xs text-[#8B949E] mt-0.5">{opt.desc}</p>
+                <p className="text-xs text-[#8B949E] mt-1">• {opt.impact}</p>
                 {kcal !== null && <p className="mt-2 text-xs font-bold text-brand">Sua meta: ~{kcal.toLocaleString('pt-BR')} kcal/dia</p>}
               </div>
               {sel && <div className="mt-0.5 shrink-0"><CheckIcon /></div>}
@@ -336,30 +336,30 @@ function Step5({
 
   return (
     <div>
-      <h2 className="text-xl font-extrabold text-gray-900">Tem alguma restrição?</h2>
-      <p className="mt-1 mb-5 text-sm text-gray-500">Opcional — pode pular e ajustar depois nas configurações.</p>
+      <h2 className="text-xl font-extrabold text-[#E6EDF3]">Tem alguma restrição?</h2>
+      <p className="mt-1 mb-5 text-sm text-[#8B949E]">Opcional — pode pular e ajustar depois nas configurações.</p>
       <div className="grid grid-cols-2 gap-2 mb-5">
         {DIETARY_OPTS.map(opt => {
           const active = data.preferencias.includes(opt.value)
           return (
             <button key={opt.value} type="button" onClick={() => toggle(opt.value)}
-              className={cn('flex items-center gap-2.5 rounded-xl border px-3.5 py-3 text-left transition-all', active ? 'border-brand bg-brand/5 ring-1 ring-brand' : 'border-gray-200 hover:border-brand/30')}
+              className={cn('flex items-center gap-2.5 rounded-xl border px-3.5 py-3 text-left transition-all', active ? 'border-brand bg-brand/5 ring-1 ring-brand' : 'border-[#2D333B] hover:border-brand/30')}
             >
               <span className="text-xl leading-none">{opt.icon}</span>
-              <span className={cn('text-sm font-semibold', active ? 'text-brand' : 'text-gray-700')}>{opt.label}</span>
+              <span className={cn('text-sm font-semibold', active ? 'text-brand' : 'text-[#E6EDF3]')}>{opt.label}</span>
             </button>
           )
         })}
       </div>
-      <label className="mb-1.5 block text-sm font-semibold text-gray-700">Alimentos que não gosto ou não posso comer</label>
+      <label className="mb-1.5 block text-sm font-semibold text-[#E6EDF3]">Alimentos que não gosto ou não posso comer</label>
       <textarea
         value={data.alimentos_nao_gosta}
         onChange={e => setField('alimentos_nao_gosta', e.target.value)}
         placeholder="Ex: fígado, chuchu, jiló..."
         rows={2}
-        className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm placeholder:text-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+        className="w-full resize-none rounded-xl border border-[#2D333B] px-3.5 py-2.5 text-sm placeholder:text-[#8B949E] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
       />
-      <button type="button" onClick={onSkip} className="mt-4 w-full text-sm text-gray-400 hover:text-gray-600 transition-colors">
+      <button type="button" onClick={onSkip} className="mt-4 w-full text-sm text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
         Pular por agora →
       </button>
     </div>
@@ -381,7 +381,7 @@ function LoadingScreen({ nome }: { nome: string }) {
   }, [])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-green-50 to-white px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0F1117] px-4">
       <div className="flex flex-col items-center gap-6 text-center">
         <div className="relative flex h-20 w-20 items-center justify-center">
           <div className="absolute inset-0 animate-ping rounded-full bg-brand/20" />
@@ -393,10 +393,10 @@ function LoadingScreen({ nome }: { nome: string }) {
           </div>
         </div>
 
-        {nome && <p className="text-base font-semibold text-gray-700">Montando sua dieta, {nome}!</p>}
+        {nome && <p className="text-base font-semibold text-[#E6EDF3]">Montando sua dieta, {nome}!</p>}
 
         <div className="min-h-[1.5rem] flex items-center">
-          <p className={cn('text-sm text-gray-500 transition-all duration-300', fade ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1')}>
+          <p className={cn('text-sm text-[#8B949E] transition-all duration-300', fade ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1')}>
             {LOADING_MSGS[idx]}
           </p>
         </div>
@@ -559,9 +559,9 @@ export function OnboardingWizard({ onComplete }: Props) {
   const transX  = dir === 'fwd' ? '10px' : '-10px'
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-green-50 via-green-50/20 to-white px-4 py-10">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0F1117] px-4 py-10">
       <div
-        className="w-full max-w-[520px] rounded-3xl bg-white p-8 shadow-xl"
+        className="w-full max-w-[520px] rounded-3xl bg-[#1C2128] border border-[#2D333B] p-8 shadow-xl"
         style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateX(0)' : `translateX(${transX})`, transition: 'opacity 0.2s ease, transform 0.2s ease' }}
       >
         <Logo />
@@ -576,7 +576,7 @@ export function OnboardingWizard({ onComplete }: Props) {
         <div className={cn('mt-8 flex gap-3', isFirst ? 'justify-end' : 'justify-between')}>
           {!isFirst && (
             <button type="button" onClick={goPrev}
-              className="flex items-center gap-2 rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 rounded-xl border border-[#2D333B] px-5 py-2.5 text-sm font-semibold text-[#8B949E] hover:bg-[#21262d] transition-colors"
             >
               ← Voltar
             </button>

@@ -26,7 +26,7 @@ export function NutriWeekLogo({ size = 'md', dark = false }: LogoProps) {
       )}>
         <LeafIcon className={cn(s.inner, dark ? 'text-white' : 'text-white')} />
       </div>
-      <span className={cn(s.text, 'font-bold', dark ? 'text-gray-900' : 'text-white')}>
+      <span className={cn(s.text, 'font-bold', dark ? 'text-[#E6EDF3]' : 'text-white')}>
         NutriWeek
       </span>
     </div>

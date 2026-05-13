@@ -216,12 +216,12 @@ function StepIndicator({ current }: { current: number }) {
           <div key={step} className="flex items-center gap-2">
             <div className={cn(
               'flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all',
-              done ? 'bg-brand text-white' : active ? 'bg-brand text-white ring-4 ring-brand/20' : 'bg-gray-100 text-gray-400',
+              done ? 'bg-brand text-white' : active ? 'bg-brand text-white ring-4 ring-brand/20' : 'bg-[#2D333B] text-[#8B949E]',
             )}>
               {done ? <Check className="h-4 w-4" /> : step}
             </div>
             {step < TOTAL_STEPS && (
-              <div className={cn('h-0.5 w-8 rounded-full transition-all', done ? 'bg-brand' : 'bg-gray-200')} />
+              <div className={cn('h-0.5 w-8 rounded-full transition-all', done ? 'bg-brand' : 'bg-[#2D333B]')} />
             )}
           </div>
         )
@@ -243,19 +243,19 @@ const LOADING_MESSAGES = [
 
 function GeneratingScreen({ message }: { message: string }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-8 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0F1117] p-8 text-center">
       <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand/10">
         <Sparkles className="h-10 w-10 text-brand animate-pulse" />
       </div>
-      <h2 className="text-2xl font-bold text-gray-900">Gerando seu plano personalizado</h2>
-      <p className="mt-2 text-sm text-gray-500 max-w-xs">
+      <h2 className="text-2xl font-bold text-[#E6EDF3]">Gerando seu plano personalizado</h2>
+      <p className="mt-2 text-sm text-[#8B949E] max-w-xs">
         Nossa IA está criando um cardápio feito especialmente para você.
       </p>
       <div className="mt-8 flex flex-col items-center gap-3">
         <Loader2 className="h-6 w-6 animate-spin text-brand" />
         <p className="text-sm font-medium text-brand">{message}</p>
       </div>
-      <p className="mt-6 text-xs text-gray-400">Isso pode levar até 1 minuto. Não feche esta página.</p>
+      <p className="mt-6 text-xs text-[#8B949E]">Isso pode levar até 1 minuto. Não feche esta página.</p>
     </div>
   )
 }
@@ -384,7 +384,7 @@ export default function OnboardingPage() {
   const stepLabels = ['Objetivo', 'Dados físicos', 'O que tenho em casa']
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0F1117] p-4">
       <div className="w-full max-w-lg">
 
         <div className="mb-8 flex justify-center">
@@ -393,29 +393,29 @@ export default function OnboardingPage() {
 
         <div className="mb-8 flex flex-col items-center gap-3">
           <StepIndicator current={step} />
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+          <p className="text-xs font-medium text-[#8B949E] uppercase tracking-wider">
             Passo {step} de {TOTAL_STEPS} — {stepLabels[step - 1]}
           </p>
         </div>
 
-        <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-100">
+        <div className="rounded-2xl bg-[#1C2128] p-8 border border-[#2D333B]">
 
           {/* Step 1 */}
           {step === 1 && (
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Qual é o seu objetivo principal?</h2>
-              <p className="mt-1 text-sm text-gray-500">Usaremos isso para calcular suas metas calóricas ideais.</p>
+              <h2 className="text-xl font-bold text-[#E6EDF3]">Qual é o seu objetivo principal?</h2>
+              <p className="mt-1 text-sm text-[#8B949E]">Usaremos isso para calcular suas metas calóricas ideais.</p>
               <div className="mt-6 space-y-3">
                 {OBJECTIVES.map(obj => (
                   <button key={obj.value} type="button" onClick={() => update('objetivo', obj.value)}
                     className={cn(
                       'flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left transition-all',
-                      data.objetivo === obj.value ? 'border-brand bg-brand/5 shadow-sm' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50',
+                      data.objetivo === obj.value ? 'border-brand bg-brand/5 shadow-sm' : 'border-[#2D333B] hover:border-[#3D444D] hover:bg-[#21262d]',
                     )}>
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-2xl">{obj.emoji}</span>
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2D333B] text-2xl">{obj.emoji}</span>
                     <div className="flex-1 min-w-0">
-                      <p className={cn('font-semibold', data.objetivo === obj.value ? 'text-brand' : 'text-gray-800')}>{obj.title}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{obj.description}</p>
+                      <p className={cn('font-semibold', data.objetivo === obj.value ? 'text-brand' : 'text-[#E6EDF3]')}>{obj.title}</p>
+                      <p className="text-xs text-[#8B949E] mt-0.5">{obj.description}</p>
                     </div>
                     {data.objetivo === obj.value && (
                       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-white">
@@ -431,8 +431,8 @@ export default function OnboardingPage() {
           {/* Step 2 */}
           {step === 2 && (
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Seus dados físicos</h2>
-              <p className="mt-1 text-sm text-gray-500">Usados para calcular seu gasto calórico diário.</p>
+              <h2 className="text-xl font-bold text-[#E6EDF3]">Seus dados físicos</h2>
+              <p className="mt-1 text-sm text-[#8B949E]">Usados para calcular seu gasto calórico diário.</p>
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <Input label="Peso atual" type="number" value={data.peso}
                   onChange={e => update('peso', e.target.value)} placeholder="75" hint="kg" min="30" max="300" />
@@ -440,17 +440,17 @@ export default function OnboardingPage() {
                   onChange={e => update('altura', e.target.value)} placeholder="175" hint="cm" min="100" max="250" />
               </div>
               <div className="mt-4">
-                <label className="mb-2 block text-sm font-medium text-gray-700">Nível de atividade física</label>
+                <label className="mb-2 block text-sm font-medium text-[#E6EDF3]">Nível de atividade física</label>
                 <div className="space-y-2">
                   {ACTIVITY_LEVELS.map(level => (
                     <button key={level.value} type="button" onClick={() => update('nivelAtividade', level.value)}
                       className={cn(
                         'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-all',
-                        data.nivelAtividade === level.value ? 'border-brand bg-brand/5' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50',
+                        data.nivelAtividade === level.value ? 'border-brand bg-brand/5' : 'border-[#2D333B] hover:border-[#3D444D] hover:bg-[#21262d]',
                       )}>
                       <div>
-                        <p className={cn('text-sm font-semibold', data.nivelAtividade === level.value ? 'text-brand' : 'text-gray-800')}>{level.label}</p>
-                        <p className="text-xs text-gray-400">{level.description}</p>
+                        <p className={cn('text-sm font-semibold', data.nivelAtividade === level.value ? 'text-brand' : 'text-[#E6EDF3]')}>{level.label}</p>
+                        <p className="text-xs text-[#8B949E]">{level.description}</p>
                       </div>
                       {data.nivelAtividade === level.value && (
                         <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-white">
@@ -467,8 +467,8 @@ export default function OnboardingPage() {
                   <div className="mt-5 rounded-xl bg-brand/5 border border-brand/15 p-4">
                     <p className="text-xs font-semibold text-brand uppercase tracking-wider mb-2">Suas metas estimadas</p>
                     <div className="flex gap-6">
-                      <div><p className="text-xl font-bold text-gray-900">{m.calorias}</p><p className="text-xs text-gray-500">kcal / dia</p></div>
-                      <div><p className="text-xl font-bold text-gray-900">{m.proteina}g</p><p className="text-xs text-gray-500">proteína / dia</p></div>
+                      <div><p className="text-xl font-bold text-[#E6EDF3]">{m.calorias}</p><p className="text-xs text-[#8B949E]">kcal / dia</p></div>
+                      <div><p className="text-xl font-bold text-[#E6EDF3]">{m.proteina}g</p><p className="text-xs text-[#8B949E]">proteína / dia</p></div>
                     </div>
                   </div>
                 )
@@ -479,8 +479,8 @@ export default function OnboardingPage() {
           {/* Step 3 */}
           {step === 3 && (
             <div>
-              <h2 className="text-xl font-bold text-gray-900">O que você tem em casa?</h2>
-              <p className="mt-1 text-sm text-gray-500">
+              <h2 className="text-xl font-bold text-[#E6EDF3]">O que você tem em casa?</h2>
+              <p className="mt-1 text-sm text-[#8B949E]">
                 Marque os alimentos disponíveis. A IA vai montar sua dieta usando eles.
               </p>
 
@@ -490,7 +490,7 @@ export default function OnboardingPage() {
                     {data.alimentosEmCasa.length} {data.alimentosEmCasa.length === 1 ? 'item selecionado' : 'itens selecionados'}
                   </span>
                   <button type="button" onClick={() => setData(d => ({ ...d, alimentosEmCasa: [] }))}
-                    className="text-xs text-gray-400 hover:text-gray-600 underline">
+                    className="text-xs text-[#8B949E] hover:text-[#E6EDF3] underline">
                     Limpar tudo
                   </button>
                 </div>
@@ -499,7 +499,7 @@ export default function OnboardingPage() {
               <div className="mt-4 space-y-4 max-h-[360px] overflow-y-auto pr-1">
                 {ALIMENTOS_CATEGORIAS.map(cat => (
                   <div key={cat.label}>
-                    <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#8B949E]">
                       <span>{cat.emoji}</span> {cat.label}
                     </p>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -511,11 +511,11 @@ export default function OnboardingPage() {
                               'flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-all',
                               selected
                                 ? 'border-brand bg-brand/5 font-medium text-brand'
-                                : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50',
+                                : 'border-[#2D333B] text-[#8B949E] hover:border-[#3D444D] hover:bg-[#21262d]',
                             )}>
                             <span className={cn(
                               'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-all',
-                              selected ? 'border-brand bg-brand' : 'border-gray-300',
+                              selected ? 'border-brand bg-brand' : 'border-[#2D333B]',
                             )}>
                               {selected && <Check className="h-2.5 w-2.5 text-white" />}
                             </span>
@@ -531,7 +531,7 @@ export default function OnboardingPage() {
           )}
 
           {error && (
-            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+            <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</div>
           )}
         </div>
 
@@ -539,7 +539,7 @@ export default function OnboardingPage() {
         <div className="mt-6 flex items-center justify-between">
           {step > 1 ? (
             <button type="button" onClick={() => setStep(s => s - 1)}
-              className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100 transition-colors">
+              className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium text-[#8B949E] hover:bg-[#21262d] transition-colors">
               <ChevronLeft className="h-4 w-4" /> Anterior
             </button>
           ) : <div />}
@@ -559,7 +559,7 @@ export default function OnboardingPage() {
         </div>
 
         {step === 3 && (
-          <p className="mt-4 text-center text-xs text-gray-400">
+          <p className="mt-4 text-center text-xs text-[#8B949E]">
             Pode pular se preferir — a IA vai sugerir alimentos práticos e acessíveis.
           </p>
         )}
