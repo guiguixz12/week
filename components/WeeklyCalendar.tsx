@@ -9,6 +9,7 @@ import {
   Dumbbell,
   Flame,
   Plus,
+  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PENDING_PLAN_KEY, getProfile } from '@/lib/profile'
@@ -204,12 +205,13 @@ export interface WeeklyCalendarProps {
   onAddMeal?: (date: string, mealType: MealType) => void
   onEditMeal?: (slot: MealSlot, date: string) => void
   onWeekStartChange?: (weekStart: string) => void
+  onGeneratePlan?: (weekStart: string) => void
   refreshKey?: number
 }
 
 type ViewMode = 'week' | 'day'
 
-export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekStartChange, refreshKey }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekStartChange, onGeneratePlan, refreshKey }: WeeklyCalendarProps) {
   const [weekStart,  setWeekStart]  = useState<Date>(() => getMondayOf(new Date()))
   const [aiPlan,     setAiPlan]     = useState<WeekPlan | null>(null)
   const [localPlan,  setLocalPlan]  = useState<WeekPlan | null>(null)
@@ -348,6 +350,17 @@ export function WeeklyCalendar({ initialWeekPlan, onAddMeal, onEditMeal, onWeekS
               <h2 className="text-base font-bold text-gray-900">Planejamento Semanal</h2>
               <p className="mt-0.5 text-xs text-gray-400">{weekLabel}</p>
             </div>
+
+            {/* Generate plan button */}
+            {onGeneratePlan && (
+              <button
+                onClick={() => onGeneratePlan(toLocalISODate(weekStart))}
+                className="flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-xs font-bold text-white hover:bg-brand-600 transition-colors shadow-sm"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Gerar Dieta
+              </button>
+            )}
 
             {/* View mode toggle */}
             <div className="flex gap-0.5 rounded-lg border border-gray-200 bg-gray-50 p-0.5">

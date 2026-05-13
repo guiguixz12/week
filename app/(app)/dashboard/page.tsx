@@ -1,10 +1,11 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { WeeklyCalendar } from '@/components/WeeklyCalendar'
-import { MealModal }      from '@/components/MealModal'
-import { upsertMealSlot } from '@/lib/store'
-import type { MealSlot, MealType } from '@/types'
+import { WeeklyCalendar }    from '@/components/WeeklyCalendar'
+import { MealModal }         from '@/components/MealModal'
+import { GeneratePlanModal } from '@/components/GeneratePlanModal'
+import { upsertMealSlot, saveWeekPlan } from '@/lib/store'
+import type { MealSlot, MealType, WeekPlan } from '@/types'
 
 interface ModalState {
   isOpen:        boolean
@@ -19,6 +20,8 @@ export default function DashboardPage() {
   const [modal,      setModal]      = useState<ModalState>(CLOSED)
   const [weekStart,  setWeekStart]  = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
+  const [generateOpen,      setGenerateOpen]      = useState(false)
+  const [generateWeekStart, setGenerateWeekStart] = useState('')
 
   function openAdd(date: string, mealType: MealType) {
     setModal({ isOpen: true, date, mealType })
@@ -42,12 +45,24 @@ export default function DashboardPage() {
     setRefreshKey(k => k + 1)
   }, [modal.date, modal.mealType, weekStart])
 
+  function handleOpenGenerate(ws: string) {
+    setGenerateWeekStart(ws)
+    setGenerateOpen(true)
+  }
+
+  function handlePlanGenerated(plan: WeekPlan) {
+    saveWeekPlan(plan)
+    setGenerateOpen(false)
+    setRefreshKey(k => k + 1)
+  }
+
   return (
     <>
       <WeeklyCalendar
         onAddMeal={openAdd}
         onEditMeal={openEdit}
         onWeekStartChange={setWeekStart}
+        onGeneratePlan={handleOpenGenerate}
         refreshKey={refreshKey}
       />
       <MealModal
@@ -58,6 +73,12 @@ export default function DashboardPage() {
         onClose={() => setModal(CLOSED)}
         onSave={handleSave}
         onDelete={modal.existingSlot ? handleDelete : undefined}
+      />
+      <GeneratePlanModal
+        isOpen={generateOpen}
+        weekStart={generateWeekStart}
+        onClose={() => setGenerateOpen(false)}
+        onSuccess={handlePlanGenerated}
       />
     </>
   )

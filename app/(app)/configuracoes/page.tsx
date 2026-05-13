@@ -37,38 +37,6 @@ function Section({ icon, title, children }: { icon: React.ReactNode; title: stri
   )
 }
 
-// ─── Food categories (same as onboarding) ─────────────────────────────────────
-
-const ALIMENTOS_CATEGORIAS = [
-  {
-    label: 'Proteínas', emoji: '🥩',
-    items: [
-      'Frango', 'Carne moída', 'Ovos', 'Atum (lata)', 'Sardinha (lata)',
-      'Peixe', 'Feijão', 'Lentilha', 'Grão-de-bico', 'Presunto/Peito peru',
-    ],
-  },
-  {
-    label: 'Carboidratos', emoji: '🍚',
-    items: ['Arroz', 'Macarrão', 'Pão', 'Batata', 'Batata-doce', 'Aveia', 'Tapioca', 'Mandioca/Aipim', 'Granola'],
-  },
-  {
-    label: 'Legumes e Verduras', emoji: '🥦',
-    items: ['Alface', 'Tomate', 'Cenoura', 'Cebola', 'Alho', 'Brócolis', 'Abobrinha', 'Espinafre', 'Beterraba', 'Couve', 'Pepino'],
-  },
-  {
-    label: 'Frutas', emoji: '🍎',
-    items: ['Banana', 'Maçã', 'Laranja', 'Mamão', 'Abacate', 'Morango', 'Limão', 'Melancia', 'Manga'],
-  },
-  {
-    label: 'Laticínios', emoji: '🥛',
-    items: ['Leite', 'Queijo', 'Iogurte', 'Requeijão', 'Manteiga'],
-  },
-  {
-    label: 'Gorduras e Temperos', emoji: '🫒',
-    items: ['Azeite', 'Óleo de cozinha', 'Sal e temperos'],
-  },
-]
-
 // ─── Dietary restriction chips ────────────────────────────────────────────────
 
 const RESTRICOES = [
@@ -91,16 +59,13 @@ export default function ConfiguracoesPage() {
     }
     return p
   })
-  const [restricoes,     setRestricoes]     = useState<string[]>([])
-  const [alimentosCasa,  setAlimentosCasa]  = useState<string[]>([])
-  const [saving, setSaving] = useState(false)
+  const [restricoes, setRestricoes] = useState<string[]>([])
+  const [saving,     setSaving]     = useState(false)
   const avatarInputRef = useRef<HTMLInputElement>(null)
 
-  // Load profile data on mount
   useEffect(() => {
     const profile = getProfile()
     setRestricoes(profile.preferencias ?? [])
-    setAlimentosCasa(profile.alimentos_em_casa ?? [])
   }, [])
 
   useEffect(() => {
@@ -120,17 +85,12 @@ export default function ConfiguracoesPage() {
     setRestricoes(r => r.includes(id) ? r.filter(x => x !== id) : [...r, id])
   }
 
-  function toggleAlimento(id: string) {
-    setAlimentosCasa(a => a.includes(id) ? a.filter(x => x !== id) : [...a, id])
-  }
-
   async function handleSave() {
     setSaving(true)
     savePreferences(prefs)
     saveProfile({
-      nome:              prefs.nome,
-      preferencias:      restricoes as ('vegetariano' | 'vegano' | 'sem_gluten' | 'sem_lactose' | 'low_carb' | 'cetogenico')[],
-      alimentos_em_casa: alimentosCasa,
+      nome:                prefs.nome,
+      preferencias:        restricoes as ('vegetariano' | 'vegano' | 'sem_gluten' | 'sem_lactose' | 'low_carb' | 'cetogenico')[],
       alimentos_nao_gosta: prefs.alimentos_evitar,
     })
     try {
@@ -220,53 +180,6 @@ export default function ConfiguracoesPage() {
             )
           })}
         </div>
-      </Section>
-
-      {/* O que tenho em casa */}
-      <Section icon={<span className="text-lg">🏠</span>} title="O que tenho em casa">
-        <p className="mb-3 text-xs text-gray-500">
-          A IA monta o cardápio priorizando esses ingredientes. Atualize sempre que quiser.
-        </p>
-
-        {alimentosCasa.length > 0 && (
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-xs font-semibold text-brand">
-              {alimentosCasa.length} {alimentosCasa.length === 1 ? 'item' : 'itens'} selecionados
-            </span>
-            <button type="button" onClick={() => setAlimentosCasa([])}
-              className="text-xs text-gray-400 hover:text-gray-600 underline">
-              Limpar tudo
-            </button>
-          </div>
-        )}
-
-        <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
-          {ALIMENTOS_CATEGORIAS.map(cat => (
-            <div key={cat.label}>
-              <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                <span>{cat.emoji}</span> {cat.label}
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {cat.items.map(item => {
-                  const on = alimentosCasa.includes(item)
-                  return (
-                    <button key={item} type="button" onClick={() => toggleAlimento(item)}
-                      className={cn(
-                        'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all',
-                        on
-                          ? 'border-brand bg-brand text-white'
-                          : 'border-gray-200 bg-white text-gray-600 hover:border-brand/40 hover:bg-brand/5',
-                      )}>
-                      {on && <Check className="h-3 w-3" />}
-                      {item}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-
         <div className="mt-4">
           <label className="mb-1 block text-xs font-semibold text-gray-600">
             Alimentos que não gosto (separados por vírgula)
