@@ -4,11 +4,11 @@ import { cn } from '@/lib/utils'
 import {
   BarChart2,
   CalendarDays,
-  ChefHat,
   Crown,
   ShoppingCart,
   Target,
   User,
+  UtensilsCrossed,
   X,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -18,7 +18,7 @@ import { usePathname, useRouter } from 'next/navigation'
 
 const NAV_MAIN = [
   { href: '/dashboard', label: 'Minha semana',    icon: CalendarDays },
-  { href: '/receitas',  label: 'Receitas',         icon: ChefHat },
+  { href: '/receitas',  label: 'Receitas',         icon: UtensilsCrossed },
   { href: '/macros',    label: 'Macros',           icon: BarChart2 },
   { href: '/compras',   label: 'Lista de compras', icon: ShoppingCart },
 ]
@@ -53,8 +53,8 @@ function NavItem({ href, label, icon: Icon, active, onClick }: NavItemProps) {
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
         active
-          ? 'bg-white/10 text-emerald-400 font-semibold'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-white/5',
+          ? 'bg-[#1D9E75] text-white font-semibold shadow-sm'
+          : 'text-[#8B949E] hover:text-white hover:bg-[#2D333B]',
       )}
     >
       <Icon className="h-[18px] w-[18px] shrink-0" />
@@ -93,23 +93,20 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Panel */}
       <aside
         className={cn(
-          // base — always a fixed overlay on mobile
-          'fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col bg-sidebar-dark border-r border-sidebar-border',
+          'fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col bg-[#161B22] border-r border-[#2D333B]',
           'transition-transform duration-300 ease-in-out',
-          // desktop — lift back into flex flow
           'lg:static lg:z-auto lg:translate-x-0',
-          // mobile open/close
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
         {/* ── Logo ────────────────────────────────────────────────────────── */}
-        <div className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border px-4">
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#2D333B] px-4">
           <Link
             href="/"
             onClick={onClose}
-            className="flex items-center gap-2.5 group"
+            className="flex items-center gap-3 group"
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-600 to-emerald-700 group-hover:from-emerald-500 group-hover:to-emerald-600 transition-colors">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#1D9E75] group-hover:bg-[#178561] transition-colors">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -117,13 +114,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-4 w-4 text-emerald-400"
+                className="h-5 w-5 text-white"
               >
                 <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
                 <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
               </svg>
             </div>
-            <span className="text-[15px] font-bold tracking-tight text-white">
+            <span className="text-base font-bold tracking-tight text-white">
               NutriWeek
             </span>
           </Link>
@@ -132,7 +129,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <button
             onClick={onClose}
             aria-label="Fechar menu"
-            className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-sidebar-hover hover:text-slate-200 lg:hidden"
+            className="rounded-md p-1.5 text-[#8B949E] transition-colors hover:bg-[#2D333B] hover:text-white lg:hidden"
           >
             <X className="h-4 w-4" />
           </button>
@@ -154,7 +151,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </ul>
 
           {/* Account section */}
-          <p className="mb-1 mt-4 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">
+          <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-widest text-[#4B5563]">
             Minha Conta
           </p>
           <ul className="space-y-0.5">
@@ -172,7 +169,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <li>
               <button
                 onClick={goToPro}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-200"
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#8B949E] hover:text-white hover:bg-[#2D333B] transition-all duration-200"
               >
                 <Crown className="h-[18px] w-[18px] shrink-0 text-amber-400" />
                 <span className="truncate">Plano Pro</span>
