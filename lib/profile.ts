@@ -25,6 +25,7 @@ export interface UserProfile {
   objetivo:          GoalType
   preferencias:      DietaryPref[]
   alimentos_nao_gosta: string
+  alimentos_em_casa: string[]
   metas:             MacroTargets
   criado_em:         string
   atualizado_em:     string
@@ -56,6 +57,7 @@ export const DEFAULT_PROFILE: UserProfile = {
   objetivo:            'manter',
   preferencias:        [],
   alimentos_nao_gosta: '',
+  alimentos_em_casa:   [],
   metas:               { ...DEFAULT_METAS },
   criado_em:           '',
   atualizado_em:       '',
@@ -72,6 +74,7 @@ export function getProfile(): UserProfile {
     return {
       ...DEFAULT_PROFILE,
       ...parsed,
+      alimentos_em_casa: parsed.alimentos_em_casa ?? [],
       metas: { ...DEFAULT_METAS, ...(parsed.metas ?? {}) },
     }
   } catch {

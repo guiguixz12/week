@@ -332,6 +332,7 @@ export default function OnboardingPage() {
         nivel_atividade: atividadeMap[data.nivelAtividade],
         preferencias:        [],
         alimentos_nao_gosta: '',
+        alimentos_em_casa:   data.alimentosEmCasa,
         metas: {
           kcal_dia: metas.calorias, proteina_g: metas.proteina,
           carbs_g: Math.round((metas.calorias * 0.45) / 4),
