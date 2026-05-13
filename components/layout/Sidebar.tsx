@@ -53,7 +53,7 @@ function NavItem({ href, label, icon: Icon, active, onClick }: NavItemProps) {
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
         active
-          ? 'bg-white/10 text-emerald-400 font-semibold'
+          ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold'
           : 'text-slate-400 hover:text-slate-200 hover:bg-white/5',
       )}
     >
@@ -94,7 +94,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         className={cn(
           // base — always a fixed overlay on mobile
-          'fixed inset-y-0 left-0 z-50 flex w-[200px] flex-col bg-sidebar-dark border-r border-sidebar-border',
+          'fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col bg-sidebar-dark border-r border-sidebar-border',
           'transition-transform duration-300 ease-in-out',
           // desktop — lift back into flex flow
           'lg:static lg:z-auto lg:translate-x-0',

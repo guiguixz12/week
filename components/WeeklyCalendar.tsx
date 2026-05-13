@@ -2,10 +2,15 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import {
+  Apple,
   ChevronLeft,
   ChevronRight,
+  Moon,
+  Plus,
   ShoppingCart,
   Sparkles,
+  Sun,
+  UtensilsCrossed,
 } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -15,13 +20,12 @@ import type { DayPlan, MealSlot, MealType, WeekPlan } from '@/types'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const MEAL_ICONS: Record<MealType, string> = {
-  breakfast: '☀️',
-  snack:     '🍎',
-  lunch:     '🍽️',
-  dinner:    '🌙',
+const MEAL_ICONS: Record<MealType, React.ElementType> = {
+  breakfast: Sun,
+  snack:     Apple,
+  lunch:     UtensilsCrossed,
+  dinner:    Moon,
 }
-
 
 const MEAL_ORDER: MealType[] = ['breakfast', 'snack', 'lunch', 'dinner']
 
@@ -118,9 +122,9 @@ function MetricCard({
   statusOk: boolean
 }) {
   return (
-    <div className="rounded-xl bg-[#161b22] p-5 border border-[#21262d]">
-      <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{label}</p>
-      <p className="mt-2 text-3xl font-bold text-white">{value}</p>
+    <div className="rounded-xl bg-[#161b22] p-4 border border-[#21262d]">
+      <p className="text-sm font-medium text-slate-400">{label}</p>
+      <p className="mt-2 text-4xl font-bold text-white">{value}</p>
       <p
         className={cn(
           'mt-1.5 text-xs font-medium flex items-center gap-1',
@@ -148,17 +152,17 @@ function DayColumn({ date, dayName, isToday, dayPlan, onAddMeal, onEditMeal }: D
   return (
     <div
       className={cn(
-        'flex flex-col rounded-xl bg-[#161b22] border p-3 min-w-[150px] flex-1',
+        'flex flex-col rounded-xl border p-4 min-w-[160px] w-[175px] flex-shrink-0',
         isToday
-          ? 'border-emerald-500/50 shadow-[0_0_0_1px_rgba(16,185,129,0.2)]'
-          : 'border-[#21262d]',
+          ? 'bg-emerald-500/5 border-emerald-500/50 shadow-[0_0_0_1px_rgba(16,185,129,0.2)]'
+          : 'bg-[#161b22] border-[#21262d]',
       )}
     >
       {/* Day header */}
-      <div className="mb-3">
+      <div className="mb-2">
         <p
           className={cn(
-            'text-xs font-bold uppercase tracking-widest',
+            'text-xs font-bold uppercase tracking-wider',
             isToday ? 'text-emerald-400' : 'text-slate-400',
           )}
         >
@@ -170,6 +174,7 @@ function DayColumn({ date, dayName, isToday, dayPlan, onAddMeal, onEditMeal }: D
       {/* Meal slots */}
       {MEAL_ORDER.map((mealType, i) => {
         const slot = dayPlan?.meals[mealType]
+        const Icon = MEAL_ICONS[mealType]
         return (
           <button
             key={mealType}
@@ -181,15 +186,18 @@ function DayColumn({ date, dayName, isToday, dayPlan, onAddMeal, onEditMeal }: D
               i < 3 && 'border-b border-[#21262d]',
             )}
           >
-            <span className="text-sm leading-tight mt-0.5 shrink-0">
-              {MEAL_ICONS[mealType]}
-            </span>
+            <Icon
+              className={cn(
+                'h-3.5 w-3.5 leading-tight mt-0.5 shrink-0',
+                slot ? 'text-slate-400' : 'text-slate-600',
+              )}
+            />
             {slot ? (
               <span className="text-sm text-slate-200 leading-tight line-clamp-2 group-hover:text-white transition-colors">
                 {slot.name}
               </span>
             ) : (
-              <span className="text-xs text-slate-600 group-hover:text-slate-400 transition-colors">
+              <span className="text-xs italic text-slate-600 group-hover:text-slate-400 transition-colors">
                 Adicionar...
               </span>
             )}
@@ -319,34 +327,9 @@ export function WeeklyCalendar({
     <div className="flex flex-col gap-6">
 
       {/* ── Page header ────────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm text-slate-400">Semana de {weekLabel}</p>
-          <h1 className="text-2xl font-bold text-white">Minha semana alimentar</h1>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Gerar com IA */}
-          {onGeneratePlan && (
-            <button
-              onClick={() => onGeneratePlan(toLocalISODate(weekStart))}
-              className="flex items-center gap-1.5 rounded-lg border border-[#30363d] bg-[#161b22] px-3.5 py-2 text-sm font-semibold text-white hover:border-emerald-500/50 hover:text-emerald-400 transition-all"
-            >
-              <Sparkles className="h-4 w-4" />
-              Gerar com IA
-            </button>
-          )}
-
-          {/* Ver lista */}
-          <Link
-            href="/compras"
-            className="flex items-center gap-1.5 rounded-lg border border-[#30363d] bg-[#161b22] px-3.5 py-2 text-sm font-semibold text-white hover:border-slate-500 transition-all"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            Ver lista
-          </Link>
-
-          {/* Week navigation */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* Left: week nav + title */}
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
             <button
               onClick={prevWeek}
@@ -369,29 +352,73 @@ export function WeeklyCalendar({
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
+          <div>
+            <p className="text-xs text-slate-400">Semana de {weekLabel}</p>
+            <h1 className="text-xl font-bold text-white leading-tight">Minha semana alimentar</h1>
+          </div>
+        </div>
+
+        {/* Right: action buttons + Plus */}
+        <div className="flex items-center gap-2">
+          {/* Quick add */}
+          <button
+            onClick={() => onAddMeal?.(todayStr, 'breakfast')}
+            aria-label="Adicionar refeição"
+            className="flex items-center justify-center rounded-lg border border-[#30363d] bg-[#161b22] p-2 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-400 transition-all"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+
+          {/* Gerar com IA */}
+          {onGeneratePlan && (
+            <button
+              onClick={() => onGeneratePlan(toLocalISODate(weekStart))}
+              className="flex items-center gap-1.5 rounded-lg border border-[#30363d] bg-[#161b22] px-3.5 py-2 text-sm font-semibold text-white hover:border-emerald-500/50 hover:text-emerald-400 transition-all"
+            >
+              <Sparkles className="h-4 w-4" />
+              Gerar com IA
+            </button>
+          )}
+
+          {/* Ver lista */}
+          <Link
+            href="/compras"
+            className="flex items-center gap-1.5 rounded-lg border border-[#30363d] bg-[#161b22] px-3.5 py-2 text-sm font-semibold text-white hover:border-slate-500 transition-all"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Ver lista
+          </Link>
         </div>
       </div>
 
       {/* ── Metric cards ───────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-4">
-        <MetricCard
-          label="Calorias médias/dia"
-          value={`${metrics.avgCalories.toLocaleString('pt-BR')} kcal`}
-          status={kcalStatus}
-          statusOk={kcalOk}
-        />
-        <MetricCard
-          label="Proteína média/dia"
-          value={`${metrics.avgProtein} g`}
-          status={protStatus}
-          statusOk={protOk}
-        />
-        <MetricCard
-          label="Dias planejados"
-          value={`${metrics.plannedDays} / 7`}
-          status={daysStatus}
-          statusOk={daysOk}
-        />
+      <div className="overflow-x-auto">
+        <div className="grid grid-cols-4 gap-4 min-w-max">
+          <MetricCard
+            label="Calorias médias/dia"
+            value={metrics.avgCalories.toLocaleString('pt-BR')}
+            status={kcalStatus}
+            statusOk={kcalOk}
+          />
+          <MetricCard
+            label="Meta calórica"
+            value={kcalGoal.toLocaleString('pt-BR')}
+            status="kcal por dia"
+            statusOk
+          />
+          <MetricCard
+            label="Proteína média/dia"
+            value={`${metrics.avgProtein}g`}
+            status={protStatus}
+            statusOk={protOk}
+          />
+          <MetricCard
+            label="Dias planejados"
+            value={`${metrics.plannedDays}/7`}
+            status={daysStatus}
+            statusOk={daysOk}
+          />
+        </div>
       </div>
 
       {/* ── Day columns ────────────────────────────────────────────────────── */}
