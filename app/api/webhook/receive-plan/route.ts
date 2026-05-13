@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { storePendingPlan, getPendingPlan, diasToWeekPlan } from '@/lib/pending-plans'
-import { readAdminConfig } from '@/lib/admin-config'
 import type { WeekPlan } from '@/types'
 
 // ─── POST: n8n calls this to deliver the generated plan ──────────────────────
@@ -17,8 +16,7 @@ import type { WeekPlan } from '@/types'
 
 export async function POST(req: NextRequest) {
   // Optional secret validation (file config takes priority over env var)
-  const fileConfig     = readAdminConfig()
-  const expectedSecret = fileConfig.webhookSecret || process.env.WEBHOOK_SECRET || ''
+  const expectedSecret = process.env.WEBHOOK_SECRET || ''
   if (expectedSecret) {
     const headerSecret = req.headers.get('x-webhook-secret') ?? ''
     const body = await req.json() as Record<string, unknown>

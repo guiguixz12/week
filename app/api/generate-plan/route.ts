@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
+import { getOpenAiKey } from '@/lib/admin-config'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -109,22 +110,13 @@ function extractJSON(text: string): WeeklyPlan {
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  // Bracket notation prevents Next.js from inlining this at build time
-  const apiKey = process.env['OPENAI_API_KEY']
+  // Admin panel key takes priority over env var
+  const apiKey = getOpenAiKey()
   if (!apiKey) {
-    const { existsSync } = await import('fs')
-    return NextResponse.json({
-      error: 'OPENAI_API_KEY não configurada no servidor.',
-      debug: {
-        cwd: process.cwd(),
-        totalEnvVars: Object.keys(process.env).length,
-        hasOpenAIKey: Object.prototype.hasOwnProperty.call(process.env, 'OPENAI_API_KEY'),
-        openAIKeyLength: (process.env['OPENAI_API_KEY'] ?? '').length,
-        envFileExists: existsSync('/app/.env'),
-        envLocalExists: existsSync('/app/.env.local'),
-        envVarNames: Object.keys(process.env).filter(k => k.startsWith('OPENAI') || k.startsWith('NEXT') || k.startsWith('NODE')),
-      }
-    }, { status: 500 })
+    return NextResponse.json(
+      { error: 'OPENAI_API_KEY não configurada. Adicione no Painel Admin ou no EasyPanel.' },
+      { status: 500 },
+    )
   }
 
   const client = new OpenAI({ apiKey })
