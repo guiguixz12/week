@@ -7,62 +7,37 @@ function validate(password: string | undefined): boolean {
   return password === ADMIN_PASSWORD
 }
 
-function buildConfig(req: NextRequest) {
-  const host   = req.headers.get('host') ?? 'localhost:3000'
-  const proto  = host.startsWith('localhost') ? 'http' : 'https'
-  const appUrl = `${proto}://${host}`
+function buildConfig() {
+  const file         = readAdminConfig()
+  const n8nWebhookUrl = file.n8nWebhookUrl || process.env.N8N_WEBHOOK_URL || null
+  const hasOpenAi    = !!process.env.OPENAI_API_KEY
 
-  const fileConfig = readAdminConfig()
+  const mode: 'n8n' | 'openai' | 'none' =
+    n8nWebhookUrl ? 'n8n' : hasOpenAi ? 'openai' : 'none'
 
-  // File config takes priority over env vars
-  const n8nWebhookUrl = fileConfig.n8nWebhookUrl || process.env.N8N_WEBHOOK_URL || null
-  const webhookSecret = fileConfig.webhookSecret  || process.env.WEBHOOK_SECRET  || null
-
-  return {
-    n8nWebhookUrl,
-    webhookSecret,
-    receivePlanUrl:   `${appUrl}/api/webhook/receive-plan`,
-    appUrl,
-    n8nConfigured:    !!n8nWebhookUrl,
-    secretConfigured: !!webhookSecret,
-    openAiConfigured: !!process.env.OPENAI_API_KEY,
-    savedAt:          fileConfig.updatedAt || null,
-  }
+  return { n8nWebhookUrl, openAiConfigured: hasOpenAi, mode, savedAt: file.updatedAt || null }
 }
 
-// POST — validate password and return config
+// POST — validate password, return config
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as { password?: string }
-  if (!validate(body.password)) {
-    return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 })
-  }
-  return NextResponse.json(buildConfig(req))
+  const { password } = (await req.json()) as { password?: string }
+  if (!validate(password)) return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 })
+  return NextResponse.json(buildConfig())
 }
 
-// PUT — validate password and save new config values
+// PUT — validate password, save n8n URL
 export async function PUT(req: NextRequest) {
-  const body = (await req.json()) as {
-    password?: string
-    n8nWebhookUrl?: string
-    webhookSecret?: string
-  }
-
-  if (!validate(body.password)) {
-    return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 })
-  }
+  const { password, n8nWebhookUrl } = (await req.json()) as { password?: string; n8nWebhookUrl?: string }
+  if (!validate(password)) return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 })
 
   try {
-    writeAdminConfig({
-      n8nWebhookUrl: body.n8nWebhookUrl ?? '',
-      webhookSecret: body.webhookSecret ?? '',
-    })
+    writeAdminConfig({ n8nWebhookUrl: n8nWebhookUrl ?? '' })
   } catch (err) {
-    console.error('[admin/config PUT]', err)
     return NextResponse.json(
       { error: `Erro ao salvar: ${err instanceof Error ? err.message : String(err)}` },
       { status: 500 },
     )
   }
 
-  return NextResponse.json({ ok: true, config: buildConfig(req) })
+  return NextResponse.json({ ok: true, config: buildConfig() })
 }

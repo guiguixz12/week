@@ -5,23 +5,19 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import {
   Lock, Eye, EyeOff, Check, Copy, AlertCircle, CheckCircle2,
-  Webhook, Key, Globe, Settings, RefreshCw, ChevronDown, ChevronUp, Save,
+  Sparkles, Webhook, RefreshCw, Save, ChevronDown, ChevronUp, Info,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Config {
   n8nWebhookUrl:    string | null
-  webhookSecret:    string | null
-  receivePlanUrl:   string
-  appUrl:           string
-  n8nConfigured:    boolean
-  secretConfigured: boolean
   openAiConfigured: boolean
+  mode:             'openai' | 'n8n' | 'none'
   savedAt:          string | null
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Copy helper ──────────────────────────────────────────────────────────────
 
 function useCopy() {
   const [copied, setCopied] = useState<string | null>(null)
@@ -33,256 +29,58 @@ function useCopy() {
   return { copied, copy }
 }
 
-function StatusBadge({ ok, label }: { ok: boolean; label: string }) {
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
-      ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
-    }`}>
-      {ok ? <CheckCircle2 className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
-      {label}
-    </span>
-  )
-}
+// ─── Section ──────────────────────────────────────────────────────────────────
 
-function CopyField({ label, value, id, copied, copy, secret = false }: {
-  label: string; value: string | null; id: string
-  copied: string | null; copy: (text: string, id: string) => void; secret?: boolean
-}) {
-  const [revealed, setRevealed] = useState(false)
-
-  if (!value) {
-    return (
-      <div className="space-y-1.5">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{label}</p>
-        <div className="flex h-10 items-center rounded-xl border border-dashed border-red-200 bg-red-50 px-4">
-          <span className="text-sm text-red-500">Não configurado</span>
-        </div>
-      </div>
-    )
-  }
-
-  const display = secret && !revealed ? '•'.repeat(Math.min(value.length, 24)) : value
-
-  return (
-    <div className="space-y-1.5">
-      <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{label}</p>
-      <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5">
-        <span className="flex-1 truncate font-mono text-sm text-gray-800">{display}</span>
-        {secret && (
-          <button onClick={() => setRevealed(r => !r)}
-            className="shrink-0 rounded-lg p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors">
-            {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-        )}
-        <button onClick={() => copy(value, id)}
-          className="shrink-0 rounded-lg p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors">
-          {copied === id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function CodeBlock({ code, id, copied, copy }: {
-  code: string; id: string; copied: string | null; copy: (t: string, i: string) => void
-}) {
-  return (
-    <div className="relative rounded-xl bg-gray-900 p-4">
-      <button onClick={() => copy(code, id)}
-        className="absolute right-3 top-3 flex items-center gap-1 rounded-lg bg-gray-700 px-2.5 py-1 text-xs text-gray-300 hover:bg-gray-600 transition-colors">
-        {copied === id ? <><Check className="h-3 w-3 text-green-400" /> Copiado</> : <><Copy className="h-3 w-3" /> Copiar</>}
-      </button>
-      <pre className="overflow-x-auto text-xs text-gray-300 leading-relaxed pr-20">{code}</pre>
-    </div>
-  )
-}
-
-function Section({ icon: Icon, title, children, defaultOpen = true }: {
-  icon: React.ElementType; title: string; children: React.ReactNode; defaultOpen?: boolean
+function Section({ title, children, defaultOpen = true }: {
+  title: string; children: React.ReactNode; defaultOpen?: boolean
 }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
     <div className="rounded-2xl bg-white ring-1 ring-gray-200 shadow-sm overflow-hidden">
       <button onClick={() => setOpen(o => !o)}
-        className="flex w-full items-center gap-3 px-6 py-4 text-left hover:bg-gray-50 transition-colors">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10">
-          <Icon className="h-4 w-4 text-brand" />
-        </div>
-        <span className="flex-1 font-semibold text-gray-900">{title}</span>
+        className="flex w-full items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors">
+        <span className="font-semibold text-gray-900">{title}</span>
         {open ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
       </button>
-      {open && <div className="border-t border-gray-100 px-6 py-5 space-y-5">{children}</div>}
+      {open && <div className="border-t border-gray-100 px-6 py-5">{children}</div>}
     </div>
   )
 }
 
-// ─── Config form ──────────────────────────────────────────────────────────────
+// ─── Mode badge ───────────────────────────────────────────────────────────────
 
-function ConfigForm({ config, password, onSaved }: {
-  config: Config; password: string; onSaved: (c: Config) => void
-}) {
-  const [url,       setUrl]       = useState(config.n8nWebhookUrl ?? '')
-  const [secret,    setSecret]    = useState(config.webhookSecret ?? '')
-  const [showSec,   setShowSec]   = useState(false)
-  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'ok' | 'error'>('idle')
-  const [saveError, setSaveError] = useState('')
-
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault()
-    setSaveState('saving')
-    try {
-      const res = await fetch('/api/admin/config', {
-        method:  'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ password, n8nWebhookUrl: url.trim(), webhookSecret: secret.trim() }),
-      })
-      const json = await res.json() as { config?: Config; error?: string }
-      if (!res.ok) throw new Error(json.error ?? 'Erro desconhecido')
-      onSaved(json.config!)
-      setSaveState('ok')
-    } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Erro ao salvar')
-      setSaveState('error')
-    }
-    setTimeout(() => setSaveState('idle'), 3000)
+function ModeBadge({ mode }: { mode: Config['mode'] }) {
+  const styles = {
+    openai: 'bg-green-100 text-green-700',
+    n8n:    'bg-purple-100 text-purple-700',
+    none:   'bg-red-100 text-red-600',
   }
-
+  const labels = {
+    openai: '✓ OpenAI direta',
+    n8n:    '✓ n8n',
+    none:   '✗ Sem gerador configurado',
+  }
   return (
-    <form onSubmit={handleSave} className="space-y-4">
-      {/* n8n Webhook URL */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-          URL do Webhook n8n
-        </label>
-        <input
-          type="url"
-          value={url}
-          onChange={e => setUrl(e.target.value)}
-          placeholder="https://seu-n8n.dominio.com/webhook/nutriweek-plan"
-          className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
-        />
-        {url.includes('/webhook-test/') && (
-          <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
-            <AlertCircle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
-            <p className="text-xs text-amber-700">
-              <strong>URL de teste detectada</strong> — <code className="font-mono">/webhook-test/</code> só funciona com o editor do n8n aberto.
-              Para produção, troque por <code className="font-mono">/webhook/</code> na URL.
-              <br />
-              Exemplo: <span className="font-mono break-all">{url.replace('/webhook-test/', '/webhook/')}</span>
-            </p>
-          </div>
-        )}
-        <p className="text-xs text-gray-400">
-          URL do nó Webhook no n8n. Use <span className="font-mono">/webhook/</span> (não <span className="font-mono">/webhook-test/</span>) para produção.
-        </p>
-      </div>
-
-      {/* Webhook Secret */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Secret de Segurança <span className="text-gray-400 font-normal normal-case">(opcional)</span>
-        </label>
-        <div className="relative">
-          <input
-            type={showSec ? 'text' : 'password'}
-            value={secret}
-            onChange={e => setSecret(e.target.value)}
-            placeholder="senha-para-autenticar-o-n8n"
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 pr-12 font-mono text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
-          />
-          <button type="button" onClick={() => setShowSec(s => !s)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-            {showSec ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-        </div>
-        <p className="text-xs text-gray-400">
-          Envie este valor no header <span className="font-mono text-gray-600">X-Webhook-Secret</span> quando o n8n chamar o SaaS. Deixe em branco para desativar a verificação.
-        </p>
-      </div>
-
-      {saveState === 'error' && saveError && (
-        <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5">
-          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
-          <p className="text-xs text-red-600">{saveError}</p>
-        </div>
-      )}
-
-      <div className="flex items-center justify-between pt-1">
-        {config.savedAt && (
-          <p className="text-xs text-gray-400">
-            Último save: {new Date(config.savedAt).toLocaleString('pt-BR')}
-          </p>
-        )}
-        <button
-          type="submit"
-          disabled={saveState === 'saving'}
-          className={`ml-auto flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all ${
-            saveState === 'ok'    ? 'bg-green-600' :
-            saveState === 'error' ? 'bg-red-600'   :
-            'bg-brand hover:bg-brand-600 disabled:opacity-60'
-          }`}
-        >
-          {saveState === 'saving' && <RefreshCw className="h-4 w-4 animate-spin" />}
-          {saveState === 'ok'     && <CheckCircle2 className="h-4 w-4" />}
-          {saveState === 'error'  && <AlertCircle className="h-4 w-4" />}
-          {saveState === 'idle'   && <Save className="h-4 w-4" />}
-          {saveState === 'saving' ? 'Salvando…' :
-           saveState === 'ok'     ? 'Salvo!' :
-           saveState === 'error'  ? 'Erro ao salvar' : 'Salvar configuração'}
-        </button>
-      </div>
-    </form>
+    <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${styles[mode]}`}>
+      {labels[mode]}
+    </span>
   )
 }
 
-// ─── Payload examples ─────────────────────────────────────────────────────────
-
-const PAYLOAD_IN = `{
-  "userId":        "uuid-do-usuario",
-  "email":         "usuario@email.com",
-  "nome":          "João Silva",
-  "objetivo":      "emagrecer",
-  "peso":          85,
-  "altura":        175,
-  "nivelAtividade": "moderado",
-  "restricoes":    ["sem_gluten"],
-  "calorias_meta": 1800,
-  "proteina_meta": 170,
-  "weekStart":     "2026-05-11"
-}`
-
-const PAYLOAD_OUT_TEMPLATE = (secret: string) => `{
-  "userId":    "uuid-do-usuario",
-  "weekStart": "2026-05-11",
-  "secret":    "${secret || 'SEU_WEBHOOK_SECRET'}",
-  "dias": [
-    {
-      "dia": "Segunda-feira",
-      "cafe_da_manha": { "nome": "Omelete de ovos", "calorias": 320, "proteina": 22, "carbs": 5,  "gordura": 18 },
-      "lanche":        { "nome": "Iogurte grego",   "calorias": 150, "proteina": 15, "carbs": 10, "gordura": 3  },
-      "almoco":        { "nome": "Frango c/ arroz",  "calorias": 550, "proteina": 45, "carbs": 60, "gordura": 12 },
-      "jantar":        { "nome": "Salmão grelhado",  "calorias": 400, "proteina": 38, "carbs": 8,  "gordura": 22 }
-    }
-    // ... 7 dias no total (Segunda a Domingo)
-  ]
-}`
-
-// ─── Login screen ─────────────────────────────────────────────────────────────
+// ─── Login ────────────────────────────────────────────────────────────────────
 
 function LoginScreen({ onAuth }: { onAuth: (pwd: string) => void }) {
-  const [pwd, setPwd]     = useState('')
-  const [show, setShow]   = useState(false)
-  const [error, setError] = useState('')
+  const [pwd, setPwd]         = useState('')
+  const [show, setShow]       = useState(false)
+  const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
-    setLoading(true)
+    setError(''); setLoading(true)
     const res = await fetch('/api/admin/config', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ password: pwd }),
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd }),
     })
     setLoading(false)
     if (res.ok) { onAuth(pwd) } else { setError('Senha incorreta.') }
@@ -296,28 +94,19 @@ function LoginScreen({ onAuth }: { onAuth: (pwd: string) => void }) {
             <Lock className="h-8 w-8 text-brand" />
           </div>
           <h1 className="text-2xl font-bold text-white">Painel Admin</h1>
-          <p className="text-sm text-gray-400">Acesso restrito. Insira a senha para continuar.</p>
+          <p className="text-sm text-gray-400">Acesso restrito.</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
-            <input
-              type={show ? 'text' : 'password'}
-              value={pwd}
-              onChange={e => setPwd(e.target.value)}
-              placeholder="Senha"
-              autoFocus
-              className="w-full rounded-xl border border-gray-700 bg-gray-900 px-4 py-3 pr-12 text-white placeholder:text-gray-500 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
-            />
+            <input type={show ? 'text' : 'password'} value={pwd} onChange={e => setPwd(e.target.value)}
+              placeholder="Senha" autoFocus
+              className="w-full rounded-xl border border-gray-700 bg-gray-900 px-4 py-3 pr-12 text-white placeholder:text-gray-500 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30" />
             <button type="button" onClick={() => setShow(s => !s)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
               {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          {error && (
-            <p className="flex items-center gap-2 text-sm text-red-400">
-              <AlertCircle className="h-4 w-4" /> {error}
-            </p>
-          )}
+          {error && <p className="flex items-center gap-2 text-sm text-red-400"><AlertCircle className="h-4 w-4" /> {error}</p>}
           <button type="submit" disabled={loading}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-semibold text-white hover:bg-brand-600 transition-colors disabled:opacity-60">
             {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
@@ -334,39 +123,72 @@ function LoginScreen({ onAuth }: { onAuth: (pwd: string) => void }) {
 function Dashboard({ password }: { password: string }) {
   const [config,    setConfig]    = useState<Config | null>(null)
   const [loading,   setLoading]   = useState(true)
-  const [testState, setTestState] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
+  const [n8nUrl,    setN8nUrl]    = useState('')
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'ok' | 'error'>('idle')
+  const [saveError, setSaveError] = useState('')
+  const [testState, setTestState] = useState<'idle' | 'testing' | 'ok' | 'error'>('idle')
+  const [showUrl,   setShowUrl]   = useState(false)
   const { copied, copy } = useCopy()
 
   const loadConfig = useCallback(async () => {
     setLoading(true)
     const res = await fetch('/api/admin/config', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ password }),
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
     })
-    if (res.ok) setConfig(await res.json())
+    if (res.ok) {
+      const data = await res.json() as Config
+      setConfig(data)
+      setN8nUrl(data.n8nWebhookUrl ?? '')
+    }
     setLoading(false)
   }, [password])
 
   useEffect(() => { loadConfig() }, [loadConfig])
 
-  async function testWebhook() {
-    setTestState('loading')
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault()
+    setSaveState('saving'); setSaveError('')
+    try {
+      const res = await fetch('/api/admin/config', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, n8nWebhookUrl: n8nUrl.trim() }),
+      })
+      const json = await res.json() as { config?: Config; error?: string }
+      if (!res.ok) throw new Error(json.error ?? 'Erro ao salvar')
+      setConfig(json.config!)
+      setSaveState('ok')
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Erro ao salvar')
+      setSaveState('error')
+    }
+    setTimeout(() => setSaveState('idle'), 3000)
+  }
+
+  async function handleTest() {
+    setTestState('testing')
     try {
       const res = await fetch('/api/n8n/trigger', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
-          userId: 'test-admin', email: 'admin@test.com', nome: 'Teste Admin',
-          objetivo: 'manter', peso: 75, altura: 175, nivelAtividade: 'moderado',
-          restricoes: [], calorias_meta: 2000, proteina_meta: 150,
-        }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 'test', objetivo: 'manter', calorias_meta: 2000, proteina_meta: 150 }),
       })
       setTestState(res.ok || res.status === 202 ? 'ok' : 'error')
     } catch {
       setTestState('error')
     }
     setTimeout(() => setTestState('idle'), 4000)
+  }
+
+  async function handleClearN8n() {
+    setN8nUrl('')
+    const res = await fetch('/api/admin/config', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password, n8nWebhookUrl: '' }),
+    })
+    if (res.ok) {
+      const json = await res.json() as { config: Config }
+      setConfig(json.config)
+    }
   }
 
   if (loading) {
@@ -376,100 +198,192 @@ function Dashboard({ password }: { password: string }) {
       </div>
     )
   }
-
   if (!config) return null
+
+  const isTestUrl = n8nUrl.includes('/webhook-test/')
 
   return (
     <div className="min-h-screen bg-gray-950 p-6">
-      <div className="mx-auto max-w-3xl space-y-6">
+      <div className="mx-auto max-w-2xl space-y-6">
 
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-white">Painel Admin</h1>
-            <p className="text-sm text-gray-400">Configurações internas — acesso restrito</p>
+            <p className="text-sm text-gray-400">Configurações internas</p>
           </div>
-          <button onClick={loadConfig}
-            className="flex items-center gap-2 rounded-xl bg-gray-800 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors">
+          <button onClick={loadConfig} className="flex items-center gap-2 rounded-xl bg-gray-800 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors">
             <RefreshCw className="h-4 w-4" /> Atualizar
           </button>
         </div>
 
-        {/* Status */}
-        <div className="grid grid-cols-3 gap-4">
-          {[
-            { label: 'n8n',    ok: config.n8nConfigured,    icon: Webhook  },
-            { label: 'Secret', ok: config.secretConfigured, icon: Key      },
-            { label: 'OpenAI', ok: config.openAiConfigured, icon: Settings },
-          ].map(({ label, ok, icon: Icon }) => (
-            <div key={label} className="rounded-2xl bg-gray-900 p-4 text-center ring-1 ring-gray-800">
-              <div className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl ${ok ? 'bg-green-900/50' : 'bg-red-900/30'}`}>
-                <Icon className={`h-5 w-5 ${ok ? 'text-green-400' : 'text-red-400'}`} />
-              </div>
-              <p className="text-xs font-semibold text-gray-400 mb-1">{label}</p>
-              <StatusBadge ok={ok} label={ok ? 'OK' : 'Faltando'} />
+        {/* Status atual do gerador de planos */}
+        <div className="rounded-2xl bg-gray-900 ring-1 ring-gray-800 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Gerador de planos ativo</p>
+          <div className="flex items-center gap-3">
+            {config.mode === 'n8n'    && <Webhook   className="h-6 w-6 text-purple-400" />}
+            {config.mode === 'openai' && <Sparkles  className="h-6 w-6 text-green-400" />}
+            {config.mode === 'none'   && <AlertCircle className="h-6 w-6 text-red-400" />}
+            <div>
+              <ModeBadge mode={config.mode} />
+              <p className="mt-1 text-xs text-gray-500">
+                {config.mode === 'n8n'    && 'Planos gerados pelo n8n (via webhook)'}
+                {config.mode === 'openai' && 'Planos gerados diretamente pela OpenAI'}
+                {config.mode === 'none'   && 'Configure a OpenAI (OPENAI_API_KEY) ou o n8n abaixo'}
+              </p>
             </div>
-          ))}
+          </div>
         </div>
 
-        {/* ── Configurar n8n ── */}
-        <Section icon={Webhook} title="Configurar integração n8n">
-          <ConfigForm config={config} password={password} onSaved={setConfig} />
-        </Section>
-
-        {/* ── URLs geradas ── */}
-        <Section icon={Globe} title="URLs ativas" defaultOpen={true}>
-          <CopyField label="URL de Retorno — n8n envia o plano aqui"
-            value={config.receivePlanUrl} id="receive-url" copied={copied} copy={copy} />
-          <CopyField label="URL do n8n configurada"
-            value={config.n8nWebhookUrl} id="n8n-url" copied={copied} copy={copy} />
-          <CopyField label="Secret configurado"
-            value={config.webhookSecret} id="secret" copied={copied} copy={copy} secret />
-
-          <button
-            onClick={testWebhook}
-            disabled={!config.n8nConfigured || testState === 'loading'}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
-              testState === 'ok'    ? 'bg-green-600 text-white' :
-              testState === 'error' ? 'bg-red-600 text-white'   :
-              'bg-brand text-white hover:bg-brand-600 disabled:opacity-40'
-            }`}
-          >
-            {testState === 'loading' && <RefreshCw className="h-4 w-4 animate-spin" />}
-            {testState === 'ok'      && <CheckCircle2 className="h-4 w-4" />}
-            {testState === 'error'   && <AlertCircle className="h-4 w-4" />}
-            {testState === 'idle'    ? 'Testar conexão com n8n' :
-             testState === 'loading' ? 'Testando…'              :
-             testState === 'ok'      ? 'n8n respondeu OK'       : 'Falha na conexão'}
-          </button>
-        </Section>
-
-        {/* ── Payload SaaS → n8n ── */}
-        <Section icon={Globe} title="Payload enviado ao n8n" defaultOpen={false}>
-          <p className="text-sm text-gray-600">
-            JSON enviado pelo SaaS para o n8n quando o usuário conclui o onboarding:
-          </p>
-          <CodeBlock code={PAYLOAD_IN} id="payload-in" copied={copied} copy={copy} />
-        </Section>
-
-        {/* ── Payload n8n → SaaS ── */}
-        <Section icon={Globe} title="Payload esperado do n8n" defaultOpen={false}>
-          <p className="text-sm text-gray-600">
-            O n8n deve fazer um <span className="font-mono text-brand">POST</span> para a URL de retorno acima com este formato:
-          </p>
-          <CodeBlock
-            code={PAYLOAD_OUT_TEMPLATE(config.webhookSecret ?? '')}
-            id="payload-out" copied={copied} copy={copy}
-          />
-          <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-700">
-            <strong>Dica:</strong> No n8n, use o nó <em>HTTP Request</em> apontando para a URL de retorno.
-            Ou use o nó <em>Respond to Webhook</em> para responder na mesma chamada (mais rápido).
+        {/* Configurar n8n */}
+        <Section title="Integração n8n (opcional)">
+          <div className="mb-4 flex items-start gap-2 rounded-xl bg-blue-50 border border-blue-200 p-3">
+            <Info className="h-4 w-4 shrink-0 text-blue-500 mt-0.5" />
+            <p className="text-xs text-blue-700">
+              O n8n é <strong>opcional</strong>. Se deixar em branco, o SaaS usa a OpenAI diretamente —
+              que já funciona se a <code className="font-mono">OPENAI_API_KEY</code> estiver configurada no EasyPanel.
+              Configure o n8n apenas se quiser usar um fluxo personalizado.
+            </p>
           </div>
+
+          <form onSubmit={handleSave} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                URL do Webhook n8n
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={showUrl ? n8nUrl : (n8nUrl ? '•'.repeat(Math.min(n8nUrl.length, 40)) : '')}
+                  onChange={e => { if (showUrl) setN8nUrl(e.target.value) }}
+                  onFocus={() => setShowUrl(true)}
+                  placeholder="https://seu-n8n.dominio.com/webhook/id-do-fluxo"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 pr-20 font-mono text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <button type="button" onClick={() => setShowUrl(s => !s)}
+                    className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors">
+                    {showUrl ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                  {n8nUrl && (
+                    <button type="button" onClick={() => copy(n8nUrl, 'url')}
+                      className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors">
+                      {copied === 'url' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {isTestUrl && (
+                <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
+                  <div className="text-xs text-amber-700">
+                    <strong>URL de teste detectada</strong> — só funciona com o editor n8n aberto.
+                    Para produção, substitua <code className="font-mono">/webhook-test/</code> por <code className="font-mono">/webhook/</code>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {saveState === 'error' && saveError && (
+              <p className="flex items-center gap-2 text-sm text-red-600">
+                <AlertCircle className="h-4 w-4" /> {saveError}
+              </p>
+            )}
+
+            <div className="flex items-center gap-3">
+              <button type="submit" disabled={saveState === 'saving'}
+                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all ${
+                  saveState === 'ok'    ? 'bg-green-600' :
+                  saveState === 'error' ? 'bg-red-600' :
+                  'bg-brand hover:bg-brand-600 disabled:opacity-60'
+                }`}>
+                {saveState === 'saving' && <RefreshCw className="h-4 w-4 animate-spin" />}
+                {saveState === 'ok'     && <CheckCircle2 className="h-4 w-4" />}
+                {saveState === 'idle'   && <Save className="h-4 w-4" />}
+                {saveState === 'saving' ? 'Salvando…' : saveState === 'ok' ? 'Salvo!' : 'Salvar'}
+              </button>
+
+              {config.n8nWebhookUrl && (
+                <>
+                  <button type="button" onClick={handleTest} disabled={testState === 'testing'}
+                    className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all ${
+                      testState === 'ok'    ? 'border-green-500 bg-green-50 text-green-700' :
+                      testState === 'error' ? 'border-red-300 bg-red-50 text-red-600' :
+                      'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                    }`}>
+                    {testState === 'testing' && <RefreshCw className="h-4 w-4 animate-spin" />}
+                    {testState === 'ok'      && <CheckCircle2 className="h-4 w-4" />}
+                    {testState === 'error'   && <AlertCircle className="h-4 w-4" />}
+                    {testState === 'idle' ? 'Testar' : testState === 'testing' ? 'Testando…' : testState === 'ok' ? 'OK!' : 'Falhou'}
+                  </button>
+
+                  <button type="button" onClick={handleClearN8n}
+                    className="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors">
+                    Remover n8n
+                  </button>
+                </>
+              )}
+            </div>
+
+            {config.savedAt && (
+              <p className="text-xs text-gray-400">Último save: {new Date(config.savedAt).toLocaleString('pt-BR')}</p>
+            )}
+          </form>
         </Section>
 
-        <p className="text-center text-xs text-gray-600 pb-4">
-          Painel Admin — NutriWeek · acesso restrito
-        </p>
+        {/* Como o n8n deve responder */}
+        {config.n8nWebhookUrl && (
+          <Section title="Como configurar o n8n" defaultOpen={false}>
+            <div className="space-y-4 text-sm text-gray-700">
+              <p>O SaaS envia os dados do usuário para o n8n assim que ele conclui o onboarding. O n8n deve responder com o plano gerado.</p>
+
+              <div className="space-y-2">
+                <p className="font-semibold text-gray-900">No n8n, crie este fluxo:</p>
+                <ol className="space-y-1 text-gray-600 list-decimal list-inside">
+                  <li><strong>Webhook</strong> — recebe os dados do usuário</li>
+                  <li><strong>AI Agent / OpenAI</strong> — gera o plano alimentar</li>
+                  <li><strong>Respond to Webhook</strong> — retorna o plano para o SaaS</li>
+                </ol>
+              </div>
+
+              <div className="rounded-xl bg-gray-900 p-4">
+                <p className="text-xs text-gray-400 mb-2">Dados recebidos pelo n8n (body do webhook):</p>
+                <pre className="text-xs text-gray-300 overflow-x-auto">{`{
+  "userId": "uuid-do-usuario",
+  "objetivo": "emagrecer",
+  "calorias_meta": 1800,
+  "proteina_meta": 150,
+  "restricoes": ["sem_gluten"],
+  "weekStart": "2026-05-11"
+}`}</pre>
+              </div>
+
+              <div className="rounded-xl bg-gray-900 p-4">
+                <p className="text-xs text-gray-400 mb-2">O n8n deve responder com este JSON:</p>
+                <pre className="text-xs text-gray-300 overflow-x-auto">{`{
+  "dias": [
+    {
+      "dia": "Segunda-feira",
+      "cafe_da_manha": { "nome": "Omelete",      "calorias": 320, "proteina": 22, "carbs": 5,  "gordura": 18 },
+      "lanche":        { "nome": "Iogurte grego", "calorias": 150, "proteina": 15, "carbs": 10, "gordura": 3  },
+      "almoco":        { "nome": "Frango e arroz", "calorias": 550, "proteina": 45, "carbs": 60, "gordura": 12 },
+      "jantar":        { "nome": "Salmão",         "calorias": 400, "proteina": 38, "carbs": 8,  "gordura": 22 }
+    }
+    // 7 dias no total
+  ]
+}`}</pre>
+              </div>
+
+              <div className="rounded-xl bg-green-50 border border-green-200 p-3 text-xs text-green-700">
+                Use o nó <strong>Respond to Webhook</strong> no final do fluxo n8n para enviar a resposta
+                de volta para o SaaS na mesma chamada. O SaaS espera até 58 segundos pela resposta.
+              </div>
+            </div>
+          </Section>
+        )}
+
+        <p className="text-center text-xs text-gray-600 pb-4">Painel Admin — acesso restrito</p>
       </div>
     </div>
   )
