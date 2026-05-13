@@ -19,12 +19,11 @@ import type { Objetivo } from '@/types/database'
 type NivelAtividade = 'sedentario' | 'leve' | 'moderado' | 'muito_ativo' | 'extremo'
 
 interface OnboardingData {
-  objetivo:       Objetivo | ''
-  peso:           string
-  altura:         string
-  nivelAtividade: NivelAtividade
-  restricoes:     string[]
-  outraRestricao: string
+  objetivo:         Objetivo | ''
+  peso:             string
+  altura:           string
+  nivelAtividade:   NivelAtividade
+  alimentosEmCasa:  string[]
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -43,14 +42,90 @@ const ACTIVITY_LEVELS: { value: NivelAtividade; label: string; description: stri
   { value: 'extremo',     label: 'Extremamente ativo',   description: 'Atleta ou trabalho físico intenso' },
 ]
 
-const RESTRICOES_OPTIONS = [
-  { id: 'vegetariano', emoji: '🌿', label: 'Vegetariano' },
-  { id: 'vegano',      emoji: '🌱', label: 'Vegano' },
-  { id: 'sem_gluten',  emoji: '🌾', label: 'Sem glúten' },
-  { id: 'sem_lactose', emoji: '🥛', label: 'Sem lactose' },
-  { id: 'sem_nozes',   emoji: '🥜', label: 'Sem nozes/amendoim' },
-  { id: 'halal',       emoji: '🕌', label: 'Halal' },
-  { id: 'kosher',      emoji: '✡️', label: 'Kosher' },
+const ALIMENTOS_CATEGORIAS = [
+  {
+    label: 'Proteínas',
+    emoji: '🥩',
+    items: [
+      { id: 'Frango',              label: 'Frango' },
+      { id: 'Carne moída',         label: 'Carne moída' },
+      { id: 'Ovos',                label: 'Ovos' },
+      { id: 'Atum (lata)',         label: 'Atum (lata)' },
+      { id: 'Sardinha (lata)',     label: 'Sardinha (lata)' },
+      { id: 'Peixe',               label: 'Peixe' },
+      { id: 'Feijão',              label: 'Feijão' },
+      { id: 'Lentilha',            label: 'Lentilha' },
+      { id: 'Grão-de-bico',        label: 'Grão-de-bico' },
+      { id: 'Presunto/Peito peru', label: 'Presunto/Peito peru' },
+    ],
+  },
+  {
+    label: 'Carboidratos',
+    emoji: '🍚',
+    items: [
+      { id: 'Arroz',          label: 'Arroz' },
+      { id: 'Macarrão',       label: 'Macarrão' },
+      { id: 'Pão',            label: 'Pão' },
+      { id: 'Batata',         label: 'Batata' },
+      { id: 'Batata-doce',    label: 'Batata-doce' },
+      { id: 'Aveia',          label: 'Aveia' },
+      { id: 'Tapioca',        label: 'Tapioca' },
+      { id: 'Mandioca/Aipim', label: 'Mandioca/Aipim' },
+      { id: 'Granola',        label: 'Granola' },
+    ],
+  },
+  {
+    label: 'Legumes e Verduras',
+    emoji: '🥦',
+    items: [
+      { id: 'Alface',     label: 'Alface' },
+      { id: 'Tomate',     label: 'Tomate' },
+      { id: 'Cenoura',    label: 'Cenoura' },
+      { id: 'Cebola',     label: 'Cebola' },
+      { id: 'Alho',       label: 'Alho' },
+      { id: 'Brócolis',   label: 'Brócolis' },
+      { id: 'Abobrinha',  label: 'Abobrinha' },
+      { id: 'Espinafre',  label: 'Espinafre' },
+      { id: 'Beterraba',  label: 'Beterraba' },
+      { id: 'Couve',      label: 'Couve' },
+      { id: 'Pepino',     label: 'Pepino' },
+    ],
+  },
+  {
+    label: 'Frutas',
+    emoji: '🍎',
+    items: [
+      { id: 'Banana',    label: 'Banana' },
+      { id: 'Maçã',      label: 'Maçã' },
+      { id: 'Laranja',   label: 'Laranja' },
+      { id: 'Mamão',     label: 'Mamão' },
+      { id: 'Abacate',   label: 'Abacate' },
+      { id: 'Morango',   label: 'Morango' },
+      { id: 'Limão',     label: 'Limão' },
+      { id: 'Melancia',  label: 'Melancia' },
+      { id: 'Manga',     label: 'Manga' },
+    ],
+  },
+  {
+    label: 'Laticínios',
+    emoji: '🥛',
+    items: [
+      { id: 'Leite',       label: 'Leite' },
+      { id: 'Queijo',      label: 'Queijo' },
+      { id: 'Iogurte',     label: 'Iogurte' },
+      { id: 'Requeijão',   label: 'Requeijão' },
+      { id: 'Manteiga',    label: 'Manteiga' },
+    ],
+  },
+  {
+    label: 'Gorduras e Temperos',
+    emoji: '🫒',
+    items: [
+      { id: 'Azeite',              label: 'Azeite' },
+      { id: 'Óleo de cozinha',     label: 'Óleo de cozinha' },
+      { id: 'Sal e temperos',      label: 'Sal e temperos' },
+    ],
+  },
 ]
 
 const TOTAL_STEPS = 3
@@ -93,8 +168,8 @@ interface DiaAPI {
 }
 
 async function generatePlan(params: {
-  objetivo: string; calorias_meta: number; proteina_meta: number; restricoes: string[]
-  userId: string; weekStart: string
+  objetivo: string; calorias_meta: number; proteina_meta: number
+  alimentos_em_casa: string[]; userId: string; weekStart: string
 }) {
   // 1. Try n8n if configured
   const n8nRes = await fetch('/api/n8n/trigger', {
@@ -115,10 +190,10 @@ async function generatePlan(params: {
   const aiRes = await fetch('/api/generate-plan', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      objetivo:      params.objetivo,
-      calorias_meta: params.calorias_meta,
-      proteina_meta: params.proteina_meta,
-      restricoes:    params.restricoes,
+      objetivo:          params.objetivo,
+      calorias_meta:     params.calorias_meta,
+      proteina_meta:     params.proteina_meta,
+      alimentos_em_casa: params.alimentos_em_casa,
     }),
   })
 
@@ -188,7 +263,7 @@ function GeneratingScreen({ message }: { message: string }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const INITIAL: OnboardingData = {
-  objetivo: '', peso: '', altura: '', nivelAtividade: 'moderado', restricoes: [], outraRestricao: '',
+  objetivo: '', peso: '', altura: '', nivelAtividade: 'moderado', alimentosEmCasa: [],
 }
 
 export default function OnboardingPage() {
@@ -203,10 +278,12 @@ export default function OnboardingPage() {
   function update<K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) {
     setData(d => ({ ...d, [key]: value }))
   }
-  function toggleRestricao(id: string) {
+  function toggleAlimento(id: string) {
     setData(d => ({
       ...d,
-      restricoes: d.restricoes.includes(id) ? d.restricoes.filter(r => r !== id) : [...d.restricoes, id],
+      alimentosEmCasa: d.alimentosEmCasa.includes(id)
+        ? d.alimentosEmCasa.filter(a => a !== id)
+        : [...d.alimentosEmCasa, id],
     }))
   }
   function canAdvance() {
@@ -253,10 +330,8 @@ export default function OnboardingPage() {
         peso_atual_kg:   Number(data.peso)   || 0,
         altura_cm:       Number(data.altura) || 0,
         nivel_atividade: atividadeMap[data.nivelAtividade],
-        preferencias:    data.restricoes.filter(r =>
-          ['vegetariano','vegano','sem_gluten','sem_lactose','low_carb','cetogenico'].includes(r)
-        ) as ('vegetariano' | 'vegano' | 'sem_gluten' | 'sem_lactose' | 'low_carb' | 'cetogenico')[],
-        alimentos_nao_gosta: data.outraRestricao,
+        preferencias:        [],
+        alimentos_nao_gosta: '',
         metas: {
           kcal_dia: metas.calorias, proteina_g: metas.proteina,
           carbs_g: Math.round((metas.calorias * 0.45) / 4),
@@ -277,11 +352,11 @@ export default function OnboardingPage() {
 
       try {
         const plan = await generatePlan({
-          objetivo:      data.objetivo,
-          calorias_meta: metas.calorias,
-          proteina_meta: metas.proteina,
-          restricoes:    [...data.restricoes, ...(data.outraRestricao ? [data.outraRestricao] : [])],
-          userId:        user.id,
+          objetivo:          data.objetivo,
+          calorias_meta:     metas.calorias,
+          proteina_meta:     metas.proteina,
+          alimentos_em_casa: data.alimentosEmCasa,
+          userId:            user.id,
           weekStart,
         })
 
@@ -305,7 +380,7 @@ export default function OnboardingPage() {
 
   if (generating) return <GeneratingScreen message={genMessage} />
 
-  const stepLabels = ['Objetivo', 'Dados físicos', 'Restrições']
+  const stepLabels = ['Objetivo', 'Dados físicos', 'O que tenho em casa']
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
@@ -403,29 +478,53 @@ export default function OnboardingPage() {
           {/* Step 3 */}
           {step === 3 && (
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Restrições alimentares</h2>
-              <p className="mt-1 text-sm text-gray-500">Selecione todas que se aplicam. Pode pular se não houver.</p>
-              <div className="mt-6 grid grid-cols-2 gap-2">
-                {RESTRICOES_OPTIONS.map(r => {
-                  const selected = data.restricoes.includes(r.id)
-                  return (
-                    <button key={r.id} type="button" onClick={() => toggleRestricao(r.id)}
-                      className={cn(
-                        'flex items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all',
-                        selected ? 'border-brand bg-brand/5' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50',
-                      )}>
-                      <span className="text-lg">{r.emoji}</span>
-                      <span className={cn('text-sm font-medium', selected ? 'text-brand' : 'text-gray-700')}>{r.label}</span>
-                      {selected && <Check className="ml-auto h-3.5 w-3.5 shrink-0 text-brand" />}
-                    </button>
-                  )
-                })}
-              </div>
-              <div className="mt-4">
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">Outras restrições ou preferências</label>
-                <textarea value={data.outraRestricao} onChange={e => update('outraRestricao', e.target.value)}
-                  placeholder="Ex: alergia a frutos do mar, intolerância a ovos…" rows={3}
-                  className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all" />
+              <h2 className="text-xl font-bold text-gray-900">O que você tem em casa?</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Marque os alimentos disponíveis. A IA vai montar sua dieta usando eles.
+              </p>
+
+              {data.alimentosEmCasa.length > 0 && (
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-brand">
+                    {data.alimentosEmCasa.length} {data.alimentosEmCasa.length === 1 ? 'item selecionado' : 'itens selecionados'}
+                  </span>
+                  <button type="button" onClick={() => setData(d => ({ ...d, alimentosEmCasa: [] }))}
+                    className="text-xs text-gray-400 hover:text-gray-600 underline">
+                    Limpar tudo
+                  </button>
+                </div>
+              )}
+
+              <div className="mt-4 space-y-4 max-h-[360px] overflow-y-auto pr-1">
+                {ALIMENTOS_CATEGORIAS.map(cat => (
+                  <div key={cat.label}>
+                    <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                      <span>{cat.emoji}</span> {cat.label}
+                    </p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {cat.items.map(item => {
+                        const selected = data.alimentosEmCasa.includes(item.id)
+                        return (
+                          <button key={item.id} type="button" onClick={() => toggleAlimento(item.id)}
+                            className={cn(
+                              'flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-all',
+                              selected
+                                ? 'border-brand bg-brand/5 font-medium text-brand'
+                                : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50',
+                            )}>
+                            <span className={cn(
+                              'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-all',
+                              selected ? 'border-brand bg-brand' : 'border-gray-300',
+                            )}>
+                              {selected && <Check className="h-2.5 w-2.5 text-white" />}
+                            </span>
+                            {item.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -460,7 +559,7 @@ export default function OnboardingPage() {
 
         {step === 3 && (
           <p className="mt-4 text-center text-xs text-gray-400">
-            Você pode alterar todas essas informações nas configurações do seu perfil.
+            Pode pular se preferir — a IA vai sugerir alimentos práticos e acessíveis.
           </p>
         )}
       </div>

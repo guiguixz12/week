@@ -8,8 +8,8 @@ interface GeneratePlanRequest {
   objetivo: 'emagrecer' | 'manter' | 'ganhar_massa'
   calorias_meta: number
   proteina_meta: number
+  alimentos_em_casa?: string[]
   restricoes?: string[]
-  preferencias?: string[]
 }
 
 interface Meal {
@@ -42,13 +42,13 @@ function buildPrompt(body: GeneratePlanRequest): string {
     ganhar_massa: 'ganho de massa muscular (superávit calórico)',
   }[body.objetivo]
 
+  const alimentosText = body.alimentos_em_casa?.length
+    ? `Ingredientes disponíveis em casa: ${body.alimentos_em_casa.join(', ')}.`
+    : null
+
   const restricoesText = body.restricoes?.length
     ? `Restrições alimentares: ${body.restricoes.join(', ')}.`
-    : 'Sem restrições alimentares.'
-
-  const preferenciasText = body.preferencias?.length
-    ? `Preferências: ${body.preferencias.join(', ')}.`
-    : ''
+    : null
 
   return `Você é um nutricionista especializado em planejamento alimentar semanal.
 
@@ -56,8 +56,10 @@ Crie um plano alimentar semanal completo para um usuário com as seguintes carac
 - Objetivo: ${objetivoLabel}
 - Meta calórica diária: ${body.calorias_meta} kcal
 - Meta de proteína diária: ${body.proteina_meta}g
-- ${restricoesText}
-- ${preferenciasText}
+${alimentosText ? `- ${alimentosText}` : ''}
+${restricoesText ? `- ${restricoesText}` : ''}
+
+${alimentosText ? `IMPORTANTE: Monte as refeições priorizando os ingredientes disponíveis listados acima. Use combinações criativas mas realistas com esses alimentos. Só inclua ingredientes que não estão na lista quando forem complementos muito básicos (sal, azeite, temperos simples) ou quando for absolutamente necessário para atingir as metas nutricionais.` : ''}
 
 Retorne SOMENTE um JSON válido, sem explicações, sem markdown, sem blocos de código.
 O JSON deve seguir exatamente esta estrutura:
